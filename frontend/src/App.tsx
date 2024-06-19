@@ -1,4 +1,5 @@
 import './App.css'
+import { Landing } from './pages/Landing'
 import Register from './pages/Register'
 
 function App() {
@@ -6,6 +7,7 @@ function App() {
     <>
       <div>
         <Register />
+        <Landing />
       </div>
     </>
   )
