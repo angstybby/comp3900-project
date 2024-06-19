@@ -8,3 +8,5 @@ Go to `frontend` and `backend` and run `npm i`
 
 - Run `npm run dev` from the `frontend` folder
 - Run `npm start` from the `backend` folder
+
+## Branch Protection Test
