@@ -2,7 +2,7 @@
 
 ## Setup
 
-Go to `frontend` and `backend` and run `npm i`
+Go to `frontend` and `backend` and run `npm i` on EACH FOLDER
 
 ## Running Locally
 
