@@ -1,3 +1,6 @@
+import ButtonPrimary from "../components/ButtonPrimary";
+import Textbox from "../components/Textbox";
+
 export const Landing = () => {
   return (
     <div className="min-h-screen min-w-screen flex">
@@ -12,39 +15,23 @@ export const Landing = () => {
                     <label className="block text-gray-700 text-sm mb-2">
                       Email Address
                     </label>
-                    <input 
-                      id='email'
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      required
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" 
-                    />
+                    <Textbox id="email" name="email" type="email" autoComplete="email" />
                 </div>
                 <div className="mt-8">
                     <div className="flex justify-between">
                         <label className="block text-gray-700 text-sm mb-2">Password</label>
-                        <a href="#" className="text-xs font-semibold text-indigo-600 hover:text-indigo-300 h-fit">
+                        <a href="#" className="text-xs font-normal text-indigo-600 hover:underline h-fit">
                           Forgot your password?
                         </a>
                     </div>
-                    <input 
-                      id="password"
-                      name="password"
-                      type="password"
-                      autoComplete="password"
-                      required
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
+                    <Textbox id="password" name="password" type="password" autoComplete="password" />
                 </div>
                 <div className="mt-8" title="Login Button">
-                    <button className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                      Sign-In
-                    </button>
+                    <ButtonPrimary text="Sign-In" url="/home" />
                 </div>
                 <div className="mt-4 flex items-center justify-between">
                     <p className="text-xs text-gray-500 ">Don't Have an Account?</p>
-                    <a href="#" className="text-xs text-indigo-600 hover:text-indigo-300 font-bold">Register Here!</a>
+                    <a href="/register" className="text-xs text-indigo-600 hover:text-indigo-300 font-bold">Register Here!</a>
                 </div>
             </div>
         </div>
