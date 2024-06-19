@@ -19,7 +19,7 @@ export default function Example() {
                 Full Name
               </label>
               <div className="mt-2">
-                <Textbox id="name" name="name" type="text" autoComplete="name" />
+                <Textbox id="name" name="name" type="text" autoComplete="name" placeholder="name"/>
               </div>
             </div>
             <div>
@@ -27,7 +27,7 @@ export default function Example() {
                 zID
               </label>
               <div className="mt-2">
-                <Textbox id="zId" name="zId" type="text" autoComplete="zId" />
+                <Textbox id="zId" name="zId" type="text" autoComplete="zId" placeholder="zid" />
               </div>
             </div>
             <div>
@@ -35,7 +35,7 @@ export default function Example() {
                 Email Address
               </label>
               <div className="mt-2">
-                <Textbox id="email" name="email" type="email" autoComplete="email" />
+                <Textbox id="email" name="email" type="email" autoComplete="email" placeholder="email@gmail.com" />
               </div>
             </div>
 
@@ -46,7 +46,7 @@ export default function Example() {
                 </label>
               </div>
               <div className="mt-2">
-                <Textbox id="password" name="password" type="password" autoComplete="new-password" />
+                <Textbox id="password" name="password" type="password" autoComplete="new-password" placeholder="password" />
               </div>
             </div>
             <div>
@@ -56,7 +56,7 @@ export default function Example() {
                 </label>
               </div>
               <div className="mt-2">
-                <Textbox id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" />
+                <Textbox id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" placeholder="confirm password" />
               </div>
             </div>
 
