@@ -8,7 +8,7 @@ export default function Example() {
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h1 className="text-5xl text-center font-extralight tracking-wide">Skill <br /> Issue</h1>
           <h2 className="mt-10 text-2xl text-center tracking-wide font-normal leading-9 text-gray-900">
-            Sign-up
+            Register
           </h2>
         </div>
 
@@ -61,14 +61,14 @@ export default function Example() {
             </div>
 
             <div>
-              <ButtonPrimary text="Sign-up" />
+              <ButtonPrimary text="Register Now!" />
             </div>
           </form>
 
           <p className="mt-5 text-center text-sm text-gray-500">
             Got an account?{' '}
             <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-300">
-              Sign-in
+              Sign-In
             </a>
           </p>
         </div>
