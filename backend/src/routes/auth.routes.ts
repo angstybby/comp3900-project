@@ -3,7 +3,7 @@ import validator from "validator";
 import { sign } from "jsonwebtoken";
 import { dbAddUser, dbFindUserByEmail } from "../models/auth.models";
 import { sha256 } from "js-sha256";
-import { validatePassword, validateZid } from "../utils/auth.utils";
+import { validateName, validatePassword, validateZid } from "../utils/auth.utils";
 
 const router = express.Router();
 
@@ -17,12 +17,15 @@ router.post("/register", async (req, res) => {
         return res.status(400).send("Some details are missing");
     }
 
-    // TODO check the zid, length etc
+    // Check if the zid is valid
     if (!validateZid(zid)) {
-        return res.status(400).send("zid is invalid");
+        return res.status(400).send("Zid is invalid");
     }
 
-    // TODO check name
+    // Check if the name is valid
+    if (!validateName(fullname)) {
+        return res.status(400).send("Name is invalid");
+    }
 
     // Check if the email is valid
     if (!validator.isEmail(email)) {

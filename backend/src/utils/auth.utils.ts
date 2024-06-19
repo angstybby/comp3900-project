@@ -11,3 +11,8 @@ export const validatePassword = (password: string): boolean => {
 
     return false;
 };
+
+export const validateName = (name: string): boolean => {
+    const regex = /^[a-zA-Z\s]*$/;
+    return regex.test(name);
+}
