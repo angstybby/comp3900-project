@@ -3,6 +3,7 @@ import validator from "validator";
 import { sign } from "jsonwebtoken";
 import { dbAddUser, dbFindUserByEmail } from "../models/auth.models";
 import { sha256 } from "js-sha256";
+import { validatePassword, validateZid } from "../utils/auth.utils";
 
 const router = express.Router();
 
@@ -17,6 +18,10 @@ router.post("/register", async (req, res) => {
     }
 
     // TODO check the zid, length etc
+    if (!validateZid(zid)) {
+        return res.status(400).send("zid is invalid");
+    }
+
     // TODO check name
 
     // Check if the email is valid
@@ -24,7 +29,10 @@ router.post("/register", async (req, res) => {
         return res.status(400).send("Email is invalid");
     }
 
-    // TODO check the password, length etc
+    // Check the password, length etc
+    if (!validatePassword(password)) {
+        return res.status(400).send("Password is invalid");
+    }
 
     // Check if the email is already in use
     dbFindUserByEmail(email).then((user) => {
@@ -40,7 +48,9 @@ router.post("/register", async (req, res) => {
         fullname,
     };
 
-    // TODO Hash the password
+    // Hash the password
+    user.password = sha256(user.password);
+
     // Adds the user to the database
     await dbAddUser(user).catch((error) => {
         return res.status(500).send(error);
@@ -87,7 +97,6 @@ router.post("/login", async (req, res) => {
     res.status(200).send("Successful login");
 });
 
-// TODO add a reset password route
 router.post("/reset-password", async (req, res) => {
     // Gets the email from the request body
     const { email } = req.body;
