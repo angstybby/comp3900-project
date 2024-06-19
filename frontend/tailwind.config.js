@@ -7,7 +7,8 @@ export default {
     "./src/**/*.{ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+    },
   },
   plugins: [require("@tailwindcss/forms")],
 };

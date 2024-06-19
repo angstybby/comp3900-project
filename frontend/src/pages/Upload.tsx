@@ -3,7 +3,7 @@ import Textbox from "../components/Textbox";
 import React, { useState, ChangeEvent } from 'react';
 
 
-export default function UploadPage() {
+export default function Upload() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +61,7 @@ export default function UploadPage() {
 
 
               <div className="mt-4">
-                <ButtonPrimary text="Next" />
+                <ButtonPrimary text="Next" url="/Home"/>
               </div>
             </form>
           </div>
