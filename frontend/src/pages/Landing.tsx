@@ -29,9 +29,8 @@ export const Landing = () => {
           <div className="mt-8" title="Login Button">
             <ButtonPrimary text="Sign-In" url="/dashboard" />
           </div>
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-gray-500 ">Don't Have an Account?</p>
-            <a href="/register" className="text-xs text-indigo-600 hover:text-indigo-300 font-bold">Register Here!</a>
+          <div className="mt-4 flex gap-1 items-center justify-center">
+            <a href="/register" className="text-xs text-indigo-600 hover:text-indigo-300 font-bold">Don't Have an Account? Register Here!</a>
           </div>
         </div>
       </div>
