@@ -3,7 +3,11 @@ import validator from "validator";
 import { sign } from "jsonwebtoken";
 import { dbAddUser, dbFindUserByEmail } from "../models/auth.models";
 import { sha256 } from "js-sha256";
-import { validateName, validatePassword, validateZid } from "../utils/auth.utils";
+import {
+    validateName,
+    validatePassword,
+    validateZid,
+} from "../utils/auth.utils";
 
 const router = express.Router();
 
@@ -84,9 +88,11 @@ router.post("/login", async (req, res) => {
         return res.status(400).send("Email is invalid");
     }
 
+    const passwordHash = sha256(password);
+
     // Check if the email exists in the database
     const user = await dbFindUserByEmail(email);
-    if (!user || user.password !== password) {
+    if (!user || user.password !== passwordHash) {
         return res.status(400).send("Email or password is incorrect");
     }
 
@@ -94,11 +100,17 @@ router.post("/login", async (req, res) => {
     if (!process.env.JWT_HASH) {
         return res.status(500).send("Server error");
     }
+
+    // TODO change the user, to not include the password
+    // Should just send the zid, email and fullname ?
+
     const token = sign(user, process.env.JWT_HASH, { expiresIn: "1d" });
     res.cookie("token", token);
 
     res.status(200).send("Successful login");
 });
+
+router.post("/logout", async (req, res) => {});
 
 router.post("/reset-password", async (req, res) => {
     // Gets the email from the request body
