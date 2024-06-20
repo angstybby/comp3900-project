@@ -1,5 +1,5 @@
 import ButtonPrimary from "../components/ButtonPrimary";
-import Textbox from "../components/Textbox";
+import TextArea from "../components/TextArea";
 import { useState, ChangeEvent } from 'react';
 
 
@@ -15,7 +15,7 @@ export default function Upload() {
 
   return (
     <>
-      <div className="flex min-h-screen justify-center items-center px-6 py-20 lg:px-8">
+      <div className="flex min-h-screen justify-center items-center px-6 py-2 lg:px-8">
         <div className="w-full max-w-xl">
           <h1 className="text-5xl text-center font-extralight tracking-wide">Skill <br /> Issue</h1>
           <h2 className="mt-10 text-2xl text-center tracking-wide font-normal leading-9 text-gray-900">
@@ -30,7 +30,7 @@ export default function Upload() {
                   Courses Done
                 </label>
                 <div className="mt-2">
-                  <Textbox id="coursesDone" name="coursesDone" type="text" autoComplete="coursesDone"/>
+                    <TextArea id="coursesDone" name="coursesDone" autoComplete="coursesDone" placeholder="Example: COMP1511"/>
                 </div>
               </div>
               <div>
