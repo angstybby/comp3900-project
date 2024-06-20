@@ -1,5 +1,4 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import ProfilePic from '../../assets/Mazesoba.jpg'
 
 function classNames(...classes: string[]) {
