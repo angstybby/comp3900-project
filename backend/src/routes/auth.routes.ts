@@ -1,13 +1,14 @@
 import express from "express";
 import validator from "validator";
 import { sign } from "jsonwebtoken";
-import { dbAddUser, dbFindUserByEmail } from "../models/auth.models";
+import { JwtUser, dbAddUser, dbFindJwtUserByZid, dbFindUserByEmail } from "../models/auth.models";
 import { sha256 } from "js-sha256";
 import {
     validateName,
     validatePassword,
     validateZid,
 } from "../utils/auth.utils";
+import { dbAddProfile } from "../models/profile.models";
 
 const router = express.Router();
 
@@ -48,26 +49,23 @@ router.post("/register", async (req, res) => {
         }
     });
 
-    const user = {
-        zid,
-        email,
-        password,
-        fullname,
-    };
-
     // Hash the password
-    user.password = sha256(user.password);
+    const hashedPassword = sha256(password);
 
     // Adds the user to the database
-    await dbAddUser(user).catch((error) => {
+    await dbAddUser(zid, email, hashedPassword).catch((error) => {
+        return res.status(500).send(error);
+    });
+    await dbAddProfile(zid, fullname).catch((error) => {
         return res.status(500).send(error);
     });
 
     // Makes the token and sends it to the user
+    const jwtUser: JwtUser = await dbFindJwtUserByZid(zid);
     if (!process.env.JWT_HASH) {
         return res.status(500).send("Server error");
     }
-    const token = sign(user, process.env.JWT_HASH, { expiresIn: "1d" });
+    const token = sign(jwtUser, process.env.JWT_HASH, { expiresIn: "1d" });
     res.cookie("token", token);
 
     // Send a success message
@@ -101,10 +99,9 @@ router.post("/login", async (req, res) => {
         return res.status(500).send("Server error");
     }
 
-    // TODO change the user, to not include the password
-    // Should just send the zid, email and fullname ?
+    const jwtUser: JwtUser = await dbFindJwtUserByZid(user.zid);
 
-    const token = sign(user, process.env.JWT_HASH, { expiresIn: "1d" });
+    const token = sign(jwtUser, process.env.JWT_HASH, { expiresIn: "1d" });
     res.cookie("token", token);
 
     res.status(200).send("Successful login");
