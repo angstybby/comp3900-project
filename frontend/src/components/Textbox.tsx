@@ -1,4 +1,4 @@
-const Textbox = ({ id, name, type, autoComplete }: { id: string, name: string, type: string, autoComplete: string }) => {
+const Textbox = ({ id, name, type, autoComplete}: { id: string, name: string, type: string, autoComplete: string}) => {
     return (
         <input
             id={id}

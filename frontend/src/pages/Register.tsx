@@ -19,7 +19,7 @@ export default function Register() {
                 Full Name
               </label>
               <div className="mt-2">
-                <Textbox id="name" name="name" type="text" autoComplete="name" />
+                <Textbox id="name" name="name" type="text" autoComplete="name"/>
               </div>
             </div>
             <div>
@@ -27,7 +27,7 @@ export default function Register() {
                 zID
               </label>
               <div className="mt-2">
-                <Textbox id="zId" name="zId" type="text" autoComplete="zId" />
+                <Textbox id="zId" name="zId" type="text" autoComplete="zId"/>
               </div>
             </div>
             <div>
@@ -35,7 +35,7 @@ export default function Register() {
                 Email Address
               </label>
               <div className="mt-2">
-                <Textbox id="email" name="email" type="email" autoComplete="email" />
+                <Textbox id="email" name="email" type="email" autoComplete="email"/>
               </div>
             </div>
 
@@ -46,7 +46,7 @@ export default function Register() {
                 </label>
               </div>
               <div className="mt-2">
-                <Textbox id="password" name="password" type="password" autoComplete="new-password" />
+                <Textbox id="password" name="password" type="password" autoComplete="new-password"/>
               </div>
             </div>
             <div>
@@ -56,12 +56,12 @@ export default function Register() {
                 </label>
               </div>
               <div className="mt-2">
-                <Textbox id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" />
+                <Textbox id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password"/>
               </div>
             </div>
 
             <div>
-              <ButtonPrimary text="Register Now!" url="/dashboard" />
+              <ButtonPrimary text="Register Now!" url="/Upload" />
             </div>
           </form>
 

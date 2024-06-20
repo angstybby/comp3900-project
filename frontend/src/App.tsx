@@ -3,11 +3,13 @@ import './App.css'
 import { Landing } from './pages/Landing'
 import Register from './pages/Register'
 import Home from './pages/Home'
+import Upload from './pages/Upload'
 import SidebarLayout from './components/SidebarLayout'
 import Courses from './pages/Courses'
 import Groups from './pages/Groups'
 import Projects from './pages/Projects'
 import Profile from './pages/Profile'
+import CourseReco from './pages/CourseReco'
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
               <Route path={`/profile`} element={<Profile />} />
             </Route>
             <Route path={`/register`} element={<Register />} />
+            <Route path={`/upload`} element={<Upload/>}/>
+            <Route path={`/courseRecommendations`} element={<CourseReco/>}/>
             <Route path={`/`} element={<Landing />} />
           </Routes>
         </BrowserRouter >
