@@ -39,7 +39,6 @@ export default function Upload() {
                 </label>
               </div>
 
-
               <div className="text-left">
                 <label htmlFor="pdfUpload" className="block text-lg font-medium leading-6 text-gray-900">
                   Upload PDF:
@@ -67,10 +66,8 @@ export default function Upload() {
               <div className="mt-6 text-left">
                 <p>Selected file: {selectedFile?.name}</p>
               </div>
-
-
               <div className="mt-4">
-                <ButtonPrimary text="Next" url="/Home"/>
+                <ButtonPrimary text="Next" url="/Dashboard"/>
               </div>
             </form>
           </div>
