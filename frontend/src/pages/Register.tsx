@@ -61,7 +61,7 @@ export default function Register() {
             </div>
 
             <div>
-              <ButtonPrimary text="Register Now!" url="/home" />
+              <ButtonPrimary text="Register Now!" url="/dashboard" />
             </div>
           </form>
 
