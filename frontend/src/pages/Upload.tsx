@@ -1,6 +1,6 @@
 import ButtonPrimary from "../components/ButtonPrimary";
 import Textbox from "../components/Textbox";
-import React, { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent } from 'react';
 
 
 export default function Upload() {
@@ -19,7 +19,7 @@ export default function Upload() {
         <div className="w-full max-w-xl">
           <h1 className="text-5xl text-center font-extralight tracking-wide">Skill <br /> Issue</h1>
           <h2 className="mt-10 text-2xl text-center tracking-wide font-normal leading-9 text-gray-900">
-            Thank you for signing up! <br></br> Please add all the courses you have done so far or upload your transcript
+            Thank you for signing up! <br></br> Please add all the courses you have done so far or <b>upload your transcript </b>
             to auto-fill the courses.
           </h2>
 
