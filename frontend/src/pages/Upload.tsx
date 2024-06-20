@@ -66,12 +66,14 @@ export default function Upload() {
               <div className="mt-6 text-left">
                 <p>Selected file: {selectedFile?.name}</p>
               </div>
-              <div className="mt-4">
-                <ButtonPrimary text="Next" url="/Dashboard"/>
-              </div>
             </form>
           </div>
-        </div>
+          <div className="mt-15 flex justify-end">
+              <div className="w-1/6">
+                <ButtonPrimary text="Next" url="/courseRecommendations"/>
+              </div>
+          </div>
+          </div>
       </div>
     </>
     );

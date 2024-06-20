@@ -9,6 +9,7 @@ import Courses from './pages/Courses'
 import Groups from './pages/Groups'
 import Projects from './pages/Projects'
 import Profile from './pages/Profile'
+import CourseReco from './pages/CourseReco'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             </Route>
             <Route path={`/register`} element={<Register />} />
             <Route path={`/upload`} element={<Upload/>}/>
+            <Route path={`/courseRecommendations`} element={<CourseReco/>}/>
             <Route path={`/`} element={<Landing />} />
           </Routes>
         </BrowserRouter >
