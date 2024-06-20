@@ -1,11 +1,10 @@
 import ButtonPrimary from "../components/ButtonPrimary";
 import Textbox from "../components/Textbox";
 
-export default function Example() {
-
+export default function Register() {
   return (
     <>
-      <div className="flex max-h-full min-h-full flex-1 flex-col justify-center px-6 py-9 lg:px-8">
+      <div className="flex max-h-screen min-h-screen flex-1 flex-col justify-center px-6 py-9 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h1 className="text-4xl text-center font-extralight tracking-wide">Skill Issue</h1>
           <h2 className="mt-5 text-xl text-center tracking-wide font-semibold leading-9 text-gray-900">
@@ -62,7 +61,7 @@ export default function Example() {
             </div>
 
             <div>
-              <ButtonPrimary text="Register Now!" url="/home" />
+              <ButtonPrimary text="Register Now!" url="/dashboard" />
             </div>
           </form>
 
