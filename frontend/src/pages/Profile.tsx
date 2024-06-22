@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import ButtonPrimary from "../components/ButtonPrimary";
 import 'flowbite/dist/flowbite.min.css'; 
 
 export default function Profile() {
@@ -13,6 +12,7 @@ export default function Profile() {
     };
 
     const [showModal, setShowModal] = useState(false);
+    const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
 
     const handleOpenModal = () => {
         setShowModal(true)
@@ -22,13 +22,23 @@ export default function Profile() {
         setShowModal(false);
     };
 
+    const handleChangeProfPicModal = () => {
+        setShowChangeProfPicModal(true);
+    };
+
+    const handleCloseChangeProfPicModal = () => {
+        setShowChangeProfPicModal(false);
+    }
+
     const handleSave = () => {
         setShowModal(false);
-    }
+    };
+
+
 
 
     return (
-        <div className="min-h-screen items-center justify-center">
+        <div className="h-screen flex items-center justify-start">
             <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
 
             <div className="flex flex-col items-center justify-center mt-10"> 
