@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 
 export default function ButtonPrimary({ text, url }: { text: string, url: string }) {
 	const navigate = useNavigate();
+
 	return (
 	  <button
 	    type="submit"
