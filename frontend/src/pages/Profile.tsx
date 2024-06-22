@@ -38,7 +38,7 @@ export default function Profile() {
 
 
     return (
-        <div className="h-screen flex items-center justify-start">
+        <div className="h-screen flex items-center justify-start flex-col">
             <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
 
             <div className="flex flex-col items-center justify-center mt-10"> 
