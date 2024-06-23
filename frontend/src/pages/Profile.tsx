@@ -34,6 +34,10 @@ export default function Profile() {
         setShowModal(false);
     };
 
+    const handleFileChange = () => {
+        // stub - will need to implement later
+    }
+
 
 
 
@@ -41,13 +45,20 @@ export default function Profile() {
         <div className="h-screen flex items-center justify-start flex-col">
             <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
 
-            <div className="flex flex-col items-center justify-center mt-10"> 
-                <img 
-                    src={profileTemp.profilePic} 
-                    alt="Profile" 
-                    className="w-32 h-32 rounded-full"
-                    onClick={handleOpenChangeProfPicModal}
-                />
+            <div className="flex flex-col items-center justify-center mt-10 relative group">
+                <div className="relative w-32 h-32">
+                    <img 
+                        src={profileTemp.profilePic} 
+                        alt="Profile" 
+                        className="w-full h-full rounded-full cursor-pointer"
+                        onClick={handleOpenChangeProfPicModal}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-80 bg-black bg-opacity-50 rounded-full transition-opacity duration-300" onClick={handleOpenChangeProfPicModal}>
+                        <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M4 13V16H7L16 7L13 4L4 13Z" />
+                        </svg>
+                    </div>
+                </div>
                 <h2 className="text-2xl font-semibold mt-4">{profileTemp.name}</h2>
                 <h2 className="text-xl mt-2">{profileTemp.userType}</h2>
                 <p className="text-xl text-gray-600 mt-2">{profileTemp.bio}</p>
