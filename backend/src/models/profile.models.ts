@@ -17,9 +17,22 @@ export const dbAddProfile = async (zid: string, fullname: string) => {
     }
 };
 
-// export const dbGetProfile = async (): Promise<Profile> => {
-//     return {};
-// };
+export const dbGetProfile = async (zid: string): Promise<Profile> => {
+    try {
+        const user = await prisma.profile.findFirst({
+            where: {
+                zid: zid,
+            },
+        });
+        if (!user) {
+            throw new Error("Profile not found");
+        }
+        return user;
+    } catch (e) {
+        console.log(e);
+        throw new Error("An database error occurred");
+    }
+};
 
 // export const dbUpdateProfile = async (profile: Profile): Promise<Profile> => {
 //     return {};
