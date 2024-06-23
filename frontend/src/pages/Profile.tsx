@@ -38,9 +38,6 @@ export default function Profile() {
         // stub - will need to implement later
     }
 
-
-
-
     return (
         <div className="h-screen flex items-center justify-start flex-col">
             <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
@@ -91,15 +88,15 @@ export default function Profile() {
                         <div className="p-4 md:p-5">
                             <form className="space-y-4" onSubmit={handleSave}>
                                 <div>
-                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                                    <label htmlFor="name" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Name</label>
                                     <input type="text" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" defaultValue={profileTemp.name}/>
                                 </div>
                                 <div>
-                                    <label htmlFor="bio" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bio</label>
+                                    <label htmlFor="bio" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Bio</label>
                                     <textarea id="bio" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" defaultValue={profileTemp.bio}/>
                                 </div>
                                 <div>
-                                    <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+                                    <label htmlFor="email" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Email</label>
                                     <input type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" defaultValue={profileTemp.email}/>
                                 </div>
                                 <button type="submit" className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -114,8 +111,8 @@ export default function Profile() {
             {/* change profile picture modal */}
             {showChangeProfPicModal && (
                 <div id="change-profile-pic-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
-                    <div className="relative w-full max-w-3xl bg-white rounded-lg shadow dark:bg-gray-700">
-                        <div className="p-6 border-b rounded-t dark:border-gray-600">
+                    <div className="relative w-80 max-w-3xl bg-white rounded-lg shadow dark:bg-gray-700">
+                        <div className="flex items-center justify-between p-6 border-b rounded-t dark:border-gray-600">
                             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                                 Change Profile Picture
                             </h3>
@@ -128,7 +125,7 @@ export default function Profile() {
                         <div className="p-4 space-y-4">
                             <form onSubmit={handleSave}>
                                 <div>
-                                    <label htmlFor="profilePic" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Upload Image</label>
+                                    <label htmlFor="profilePic" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Upload Image</label>
                                     <input
                                         type="file"
                                         id="profilePic"
