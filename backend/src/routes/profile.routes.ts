@@ -12,16 +12,27 @@ router.get("/", async (req: Request, res: Response) => {
         if (!customReq.token || typeof customReq.token === "string") {
             throw new Error("Token is not valid");
         }
-        const profile = await dbGetProfile(customReq.token.email);
+        const profile = await dbGetProfile(customReq.token.zid);
         res.status(200).json(profile);
     } catch (error) {
         res.status(500).send("Error retrieving profile");
     }
 });
-
+// Works
 router.put("/update-profile", async (req, res) => {
+    // Check token is valid
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
     // Check all the fields are present or correct
     let { zid, profilePicture, userType, fullname, description, resume } = req.body;
+
+    // Checks if zid matches
+    if (customReq.token.zid !== zid) {
+        throw new Error("Zid is not valid");
+    }
 
     // Construct the profile object
     const profile: Profile = {
