@@ -1,7 +1,10 @@
 import ButtonPrimary from "../components/ButtonPrimary";
 import Textbox from "../components/Textbox";
+import axios from "axios";
 
 export default function Register() {
+
+
   return (
     <>
       <div className="flex max-h-screen min-h-screen flex-1 flex-col justify-center px-6 py-9 lg:px-8">
