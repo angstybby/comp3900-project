@@ -75,6 +75,7 @@ export default function Profile() {
             };
             reader.readAsDataURL(selectedFile);
         }
+        setShowChangeProfPicModal(false);
         
     }
 
