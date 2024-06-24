@@ -17,11 +17,19 @@ model User {
   isAdmin   Boolean  @default(false)
 }
 
+enum UserType {
+  student
+  academic
+  admin
+}
+
 model Profile {
   zid          String @id
   profileOwner User   @relation(fields: [zid], references: [zid])
 
-  fullname    String
-  description String?
-  resume      String?
+  profilePicture String?
+  userType       UserType?
+  fullname       String
+  description    String?
+  resume         String?
 }

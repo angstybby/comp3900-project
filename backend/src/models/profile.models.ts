@@ -34,6 +34,17 @@ export const dbGetProfile = async (zid: string): Promise<Profile> => {
     }
 };
 
-// export const dbUpdateProfile = async (profile: Profile): Promise<Profile> => {
-//     return {};
-// };
+export const dbUpdateProfile = async (profile: Profile): Promise<Profile> => {
+    try {
+        const user = await prisma.profile.update({
+            where: {
+                zid: profile.zid,
+            },
+            data: profile,
+        });
+        return user;
+    } catch (e) {
+        console.log(e);
+        throw new Error("An database error occurred");
+    }
+};

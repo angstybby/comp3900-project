@@ -1,7 +1,8 @@
 import express from "express";
 import { CustomRequest } from "../middleware/auth.middleware";
 import { Request, Response } from "express";
-import { dbGetProfile } from "../models/profile.models";
+import { dbGetProfile, dbUpdateProfile } from "../models/profile.models";
+import { Profile } from "@prisma/client";
 
 const router = express.Router();
 
@@ -18,13 +19,31 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
-// router.put("/update-profile", async (req, res) => {
-//     // Check all the fields are present or correct
+router.put("/update-profile", async (req, res) => {
+    // Check all the fields are present or correct
+    let { zid, profilePicture, userType, fullname, description, resume } = req.body;
 
-//     // Update the user's profile in the database
+    // Construct the profile object
+    const profile: Profile = {
+        zid,
+        profilePicture,
+        userType,
+        fullname,
+        description,
+        resume,
+    };
 
-//     // Return a success message
-// });
+    try {
+        // Update the user's profile in the database
+        await dbUpdateProfile(profile);
+
+        // Return a success message
+        res.status(200).send("Profile updated successfully");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("An error occurred while updating the profile");
+    }
+});
 
 // router.post("/upload-resume", async (req, res) => {
 //     // Take the resume and ensure it is a pdf or some format

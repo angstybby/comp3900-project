@@ -23,6 +23,7 @@ router.post("/register", async (req, res) => {
     }
 
     // Check if the zid is valid
+    // TODO check that the zid hasnt been used
     if (!validateZid(zid)) {
         return res.status(400).send("Zid is invalid");
     }
