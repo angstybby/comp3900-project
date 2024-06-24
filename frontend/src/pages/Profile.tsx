@@ -57,15 +57,25 @@ export default function Profile() {
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        // const file = e.target.files?.[0];
-        // if (file) {
-        //     setSelectedFile(file);
-        // }
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+        }
     }
 
     const handleSaveProfilePic = (e: FormEvent) => {
-        // e.preventDefault();
-        setShowChangeProfPicModal(false);
+        e.preventDefault();
+        if (selectedFile) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfile(prevProfile => ({
+                    ...prevProfile,
+                    profilePic: reader.result as string,
+                }));
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+        
     }
 
     return (
@@ -75,8 +85,8 @@ export default function Profile() {
             <div className="flex flex-col items-center justify-center mt-10 relative group">
                 <div className="relative w-32 h-32">
                     <img 
-                        src={profileTemp.profilePic} 
-                        alt="Profile" 
+                        src={profile.profilePic} 
+                        alt="Profile Picture" 
                         className="w-full h-full rounded-full cursor-pointer"
                         onClick={handleOpenChangeProfPicModal}
                     />
@@ -178,6 +188,7 @@ export default function Profile() {
                                         id="profilePic"
                                         className="bg-gray-50 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                                         accept="image/*"
+                                        onChange={handleFileChange}
                                     />
                                 </div>
                                 <button type="submit" className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
