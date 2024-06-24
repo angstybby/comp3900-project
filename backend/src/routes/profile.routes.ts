@@ -18,6 +18,17 @@ router.get("/", async (req: Request, res: Response) => {
         res.status(500).send("Error retrieving profile");
     }
 });
+
+router.get("/:zid", async (req: Request, res: Response) => {
+    try {
+        const zid = req.params.zid;
+        const profile = await dbGetProfile(zid);
+        res.status(200).json(profile);
+    } catch (error) {
+        res.status(500).send("Error retrieving profile");
+    }
+})
+
 // Works
 router.put("/update-profile", async (req, res) => {
     // Check token is valid
