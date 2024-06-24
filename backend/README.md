@@ -1,0 +1,22 @@
+## How to code in the backend
+To run the server use ```npm run dev``` and dont forget to ```npm i```.
+- I trust that you can figure out some of the rest by reading the already written code.
+- Please follow the naming conventions aswell
+- The server.ts file is used to store the main line of code to execute the server. It can have extras like importing the routes and enforcing the middle ware.
+- the src is subdived into many sections
+  - middleware
+    - functions to store the manditory functions needed to access a endpoint like auth.
+  - models
+    - the functions on interacting with the database.
+  - routes
+    - storing the defintions of the end points should ideally have minimal logic.
+  - services
+    - the main logic of the backend should be a fn called by the routes.
+  - utils
+    - extra helper functions.
+- database
+  - the data base is a mysql database. it doesnt matter tho you will be interacting with an orm (object relational mapper) it is basically an easier interface to use instead of making the sql queries. In this one we use Prisma. I want to highlight that prisma is not a database. It just generates the sql queries for us to query the database.
+  - The models for each table can be found in the prisma folder. It is extremly similar to sql, if confused just use their documentation to help u understand.
+- .env file
+  - stores all the sensitive things such as keys that we use for hashing. such as the password key etc.
+- ideally we should also write jest test's but this is super hard and ive havent figured it out.
