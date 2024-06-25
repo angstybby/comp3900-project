@@ -4,7 +4,7 @@ export const validateZid = (zid: string): boolean => {
 };
 
 export const validatePassword = (password: string): boolean => {
-  const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{7,15}$/;
+  const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$/;
   if (password.match(regex)) {
     return true;
   }
