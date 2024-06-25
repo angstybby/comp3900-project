@@ -6,6 +6,11 @@ const axiosInstanceWithAuth = axios.create({
   baseURL: BASE_URL,
 });
 
+// Obtain the token
+const getToken = () => {
+  return Cookies.get('token');
+}
+
 axiosInstanceWithAuth.interceptors.request.use((config) => {
   const token = getToken();
   console.log(token)
@@ -13,10 +18,7 @@ axiosInstanceWithAuth.interceptors.request.use((config) => {
   return config;
 });
 
-// Obtain the token
-const getToken = () => {
-  return Cookies.get('token');
-}
+
 
 const axiosNoAuth = axios.create({
   baseURL: BASE_URL,

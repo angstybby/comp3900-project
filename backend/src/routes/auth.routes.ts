@@ -152,10 +152,12 @@ router.post("/change-password", async (req, res) => {
         return res.status(400).send("Reset token and password are required");
     }
 
-    console.log("reseting password: ", resetToken, password);
+    const hashedPassword = sha256(password);
+
+    console.log("reseting password: ", resetToken, hashedPassword);
 
     try {
-        await dbSetNewPassword(resetToken, password);
+        await dbSetNewPassword(resetToken, hashedPassword);
     } catch (error) {
         console.log("setting new password issue");
         return res.status(500).send("Server error");
