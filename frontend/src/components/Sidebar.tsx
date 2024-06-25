@@ -7,7 +7,6 @@ import {
     UserGroupIcon,
     UserIcon,
     CalculatorIcon,
-    BellAlertIcon,
     UsersIcon
 } from '@heroicons/react/24/outline';
 import Cookies from 'js-cookie';
@@ -36,7 +35,6 @@ const Sidebar = () => {
                 <SidebarButton href='/courses' text='Courses' Icon={<BookOpenIcon />} />
                 <SidebarButton href='/groups' text='Groups' Icon={<UserGroupIcon />} />
                 <SidebarButton href='/projects' text='Projects' Icon={<CalculatorIcon />} />
-                <SidebarButton href='/notifications' text='Notifications' Icon={<BellAlertIcon />} />
                 <SidebarButton href='/profile' text='Profile' Icon={<UserIcon />} />
                 <SidebarButton href='/manage-users' text='Manage Users' Icon={<UsersIcon />} />
             </div>
