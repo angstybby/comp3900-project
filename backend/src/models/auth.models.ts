@@ -85,7 +85,7 @@ export const dbSetResetToken = async (email: string, resetToken: string) => {
 
 export const dbSetNewPassword = async (resetToken: string, newPassword: string) => {
     try {
-        prisma.user.update({
+        await prisma.user.update({
             where: {
                 resetToken: resetToken,
             },
@@ -94,8 +94,9 @@ export const dbSetNewPassword = async (resetToken: string, newPassword: string) 
                 resetToken: null,
             },
         })
+        console.log("updated")
     } catch (error) {
         console.log(error);
-        throw new Error("An database error occurred");
+        throw error;
     }
 }

@@ -148,15 +148,22 @@ router.post("/reset-password", async (req, res) => {
     res.status(200).send("Reset link sent");
 });
 
-router.post("/change-password/", async (req, res) => {
-    const { token, password } = req.body;
+router.post("/change-password", async (req, res) => {
+    const { resetToken, password } = req.body;
+
+    if (!resetToken || !password) {
+        return res.status(400).send("Reset token and password are required");
+    }
+
+    console.log("reseting password: ", resetToken, password);
 
     try {
-        await dbSetNewPassword(token, password);
+        await dbSetNewPassword(resetToken, password);
     } catch (error) {
         console.log("setting new password issue");
         return res.status(500).send("Server error");
     }
+    res.status(200).send("Password changed");
 });
 
 export default router;
