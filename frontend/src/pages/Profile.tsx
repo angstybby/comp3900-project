@@ -1,6 +1,5 @@
 import { FormEvent, ChangeEvent, useState, useEffect } from 'react';
 import 'flowbite/dist/flowbite.min.css'; 
-import axios from 'axios';
 import { axiosInstanceWithAuth } from '../api/Axios';
 
 export default function Profile() {
