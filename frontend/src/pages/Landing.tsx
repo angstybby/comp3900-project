@@ -31,7 +31,6 @@ export default function Landing() {
       await axiosNoAuth.post("/auth/login",
         { email: data.email, password: data.password}
       );
-      console.log(Cookies.get("token"))
       navigate("/dashboard");
     } catch (error) {
       console.log(error)
