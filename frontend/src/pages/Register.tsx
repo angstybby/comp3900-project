@@ -1,12 +1,13 @@
-import { useForm } from "react-hook-form";
+// Local Imports
 import Textbox from "../components/Textbox";
-import { useNavigate } from "react-router-dom";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
-import axios from "axios";
 import ButtonSubmit from "../components/ButtonSubmit";
 import { registerSchema } from "../utils/auth.schema";
+
+import axios from "axios";
+import { useForm } from "react-hook-form";
+import { useNavigate, Link } from "react-router-dom";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type RegisterProps = z.infer<typeof registerSchema>;
 
@@ -37,11 +38,11 @@ export default function Register() {
 
 
   return (
-    <>
+    <div className="p-5">
       <div className="flex max-h-screen min-h-screen flex-1 flex-col justify-center px-6 py-9 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h1 className="text-4xl text-center font-extralight tracking-wide">Skill Issue</h1>
-          <h2 className="mt-5 text-xl text-center tracking-wide font-semibold leading-9 text-gray-900">
+          <h2 className="mt-2 text-xl text-center tracking-wide font-semibold leading-9 text-gray-900">
             Register
           </h2>
         </div>
@@ -112,6 +113,6 @@ export default function Register() {
           </p>
         </div>
       </div>
-    </>
+    </div>
   )
 }
