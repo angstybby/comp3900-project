@@ -1,24 +1,27 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import { JwtPayload, verify } from "jsonwebtoken";
 
-interface RequestWithUser extends Request {
-    user: jwt.JwtPayload | string;
+export interface CustomRequest extends Request {
+    token: string | JwtPayload;
 }
 
-const cookieJwtAuth = (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-): void => {
-    const token = req.cookies.token;
+export const authMiddleWare = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = jwt.verify(token, process.env.MY_SECRET as string);
-		(req as RequestWithUser).user = user;
+        const token = req.header("Authorization")?.replace("Bearer ", "");
+
+        if (!token) {
+            throw new Error();
+        }
+
+        if (!process.env.JWT_HASH) {
+            res.status(500).send("Internal server error JWT_HASH not set");
+            return;
+        }
+        const decoded = verify(token, process.env.JWT_HASH);
+        (req as CustomRequest).token = decoded;
+
         next();
     } catch (err) {
-        res.clearCookie("token");
-        return res.redirect("/");
+        res.status(401).send("Please authenticate");
     }
 };
-
-export default cookieJwtAuth;

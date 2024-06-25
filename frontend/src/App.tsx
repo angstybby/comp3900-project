@@ -1,6 +1,6 @@
 import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import './App.css'
-import { Landing } from './pages/Landing'
+import Landing from './pages/Landing'
 import Register from './pages/Register'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
@@ -10,7 +10,8 @@ import Groups from './pages/Groups'
 import Projects from './pages/Projects'
 import Profile from './pages/Profile'
 import CourseReco from './pages/CourseReco'
-import Notifications from './pages/Notification'
+import Admin from './pages/Admin'
+import ResetPassword from './pages/ResetPassword'
 
 function App() {
   return (
@@ -25,10 +26,12 @@ function App() {
               <Route path={`/projects`} element={<Projects />} />
               <Route path={`/notifications`} element={<Notifications />} />
               <Route path={`/profile`} element={<Profile />} />
+              <Route path={`/manage-users`} element={<Admin />} />
             </Route>
             <Route path={`/register`} element={<Register />} />
-            <Route path={`/upload`} element={<Upload/>}/>
-            <Route path={`/courseRecommendations`} element={<CourseReco/>}/>
+            <Route path={`/upload`} element={<Upload />} />
+            <Route path={`/reset-password`} element={<ResetPassword />} />
+            <Route path={`/courseRecommendations`} element={<CourseReco />} />
             <Route path={`/`} element={<Landing />} />
           </Routes>
         </BrowserRouter >
