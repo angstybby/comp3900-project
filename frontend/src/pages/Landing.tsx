@@ -47,7 +47,8 @@ export default function Landing() {
               <label className="block text-gray-700 text-sm mb-2">
                 Email Address
               </label>
-              <Textbox id="email" name="email" type="email" autoComplete="email" />
+              <Textbox id="email" {...register("email")} name="email" type="email" autoComplete="email" />
+              {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
             </div>
             <div className="mt-8">
               <div className="flex justify-between">
@@ -56,7 +57,8 @@ export default function Landing() {
                   Forgot your password?
                 </a>
               </div>
-              <Textbox id="password" name="password" type="password" autoComplete="password" />
+              <Textbox id="password" {...register("password")} name="password" type="password" autoComplete="password" />
+              {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
             </div>
 
             <div className="mt-8" title="Sign-In">
