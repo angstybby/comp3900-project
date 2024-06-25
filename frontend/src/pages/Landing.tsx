@@ -9,15 +9,17 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { axiosNoAuth } from "../api/Axios";
 import axios from "axios";
+import { useState } from "react";
 
 type LoginProps = z.infer<typeof loginSchema>;
 
 axios.defaults.withCredentials = true;
 
 export default function Landing() {
+  const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors }} = useForm<LoginProps>({
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginProps>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -28,11 +30,12 @@ export default function Landing() {
   const onSubmit = async (data: LoginProps) => {
     try {
       await axiosNoAuth.post("/auth/login",
-        { email: data.email, password: data.password}
+        { email: data.email, password: data.password }
       );
       navigate("/dashboard");
     } catch (error) {
-      console.log(error)
+      console.error(error);
+      setIsError(true);
     }
   }
 
@@ -45,7 +48,7 @@ export default function Landing() {
             Skill Issue
           </h2>
           <p className="text-xl text-gray-600 text-center">Welcome back!</p>
-          
+
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mt-8">
               <label className="block text-gray-700 text-sm mb-2">
@@ -65,12 +68,14 @@ export default function Landing() {
               {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
             </div>
 
+            {isError && <p className="text-red-600 text-sm mt-4">Invalid email or password</p>}
+
             <div className="mt-8" title="Sign-In">
               {/* <ButtonPrimary text="Sign-In" url="/dashboard" /> */}
               <ButtonSubmit text="Sign-In" />
             </div>
           </form>
-          
+
           <div className="mt-4 flex gap-1 items-center justify-center">
             <Link to="/register" className="text-xs text-indigo-600 hover:text-indigo-300 font-bold">
               Don't Have an Account? Register Here!
