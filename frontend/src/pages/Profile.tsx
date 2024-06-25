@@ -1,6 +1,7 @@
 import { FormEvent, ChangeEvent, useState, useEffect } from 'react';
 import 'flowbite/dist/flowbite.min.css'; 
 import axios from 'axios';
+import { axiosInstanceWithAuth } from '../api/Axios';
 
 export default function Profile() {
 
@@ -18,7 +19,7 @@ export default function Profile() {
     const [profile, setProfile] = useState({
         zid: '',
         profilePicture: '',
-        userType: '',
+        // userType: '',
         fullname: '',
         description: '',
         resume: ''
@@ -43,11 +44,8 @@ export default function Profile() {
 
     const fetchProfile = async () => {
         try {
-            const response = await fetch('/profile');
-            if (!response.ok) {
-                throw new Error(`Failed to fetch profile ${response.statusText}`);
-            }
-            const profileData = await response.json();
+            const response = await axiosInstanceWithAuth.get('/profile');
+            const profileData = response.data;
             setProfile(profileData);
             setEditProfileInfo(profileData);
         } catch (error) {
@@ -82,19 +80,19 @@ export default function Profile() {
     const handleSaveEditProfile = async (e: FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.put("http://localhost:5005/profile/update-profile", editProfileInfo, {
+            const response = await axiosInstanceWithAuth.put("/profile/update-profile", editProfileInfo, {
                 headers: {
-                    // Authorization: `Bearer ${accessToken}`,
                     'Content-Type': 'application/json'
                 },
             });
             setProfile(response.data);
-            setShowEditProfileModal(false);
+            fetchProfile();
             console.log('Profile updated', editProfileInfo)
         } catch (error) {
             // setShowEditProfileModal(false);
             console.error('Error updating profile', error)
         }
+        setShowEditProfileModal(false);
         
     };
 
@@ -140,7 +138,7 @@ export default function Profile() {
                     </div>
                 </div>
                 <h2 className="text-2xl font-semibold mt-4">{profile.fullname}</h2>
-                <h2 className="text-xl mt-2">{profile.userType}</h2>
+                {/* <h2 className="text-xl mt-2">{profile.userType}</h2> */}
                 <p className="text-xl text-gray-600 mt-2">{profile.description}</p>
                 <h3 className="text-sm text-gray-500 mt-2">{profile.zid}</h3>
             </div>
@@ -181,9 +179,9 @@ export default function Profile() {
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="description" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Bio</label>
+                                    <label htmlFor="description" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Description</label>
                                     <textarea 
-                                        id="bio" 
+                                        id="description" 
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
                                         value={editProfileInfo.description}
                                         onChange={handleEditProfileChange}
