@@ -1,6 +1,6 @@
 import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import './App.css'
-import { Landing } from './pages/Landing'
+import Landing from './pages/Landing'
 import Register from './pages/Register'
 import Home from './pages/Home'
 import Upload from './pages/Upload'
