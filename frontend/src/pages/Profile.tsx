@@ -1,5 +1,6 @@
 import { FormEvent, ChangeEvent, useState, useEffect } from 'react';
 import 'flowbite/dist/flowbite.min.css'; 
+import axios from 'axios';
 
 export default function Profile() {
 
@@ -13,7 +14,16 @@ export default function Profile() {
 
     // const [profile, setProfile] = useState(profileTemp);
     // fields: zid, profilePicture, userType, fullname, description, resume
+    // const accessToken = localStorage.getItem(accessToken);
     const [profile, setProfile] = useState({
+        zid: '',
+        profilePicture: '',
+        userType: '',
+        fullname: '',
+        description: '',
+        resume: ''
+    });
+    const[editProfileInfo, setEditProfileInfo] = useState({
         zid: '',
         profilePicture: '',
         userType: '',
@@ -25,40 +35,25 @@ export default function Profile() {
     const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const[editProfileInfo, setEditProfileInfo] = useState({
-        zid: '',
-        profilePicture: '',
-        userType: '',
-        fullname: '',
-        description: '',
-        resume: ''
-    });
+    
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await fetch('/profile');
-                if (!response.ok) {
-                    throw new Error('Failed to fetcch profile');
-                }
-                const profileData = await response.json();
-                setProfile(profileData);
-                setEditProfileInfo({
-                    zid: profileData.zid,
-                    profilePicture: profileData.profilePicture,
-                    userType: profileData.userType,
-                    fullname: profileData.fullname,
-                    description: profileData.description,
-                    resume: profileData.resume,
-
-                });
-            } catch (error) {
-                console.error('Error fetching profile', error);
-            }
-        };
         fetchProfile();
-    
     }, []);
+
+    const fetchProfile = async () => {
+        try {
+            const response = await fetch('/profile');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch profile ${response.statusText}`);
+            }
+            const profileData = await response.json();
+            setProfile(profileData);
+            setEditProfileInfo(profileData);
+        } catch (error) {
+            console.error('Error fetching profile', error);
+        }
+    };
 
     const handleOpenEditProfileModal = () => {
         setShowEditProfileModal(true)
@@ -87,18 +82,13 @@ export default function Profile() {
     const handleSaveEditProfile = async (e: FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch('/update-profile', {
-                method: 'PUT',
+            const response = await axios.put("http://localhost:5005/profile/update-profile", editProfileInfo, {
                 headers: {
+                    // Authorization: `Bearer ${accessToken}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(editProfileInfo)
             });
-            if (!response.ok) {
-                throw new Error('Failed to update profile');
-            }
-            const updatedProfile = await response.json();
-            setProfile(updatedProfile);
+            setProfile(response.data);
             setShowEditProfileModal(false);
             console.log('Profile updated', editProfileInfo)
         } catch (error) {
