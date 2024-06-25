@@ -108,7 +108,9 @@ router.post("/login", async (req, res) => {
     res.status(200).send("Successful login");
 });
 
-router.post("/logout", async (req, res) => {});
+router.post("/logout", async (req, res) => {
+    
+});
 
 router.post("/reset-password", async (req, res) => {
     // Gets the email from the request body
