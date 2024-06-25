@@ -1,5 +1,4 @@
 // Local Imports
-import ButtonPrimary from "../components/ButtonPrimary";
 import ButtonSubmit from "../components/ButtonSubmit";
 import Textbox from "../components/Textbox";
 import { loginSchema } from "../utils/auth.schema";
