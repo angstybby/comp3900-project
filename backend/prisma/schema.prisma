@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  zid       String   @id
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  profile   Profile?
-  isAdmin   Boolean  @default(false)
+  zid        String   @id
+  email      String   @unique
+  password   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  profile    Profile?
+  isAdmin    Boolean  @default(false)
+  resetToken String? @unique
 }
 
 enum UserType {

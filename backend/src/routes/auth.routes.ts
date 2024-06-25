@@ -1,7 +1,14 @@
 import express from "express";
 import validator from "validator";
 import { sign } from "jsonwebtoken";
-import { JwtUser, dbAddUser, dbFindJwtUserByZid, dbFindUserByEmail } from "../models/auth.models";
+import {
+    JwtUser,
+    dbAddUser,
+    dbFindJwtUserByZid,
+    dbFindUserByEmail,
+    dbSetNewPassword,
+    dbSetResetToken,
+} from "../models/auth.models";
 import { sha256 } from "js-sha256";
 import {
     validateName,
@@ -129,9 +136,27 @@ router.post("/reset-password", async (req, res) => {
     const resetToken = sha256((Math.random() + 1).toString(36).substring(7));
 
     // TODO send an email with a reset link
+    // Setting it in the db
+    try {
+        await dbSetResetToken(email, resetToken);
+    } catch (error) {
+        console.log("setting reset token issue");
+        return res.status(500).send("Server error");
+    }
     console.log("Reset link: " + resetToken);
 
     res.status(200).send("Reset link sent");
+});
+
+router.post("/change-password/", async (req, res) => {
+    const { token, password } = req.body;
+
+    try {
+        await dbSetNewPassword(token, password);
+    } catch (error) {
+        console.log("setting new password issue");
+        return res.status(500).send("Server error");
+    }
 });
 
 export default router;

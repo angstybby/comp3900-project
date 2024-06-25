@@ -66,3 +66,36 @@ export const dbFindJwtUserByZid = async (zid: string): Promise<JwtUser> => {
         fullname: jwtUser.profile.fullname,
     };
 }
+
+export const dbSetResetToken = async (email: string, resetToken: string) => {
+    try {
+        await prisma.user.update({
+            where: {
+                email: email,
+            },
+            data: {
+                resetToken: resetToken,
+            },
+        });
+    } catch (error) {
+        console.log(error);
+        throw new Error("An database error occurred");
+    }
+}
+
+export const dbSetNewPassword = async (resetToken: string, newPassword: string) => {
+    try {
+        prisma.user.update({
+            where: {
+                resetToken: resetToken,
+            },
+            data: {
+                password: newPassword,
+                resetToken: null,
+            },
+        })
+    } catch (error) {
+        console.log(error);
+        throw new Error("An database error occurred");
+    }
+}
