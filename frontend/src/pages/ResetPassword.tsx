@@ -4,7 +4,7 @@ import { forgetPasswordSchema, resetPasswordSchema } from "../utils/auth.schema"
 
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
-import { set, z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { axiosNoAuth } from "../api/Axios";
 import axios from "axios";
