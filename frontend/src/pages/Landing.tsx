@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Cookies from "js-cookie";
 import { axiosNoAuth } from "../api/Axios";
 import axios from "axios";
 
