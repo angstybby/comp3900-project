@@ -60,9 +60,9 @@ export default function Landing() {
             <div className="mt-8">
               <div className="flex justify-between">
                 <label className="block text-gray-700 text-sm mb-2">Password</label>
-                <a href="#" className="text-xs font-normal text-indigo-600 hover:underline h-fit">
+                <Link to="/reset-password" className="text-xs font-normal text-indigo-600 hover:underline h-fit">
                   Forgot your password?
-                </a>
+                </Link>
               </div>
               <Textbox id="password" {...register("password")} name="password" type="password" autoComplete="password" />
               {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}

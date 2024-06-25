@@ -1,7 +1,6 @@
-// Local Imports
 import ButtonSubmit from "../components/ButtonSubmit";
 import Textbox from "../components/Textbox";
-import { loginSchema } from "../utils/auth.schema";
+import { forgetPasswordSchema, resetPasswordSchema } from "../utils/auth.schema";
 
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
@@ -11,74 +10,108 @@ import { axiosNoAuth } from "../api/Axios";
 import axios from "axios";
 import { useState } from "react";
 
-type LoginProps = z.infer<typeof loginSchema>;
+
+type ForgetPasswordProps = z.infer<typeof forgetPasswordSchema>;
+type ResetPasswordProps = z.infer<typeof resetPasswordSchema>;
 
 axios.defaults.withCredentials = true;
 
 export default function ResetPassword() {
-  const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
-
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginProps>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<ForgetPasswordProps>({
+    resolver: zodResolver(forgetPasswordSchema),
     defaultValues: {
       email: "",
-      password: "",
     }
-  })
+  });
 
-  const onSubmit = async (data: LoginProps) => {
+  const formVerification = useForm<ResetPasswordProps>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      verificationCode: "",
+      password: "",
+      confirmPassword: "",
+    }
+  });
+
+  const [showEmailForm, setShowEmailForm] = useState(true);
+  const [showVerificationForm, setShowVerificationForm] = useState(false);
+
+  const onSubmit = async (data: { email: string }) => {
     try {
-      await axiosNoAuth.post("/auth/login",
-        { email: data.email, password: data.password }
-      );
-      navigate("/dashboard");
+      // Send verification email logic goes here
+      await axiosNoAuth.post("/auth/reset-password", { email: data.email });
+      setShowEmailForm(false);
+      setShowVerificationForm(true);
     } catch (error) {
       console.error(error);
-      setIsError(true);
     }
-  }
+  };
+
+  const onSubmitVerification = async (data: { verificationCode: string, password: string }) => {
+    try {
+      await axiosNoAuth.post("/auth/change-password", { resetToken: data.verificationCode, password: data.password });
+      navigate("/"); // Redirect to reset password page
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="min-h-screen min-w-screen flex">
-      <div className="mx-auto self-center flex bg-white rounded-lg shadow-lg overflow-hidden sm:w-3/5 md:max-w-lg lg:max-w-4xl lg:max-h-3/5 lg:w-4/5">
-        <div className="hidden lg:block lg:w-1/2 bg-cover bg-[url('/src/assets/random-image.webp')]"></div>
-        <div className="w-full p-8 lg:w-1/2">
+      <div className="mx-auto self-center flex bg-white rounded-lg shadow-xl overflow-hidden sm:w-3/5 md:max-w-lg lg:max-w-4xl lg:max-h-3/5 lg:w-[600px]">
+        <div className="w-full p-8">
           <h2 className="text-2xl font-semibold text-gray-700 text-center">
             Skill Issue
           </h2>
           <p className="text-xl text-gray-600 text-center">Forgot your password?</p>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="mt-8">
-              <label className="block text-gray-700 text-sm mb-2">
-                Email Address
-              </label>
-              <Textbox id="email" {...register("email")} name="email" type="email" autoComplete="email" />
-              {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
-            </div>
-            <div className="mt-8">
-              <div className="flex justify-between">
-                <label className="block text-gray-700 text-sm mb-2">Password</label>
-                <a href="#" className="text-xs font-normal text-indigo-600 hover:underline h-fit">
-                  Forgot your password?
-                </a>
+          {showEmailForm && (
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="mt-8">
+                <label className="block text-gray-700 text-sm mb-2">
+                  Email Address
+                </label>
+                <Textbox id="email" type="email" autoComplete="email" {...form.register('email', { required: true })} />
+                {form.formState.errors.email && <p className="text-red-600 text-sm">Please enter a valid email address.</p>}
               </div>
-              <Textbox id="password" {...register("password")} name="password" type="password" autoComplete="password" />
-              {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
-            </div>
 
-            {isError && <p className="text-red-600 text-sm mt-4">Invalid email or password</p>}
+              <div className="mt-8">
+                <ButtonSubmit text="Send Verification Email" />
+              </div>
+            </form>
+          )}
 
-            <div className="mt-8" title="Sign-In">
-              {/* <ButtonPrimary text="Sign-In" url="/dashboard" /> */}
-              <ButtonSubmit text="Sign-In" />
-            </div>
-          </form>
+          {showVerificationForm && (
+            <form onSubmit={formVerification.handleSubmit(onSubmitVerification)}>
+              <div className="mt-8">
+                <label className="block text-gray-700 text-sm mb-2">
+                  Verification Code
+                </label>
+                <Textbox id="verificationCode" type="text" autoComplete="off" {...formVerification.register('verificationCode', { required: true })} />
+                {formVerification.formState.errors.verificationCode && <p className="text-red-600 text-sm">Please enter the verification code.</p>}
+                <label className="block text-gray-700 text-sm mt-4 mb-2">
+                  New Password
+                </label>
+                <Textbox id="password" type="password" autoComplete="off" {...formVerification.register('password', { required: true })} />
+                {formVerification.formState.errors.password && <p className="text-red-600 text-sm">Please enter a new password.</p>}
+                <label className="block text-gray-700 text-sm mt-4 mb-2">
+                  New Password
+                </label>
+                <Textbox id="password" type="password" autoComplete="off" {...formVerification.register('confirmPassword', { required: true })} />
+                {formVerification.formState.errors.password && <p className="text-red-600 text-sm">Please enter a new password.</p>}
+
+              </div>
+
+              <div className="mt-8">
+                <ButtonSubmit text="Set New Password" />
+              </div>
+            </form>
+          )}
 
           <div className="mt-4 flex gap-1 items-center justify-center">
-            <Link to="/register" className="text-xs text-indigo-600 hover:text-indigo-300 font-bold">
-              Don't Have an Account? Register Here!
+            <Link to="/" className="text-xs text-indigo-600 hover:text-indigo-300 font-bold">
+              Remembered your password? Sign-In
             </Link>
           </div>
         </div>
