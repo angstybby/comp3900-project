@@ -5,7 +5,8 @@ import {
     BookOpenIcon,
     UserGroupIcon,
     UserIcon,
-    CalculatorIcon
+    CalculatorIcon,
+    UsersIcon
 } from '@heroicons/react/24/outline';
 
 const Sidebar = () => {
@@ -17,12 +18,13 @@ const Sidebar = () => {
                 </div>
             </div>
 
-            <div className='flex flex-col w-full gap-10 mt-20'>
+            <div className='flex flex-col w-full gap-10 mt-14 mb-10'>
                 <SidebarButton href='/dashboard' Icon={<HomeIcon />} text='Dashboard' />
                 <SidebarButton href='/courses' text='Courses' Icon={<BookOpenIcon />} />
                 <SidebarButton href='/groups' text='Groups' Icon={<UserGroupIcon />} />
                 <SidebarButton href='/projects' text='Projects' Icon={<CalculatorIcon />} />
                 <SidebarButton href='/profile' text='Profile' Icon={<UserIcon />} />
+                <SidebarButton href='/manage-users' text='Manage Users' Icon={<UsersIcon />} />
             </div>
 
             <Profile />
