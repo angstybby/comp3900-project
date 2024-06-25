@@ -30,7 +30,7 @@ export default function Register() {
       await axios.post("http://localhost:5005/auth/register",
         { email: data.email, password: data.password, fullname: data.name, zid: data.zId }
       );
-      navigate("/Upload");
+      navigate("/upload");
     } catch (error) {
       console.error(error);
     }
