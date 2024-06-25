@@ -26,8 +26,30 @@ export const registerSchema = z
     path: ["confirmPassword"],
   });
 
-export const loginSchema = z
+export const loginSchema = z.object({
+  email: z.string().min(1, "Invalid email address"),
+  password: z.string().min(1, "Please enter your password"),
+});
+
+export const forgetPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export const resetPasswordSchema = z
   .object({
-    email: z.string().min(1, "Invalid email address"),
-    password: z.string().min(1, "Please enter your password")
+    verificationCode: z.string().min(6),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .refine(validatePassword, {
+        message:
+          "Password must contain at least one number and one special character",
+      }),
+    confirmPassword: z
+      .string()
+      .min(8, "Password confirmation must be at least 8 characters"),
   })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });

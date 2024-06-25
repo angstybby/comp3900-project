@@ -11,6 +11,7 @@ import Projects from './pages/Projects'
 import Profile from './pages/Profile'
 import CourseReco from './pages/CourseReco'
 import Admin from './pages/Admin'
+import ResetPassword from './pages/ResetPassword'
 
 function App() {
   return (
@@ -27,8 +28,9 @@ function App() {
               <Route path={`/manage-users`} element={<Admin />} />
             </Route>
             <Route path={`/register`} element={<Register />} />
-            <Route path={`/upload`} element={<Upload/>}/>
-            <Route path={`/courseRecommendations`} element={<CourseReco/>}/>
+            <Route path={`/upload`} element={<Upload />} />
+            <Route path={`/reset-password`} element={<ResetPassword />} />
+            <Route path={`/courseRecommendations`} element={<CourseReco />} />
             <Route path={`/`} element={<Landing />} />
           </Routes>
         </BrowserRouter >

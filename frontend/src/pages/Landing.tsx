@@ -43,6 +43,7 @@ export default function Landing() {
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
+      setIsError(true);
     }
     setLoading(false);
   };
@@ -75,15 +76,10 @@ export default function Landing() {
             </div>
             <div className="mt-8">
               <div className="flex justify-between">
-                <label className="block text-gray-700 text-sm mb-2">
-                  Password
-                </label>
-                <a
-                  href="#"
-                  className="text-xs font-normal text-indigo-600 hover:underline h-fit"
-                >
+                <label className="block text-gray-700 text-sm mb-2">Password</label>
+                <Link to="/reset-password" className="text-xs font-normal text-indigo-600 hover:underline h-fit">
                   Forgot your password?
-                </a>
+                </Link>
               </div>
               <Textbox
                 id="password"
@@ -103,8 +99,8 @@ export default function Landing() {
 
             <div className="mt-8" title="Sign-In">
               {/* <ButtonPrimary text="Sign-In" url="/dashboard" /> */}
-              {loading ? 
-                <ButtonLoading/> : <ButtonSubmit text="Sign-In" />}
+              {loading ?
+                <ButtonLoading /> : <ButtonSubmit text="Sign-In" />}
             </div>
           </form>
 
