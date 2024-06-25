@@ -23,12 +23,14 @@ export default function Landing() {
     }
   })
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: LoginProps) => {
     try {
-      const response = await axios.post("https://localhost:5005/auth/login")
+      await axios.post("https://localhost:5005/auth/login",
+        { email: data.email, password: data.password}
+      )
       navigate("/dashboard");
-    } catch {
-
+    } catch (error) {
+      console.log(error)
     }
   }
 
