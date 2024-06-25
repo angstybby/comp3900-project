@@ -4,13 +4,17 @@ import ButtonSubmit from "../components/ButtonSubmit";
 import Textbox from "../components/Textbox";
 import { loginSchema } from "../utils/auth.schema";
 
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Cookies from "js-cookie";
+import { axiosNoAuth } from "../api/Axios";
+import axios from "axios";
 
 type LoginProps = z.infer<typeof loginSchema>;
+
+axios.defaults.withCredentials = true;
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -25,9 +29,10 @@ export default function Landing() {
 
   const onSubmit = async (data: LoginProps) => {
     try {
-      await axios.post("https://localhost:5005/auth/login",
+      await axiosNoAuth.post("/auth/login",
         { email: data.email, password: data.password}
-      )
+      );
+      console.log(Cookies.get("token"))
       navigate("/dashboard");
     } catch (error) {
       console.log(error)

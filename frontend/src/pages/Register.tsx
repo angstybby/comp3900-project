@@ -3,11 +3,11 @@ import Textbox from "../components/Textbox";
 import ButtonSubmit from "../components/ButtonSubmit";
 import { registerSchema } from "../utils/auth.schema";
 
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { axiosNoAuth } from "../api/Axios";
 
 type RegisterProps = z.infer<typeof registerSchema>;
 
@@ -27,7 +27,7 @@ export default function Register() {
 
   const onSubmit = async (data: RegisterProps) => {
     try {
-      await axios.post("http://localhost:5005/auth/register",
+      await axiosNoAuth.post("/auth/register",
         { email: data.email, password: data.password, fullname: data.name, zid: data.zId }
       );
       navigate("/upload");

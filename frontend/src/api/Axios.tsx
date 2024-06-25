@@ -1,8 +1,9 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { BASE_URL } from "../utils/constants";
 
 const axiosInstanceWithAuth = axios.create({
-  baseURL: 'https://localhost:5005',
+  baseURL: BASE_URL,
 });
 
 axiosInstanceWithAuth.interceptors.request.use((config) => {
@@ -17,4 +18,10 @@ const getToken = () => {
   return Cookies.get('token');
 }
 
-export { axiosInstanceWithAuth }
+const axiosNoAuth = axios.create({
+  baseURL: BASE_URL,
+})
+
+axiosNoAuth.defaults.withCredentials = true;
+
+export { axiosInstanceWithAuth, axiosNoAuth }
