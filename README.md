@@ -7,4 +7,4 @@ Go to `frontend` and `backend` and run `npm i` on EACH FOLDER
 ## Running Locally
 
 - Run `npm run dev` from the `frontend` folder
-- Run `npm start` from the `backend` folder
+- Run `npm run dev` from the `backend` folder
