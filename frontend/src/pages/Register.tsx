@@ -26,11 +26,9 @@ export default function Register() {
 
   const onSubmit = async (data: RegisterProps) => {
     try {
-      const response = await axios.post("http://localhost:5005/auth/register",
+      await axios.post("http://localhost:5005/auth/register",
         { email: data.email, password: data.password, fullname: data.name, zid: data.zId }
       );
-      const { token } = response.data;
-      localStorage.setItem("token", token);
       navigate("/Upload");
     } catch (error) {
       console.error(error);
