@@ -143,7 +143,7 @@ router.post("/reset-password", async (req, res) => {
         console.log("setting reset token issue");
         return res.status(500).send("Server error");
     }
-    console.log("Reset link: " + resetToken);
+    console.log("Reset token: " + resetToken);
 
     res.status(200).send("Reset link sent");
 });
