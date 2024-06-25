@@ -36,7 +36,7 @@ export default function Landing() {
   const onSubmit = async (data: LoginProps) => {
     try {
       setLoading(true);
-      await axiosNoAuth.post("/auth/login", {
+      await axios.post("http://localhost:5005/auth/login", {
         email: data.email,
         password: data.password,
       });

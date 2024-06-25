@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { axiosNoAuth } from "../api/Axios";
 import { useState } from "react";
 import ButtonLoading from "../components/ButtonLoading";
+import axios from "axios";
 
 type RegisterProps = z.infer<typeof registerSchema>;
 
@@ -35,7 +36,7 @@ export default function Register() {
   const onSubmit = async (data: RegisterProps) => {
     try {
       setLoading(true);
-      await axiosNoAuth.post("/auth/register", {
+      await axios.post("http://localhost:5005/auth/register", {
         email: data.email,
         password: data.password,
         fullname: data.name,
