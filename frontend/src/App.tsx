@@ -24,6 +24,7 @@ function App() {
               <Route path={`/courses`} element={<Courses />} />
               <Route path={`/groups`} element={<Groups />} />
               <Route path={`/projects`} element={<Projects />} />
+              <Route path={`/notifications`} element={<Notifications />} />
               <Route path={`/profile`} element={<Profile />} />
               <Route path={`/manage-users`} element={<Admin />} />
             </Route>
