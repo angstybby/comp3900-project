@@ -103,17 +103,27 @@ export default function Profile() {
         }
     }
 
-    const handleSaveProfilePic = (e: FormEvent) => {
+    const handleSaveProfilePic = async (e: FormEvent) => {
         e.preventDefault();
         if (selectedFile) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
+            const formData = new FormData();
+            formData.append('profilePicture', selectedFile);
+
+            try {
+                const response = await axiosInstanceWithAuth.post('/profile/update-profile', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+            
                 setProfile(prevProfile => ({
                     ...prevProfile,
-                    profilePic: reader.result as string,
+                    profilePic: response.data.profilePicture
                 }));
-            };
-            reader.readAsDataURL(selectedFile);
+                console.log('profile picture changed successfuly', response.data.profilePicture);
+            } catch (error) {
+                console.error('Error updating profile picture.')
+            }
         }
         setShowChangeProfPicModal(false);
         
