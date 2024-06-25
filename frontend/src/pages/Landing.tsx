@@ -17,6 +17,7 @@ type LoginProps = z.infer<typeof loginSchema>;
 axios.defaults.withCredentials = true;
 
 export default function Landing() {
+  const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -97,6 +98,8 @@ export default function Landing() {
                 </p>
               )}
             </div>
+
+            {isError && <p className="text-red-600 text-sm mt-4">Invalid email or password</p>}
 
             <div className="mt-8" title="Sign-In">
               {/* <ButtonPrimary text="Sign-In" url="/dashboard" /> */}

@@ -1,8 +1,8 @@
 import { FormEvent, ChangeEvent, useState, useEffect } from "react";
 import "flowbite/dist/flowbite.min.css";
-import axios from "axios";
 import { axiosInstanceWithAuth } from "../api/Axios";
 import ButtonLoading from "../components/ButtonLoading";
+import 'flowbite/dist/flowbite.min.css'; 
 
 export default function Profile() {
   // const profileTemp = {

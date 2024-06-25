@@ -10,6 +10,7 @@ import Groups from './pages/Groups'
 import Projects from './pages/Projects'
 import Profile from './pages/Profile'
 import CourseReco from './pages/CourseReco'
+import Admin from './pages/Admin'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
               <Route path={`/groups`} element={<Groups />} />
               <Route path={`/projects`} element={<Projects />} />
               <Route path={`/profile`} element={<Profile />} />
+              <Route path={`/manage-users`} element={<Admin />} />
             </Route>
             <Route path={`/register`} element={<Register />} />
             <Route path={`/upload`} element={<Upload/>}/>

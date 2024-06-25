@@ -8,3 +8,11 @@ Go to `frontend` and `backend` and run `npm i` on EACH FOLDER
 
 - Run `npm run dev` from the `frontend` folder
 - Run `npm run dev` from the `backend` folder
+
+## Database Schema Changes
+
+If there are changes made to the schema of the database, defined in `backend/prisma/migrations/schema.prisma` you will need to run:
+
+- `npx prisma generate`
+
+To view the interactive database, simply run `npx prisma studio`. This will reflect the current state of the database but is not updated in real-time. To update data you will need to refresh the page. 
