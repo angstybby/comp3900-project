@@ -1,26 +1,57 @@
-import { FormEvent, ChangeEvent, useState } from 'react';
+import { FormEvent, ChangeEvent, useState, useEffect } from 'react';
 import 'flowbite/dist/flowbite.min.css'; 
+import axios from 'axios';
+import { axiosInstanceWithAuth } from '../api/Axios';
 
 export default function Profile() {
 
-    const profileTemp = {
-        name: 'Edrick Koda',
-        userType: 'Student',
-        bio: 'insert bio here or some other details',
-        email: 'z12345@student.unsw.edu',
-        profilePic: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png'
-    };
+    // const profileTemp = {
+    //     name: 'Edrick Koda',
+    //     userType: 'Student',
+    //     bio: 'insert bio here or some other details',
+    //     email: 'z12345@student.unsw.edu',
+    //     profilePic: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png'
+    // };
 
-    const [profile, setProfile] = useState(profileTemp);
+    // const [profile, setProfile] = useState(profileTemp);
+    // fields: zid, profilePicture, userType, fullname, description, resume
+    // const accessToken = localStorage.getItem(accessToken);
+    const [profile, setProfile] = useState({
+        zid: '',
+        profilePicture: '',
+        // userType: '',
+        fullname: '',
+        description: '',
+        resume: ''
+    });
+    const[editProfileInfo, setEditProfileInfo] = useState({
+        zid: '',
+        profilePicture: '',
+        userType: '',
+        fullname: '',
+        description: '',
+        resume: ''
+    });
     const [showEditProfileModal, setShowEditProfileModal] = useState(false);
     const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const[editProfileInfo, setEditProfileInfo] = useState({
-        name: profile.name,
-        bio: profile.bio,
-        email: profile.email,
-    });
+    
+
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    const fetchProfile = async () => {
+        try {
+            const response = await axiosInstanceWithAuth.get('/profile');
+            const profileData = response.data;
+            setProfile(profileData);
+            setEditProfileInfo(profileData);
+        } catch (error) {
+            console.error('Error fetching profile', error);
+        }
+    };
 
     const handleOpenEditProfileModal = () => {
         setShowEditProfileModal(true)
@@ -46,14 +77,23 @@ export default function Profile() {
         }));
     };
 
-    const handleSaveEditProfile = (e: FormEvent) => {
+    const handleSaveEditProfile = async (e: FormEvent) => {
         e.preventDefault();
-        setProfile(prevProfile => ({
-            ...prevProfile,
-            ...editProfileInfo,
-        }));
+        try {
+            const response = await axiosInstanceWithAuth.put("/profile/update-profile", editProfileInfo, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            setProfile(response.data);
+            fetchProfile();
+            console.log('Profile updated', editProfileInfo)
+        } catch (error) {
+            // setShowEditProfileModal(false);
+            console.error('Error updating profile', error)
+        }
         setShowEditProfileModal(false);
-
+        
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +126,7 @@ export default function Profile() {
             <div className="flex flex-col items-center justify-center mt-10 relative group">
                 <div className="relative w-32 h-32">
                     <img 
-                        src={profile.profilePic} 
+                        src={profile.profilePicture} 
                         alt="Profile Picture" 
                         className="w-full h-full rounded-full cursor-pointer"
                         onClick={handleOpenChangeProfPicModal}
@@ -97,10 +137,10 @@ export default function Profile() {
                         </svg>
                     </div>
                 </div>
-                <h2 className="text-2xl font-semibold mt-4">{profile.name}</h2>
-                <h2 className="text-xl mt-2">{profile.userType}</h2>
-                <p className="text-xl text-gray-600 mt-2">{profile.bio}</p>
-                <h3 className="text-sm text-gray-500 mt-2">{profile.email}</h3>
+                <h2 className="text-2xl font-semibold mt-4">{profile.fullname}</h2>
+                {/* <h2 className="text-xl mt-2">{profile.userType}</h2> */}
+                <p className="text-xl text-gray-600 mt-2">{profile.description}</p>
+                <h3 className="text-sm text-gray-500 mt-2">{profile.zid}</h3>
             </div>
 
             <div className="mt-8 w-80 mx-auto" title="Edit Profile Button">
@@ -132,28 +172,28 @@ export default function Profile() {
                                     <label htmlFor="name" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Name</label>
                                     <input 
                                         type="text" 
-                                        id="name" 
+                                        id="fullname" 
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
-                                        value={editProfileInfo.name}
+                                        value={editProfileInfo.fullname}
                                         onChange={handleEditProfileChange}
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="bio" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Bio</label>
+                                    <label htmlFor="description" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Description</label>
                                     <textarea 
-                                        id="bio" 
+                                        id="description" 
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
-                                        value={editProfileInfo.bio}
+                                        value={editProfileInfo.description}
                                         onChange={handleEditProfileChange}
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="email" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">Email</label>
+                                    <label htmlFor="zid" className="block mb-2 text-sm font-bold text-gray-900 dark:text-white">zID</label>
                                     <input 
-                                        type="email" 
-                                        id="email" 
+                                        type="zid" 
+                                        id="zid" 
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" 
-                                        value={editProfileInfo.email}
+                                        value={editProfileInfo.zid}
                                         onChange={handleEditProfileChange}
                                     />
                                 </div>
