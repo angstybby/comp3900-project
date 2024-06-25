@@ -4,11 +4,12 @@ import { forgetPasswordSchema, resetPasswordSchema } from "../utils/auth.schema"
 
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
-import { z } from "zod";
+import { set, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { axiosNoAuth } from "../api/Axios";
 import axios from "axios";
 import { useState } from "react";
+import ButtonLoading from "../components/ButtonLoading";
 
 
 type ForgetPasswordProps = z.infer<typeof forgetPasswordSchema>;
@@ -18,6 +19,11 @@ axios.defaults.withCredentials = true;
 
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const [showEmailForm, setShowEmailForm] = useState(true);
+  const [showVerificationForm, setShowVerificationForm] = useState(false);
+  const [loading, setloading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+
   const form = useForm<ForgetPasswordProps>({
     resolver: zodResolver(forgetPasswordSchema),
     defaultValues: {
@@ -34,23 +40,31 @@ export default function ResetPassword() {
     }
   });
 
-  const [showEmailForm, setShowEmailForm] = useState(true);
-  const [showVerificationForm, setShowVerificationForm] = useState(false);
+
 
   const onSubmit = async (data: { email: string }) => {
     try {
       // Send verification email logic goes here
+      setloading(true);
       await axiosNoAuth.post("/auth/reset-password", { email: data.email });
       setShowEmailForm(false);
+      setloading(false);
       setShowVerificationForm(true);
     } catch (error) {
+      setloading(false);
       console.error(error);
     }
   };
 
   const onSubmitVerification = async (data: { verificationCode: string, password: string }) => {
     try {
+      setloading(true);
       await axiosNoAuth.post("/auth/change-password", { resetToken: data.verificationCode, password: data.password });
+      setloading(false);
+      // delay for 2 seconds
+      setPasswordSuccess(true);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setPasswordSuccess(false);
       navigate("/"); // Redirect to reset password page
     } catch (error) {
       console.error(error);
@@ -77,7 +91,7 @@ export default function ResetPassword() {
               </div>
 
               <div className="mt-8">
-                <ButtonSubmit text="Send Verification Email" />
+                {loading ? <ButtonLoading /> : <ButtonSubmit text="Send Verification Email" />}
               </div>
             </form>
           )}
@@ -103,8 +117,9 @@ export default function ResetPassword() {
 
               </div>
 
-              <div className="mt-8">
-                <ButtonSubmit text="Set New Password" />
+              <div className="mt-8 text-center">
+                {loading ? <ButtonLoading /> : <ButtonSubmit text="Set New Password" />}
+                {passwordSuccess && <p className="text-green-600 text-sm mt-4">Password has been successfully changed.</p>}
               </div>
             </form>
           )}

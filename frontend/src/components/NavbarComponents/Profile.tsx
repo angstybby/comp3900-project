@@ -11,9 +11,9 @@ function classNames(...classes: string[]) {
 export default function Profile() {
 
   const logout = () => {
-		Cookies.remove('token', { path: '' })
+    Cookies.remove('token', { path: '' })
   }
-  
+
   const [profile, setProfile] = useState({
     zid: '',
     profilePicture: '',
@@ -22,41 +22,41 @@ export default function Profile() {
     description: '',
     resume: ''
   });
-  
+
   useEffect(() => {
     fetchProfile();
-  }, [profile]);
+  }, []); // TODO: Replace with provider to avoid multiple fetches
 
   const fetchProfile = async () => {
-      try {
-          const response = await axiosInstanceWithAuth.get('/profile');
-          const profileData = response.data;
-          setProfile(profileData);
-      } catch (error) {
-          console.error('Error fetching profile', error);
-      }
+    try {
+      const response = await axiosInstanceWithAuth.get('/profile');
+      const profileData = response.data;
+      setProfile(profileData);
+    } catch (error) {
+      console.error('Error fetching profile', error);
+    }
   };
 
   return (
     <Menu as="div" className="relative inline-block w-full text-left mt-auto bg-white hover:bg-gray-50">
       <div>
-       	<MenuButton className="flex w-full justify-start items-center gap-x-5 rounded-md px-7 py-5 text-sm text-gray-900">
+        <MenuButton className="flex w-full justify-start items-center gap-x-5 rounded-md px-7 py-5 text-sm text-gray-900">
           <img className="w-11 h-11 rounded-full" src={ProfilePic} alt="Rounded avatar" />
           <div className='flex flex-col justify-start items-start tracking-widest'>
             <p className='font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-36'>{`${profile.fullname}`}</p>
-            {profile.userType ? 
+            {profile.userType ?
               <p>{`${profile.userType}`}</p> : <p>Student</p>
             }
           </div>
         </MenuButton>
       </div>
       <Transition
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
       >
         <MenuItems anchor="top" className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">

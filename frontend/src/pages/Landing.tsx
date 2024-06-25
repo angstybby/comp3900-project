@@ -43,6 +43,7 @@ export default function Landing() {
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
+      setIsError(true);
     }
     setLoading(false);
   };
