@@ -1,11 +1,12 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { BASE_URL } from "../utils/constants";
 
-const axiosInstance = axios.create({
-  baseURL: 'https://localhost:5005',
+const axiosInstanceWithAuth = axios.create({
+  baseURL: BASE_URL,
 });
 
-axiosInstance.interceptors.request.use((config) => {
+axiosInstanceWithAuth.interceptors.request.use((config) => {
   const token = getToken();
   console.log(token)
   config.headers.Authorization = `Bearer ${token}`;
@@ -17,4 +18,10 @@ const getToken = () => {
   return Cookies.get('token');
 }
 
-export { axiosInstance }
+const axiosNoAuth = axios.create({
+  baseURL: BASE_URL,
+})
+
+axiosNoAuth.defaults.withCredentials = true;
+
+export { axiosInstanceWithAuth, axiosNoAuth }

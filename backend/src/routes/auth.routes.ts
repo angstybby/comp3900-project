@@ -104,7 +104,6 @@ router.post("/login", async (req, res) => {
 
     const token = sign(jwtUser, process.env.JWT_HASH, { expiresIn: "1d" });
     res.cookie("token", token);
-
     res.status(200).send("Successful login");
 });
 
