@@ -1,7 +1,14 @@
 import express from "express";
 import validator from "validator";
 import { sign } from "jsonwebtoken";
-import { JwtUser, dbAddUser, dbFindJwtUserByZid, dbFindUserByEmail } from "../models/auth.models";
+import {
+    JwtUser,
+    dbAddUser,
+    dbFindJwtUserByZid,
+    dbFindUserByEmail,
+    dbSetNewPassword,
+    dbSetResetToken,
+} from "../models/auth.models";
 import { sha256 } from "js-sha256";
 import {
     validateName,
@@ -107,10 +114,6 @@ router.post("/login", async (req, res) => {
     res.status(200).send("Successful login");
 });
 
-router.post("/logout", async (req, res) => {
-    
-});
-
 router.post("/reset-password", async (req, res) => {
     // Gets the email from the request body
     const { email } = req.body;
@@ -130,9 +133,34 @@ router.post("/reset-password", async (req, res) => {
     const resetToken = sha256((Math.random() + 1).toString(36).substring(7));
 
     // TODO send an email with a reset link
-    console.log("Reset link: " + resetToken);
+    // Setting it in the db
+    try {
+        await dbSetResetToken(email, resetToken);
+    } catch (error) {
+        console.log("setting reset token issue");
+        return res.status(500).send("Server error");
+    }
+    console.log("Reset token: " + resetToken);
 
     res.status(200).send("Reset link sent");
+});
+
+router.post("/change-password", async (req, res) => {
+    const { resetToken, password } = req.body;
+
+    if (!resetToken || !password) {
+        return res.status(400).send("Reset token and password are required");
+    }
+
+    console.log("reseting password: ", resetToken, password);
+
+    try {
+        await dbSetNewPassword(resetToken, password);
+    } catch (error) {
+        console.log("setting new password issue");
+        return res.status(500).send("Server error");
+    }
+    res.status(200).send("Password changed");
 });
 
 export default router;
