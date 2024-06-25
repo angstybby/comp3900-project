@@ -25,7 +25,7 @@ export default function Profile() {
   
   useEffect(() => {
     fetchProfile();
-  }, []);
+  });
 
   const fetchProfile = async () => {
       try {
