@@ -10,27 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
     "@fontsource/roboto": "^5.0.13",
     "@headlessui/react": "^2.0.4",
     "@heroicons/react": "^2.1.4",
     "@hookform/resolvers": "^3.6.0",
-    "@mui/icons-material": "^5.15.20",
-    "@mui/material": "^5.15.20",
-    "@reduxjs/toolkit": "^2.2.5",
     "@tailwindcss/forms": "^0.5.7",
-    "@trycourier/courier": "^6.2.1",
-    "@trycourier/react-inbox": "^6.0.0",
-    "@trycourier/react-provider": "^6.0.0",
     "axios": "^1.7.2",
     "flowbite": "^2.3.0",
     "js-cookie": "^3.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-redux": "^9.1.2",
+    "react-hook-form": "^7.52.0",
     "react-router-dom": "^6.23.1",
-    "react-toastify": "^10.0.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -46,7 +37,7 @@
     "eslint-plugin-react-refresh": "^0.4.6",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5.5.2",
+    "typescript": "^5.2.2",
     "vite": "^5.2.0"
   }
 }
