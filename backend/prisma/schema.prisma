@@ -16,6 +16,7 @@ model User {
   profile    Profile?
   isAdmin    Boolean  @default(false)
   resetToken String? @unique
+  notifications Notification []
 }
 
 enum UserType {
@@ -33,4 +34,12 @@ model Profile {
   fullname       String
   description    String?
   resume         String?
+}
+
+model Notification {
+  zid       String      @id
+  user      User     @relation(fields: [zid], references: [zid])
+  action    String
+  sentWhen  DateTime @default(now())
+  msgRead   Boolean  @default(false)
 }

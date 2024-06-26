@@ -8,6 +8,24 @@ export interface JwtUser {
     fullname: string;
 }
 
+export const dbAddNotification = async (
+    zid: string,
+    action: string
+) => {
+    try {
+        const createdNotification = await prisma.notification.create({
+            data: {
+                zid,
+                action,
+            },
+        });
+        console.log("Notification created", createdNotification);
+    } catch (error) {
+        console.log(error);
+        throw new Error("A database error occurred");
+    }
+};
+
 export const dbAddUser = async (
     zid: string,
     email: string,
