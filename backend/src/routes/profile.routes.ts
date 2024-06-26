@@ -82,50 +82,54 @@ router.put("/update-profile", async (req, res) => {
     }
 });
 
-router.post("/upload-resume", upload.single("pdfUpload"), async (req, res) => {
-    try {
-        const customReq = req as CustomRequest;
-        if (!customReq.token || typeof customReq.token === "string") {
-            throw new Error("Token is not valid");
-        }
-
-        const file = req.file;
-
-        // Check if file is present
-        if (!file) {
-            throw new Error("No file uploaded");
-        }
-
-        // Check if file is a pdf
-        if (file.mimetype !== "application/pdf") {
-            throw new Error("File is not a pdf");
-        }
-
-        console.log(file.buffer);
-
-        const date = new Date().toISOString();
-
-        // Upload file to S3
+router.post(
+    "/upload-transcript",
+    upload.single("pdfUpload"),
+    async (req, res) => {
         try {
-            const upload = new Upload({
-                client: s3Client,
-                params: {
-                    Bucket: "skillissue-resume",
-                    Key: `${customReq.token.zid}/resume-${date}.pdf`,
-                    Body: file.buffer,
-                },
-            });
+            const customReq = req as CustomRequest;
+            if (!customReq.token || typeof customReq.token === "string") {
+                throw new Error("Token is not valid");
+            }
 
-            await upload.done();
-            res.status(200).json({ message: "File uploaded successfully" });
-        } catch (s3error) {
-            console.error(s3error);
-            res.status(500).send("Error uploading file to S3");
+            const file = req.file;
+
+            // Check if file is present
+            if (!file) {
+                throw new Error("No file uploaded");
+            }
+
+            // Check if file is a pdf
+            if (file.mimetype !== "application/pdf") {
+                throw new Error("File is not a pdf");
+            }
+
+            console.log(file.buffer);
+
+            const date = new Date().toISOString();
+
+            // Upload file to S3
+            try {
+                const upload = new Upload({
+                    client: s3Client,
+                    params: {
+                        Bucket: "skillissue-resume",
+                        Key: `${customReq.token.zid}/resume-${date}.pdf`,
+                        Body: file.buffer,
+                    },
+                });
+
+                await upload.done();
+                res.status(200).json({ message: "File uploaded successfully" });
+            } catch (s3error) {
+                console.error(s3error);
+                res.status(500).send("Error uploading file to S3");
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("An error occurred while uploading file");
         }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("An error occurred while uploading file");
-    }
-});
+    },
+);
 
 export default router;

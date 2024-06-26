@@ -29,7 +29,7 @@ export default function Upload() {
 
     setLoading(true);
     try {
-      const response = await axiosInstanceWithAuth.post('/profile/upload-resume', formData, {
+      const response = await axiosInstanceWithAuth.post('/profile/upload-transcript', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
