@@ -12,11 +12,12 @@ import Profile from './pages/Profile'
 import CourseReco from './pages/CourseReco'
 import Admin from './pages/Admin'
 import ResetPassword from './pages/ResetPassword'
+import { ProfileProvider } from './contexts/ProfileContext'
 
 function App() {
   return (
     <>
-      <div>
+      <ProfileProvider>
         <BrowserRouter>
           <Routes>
             <Route element={<SidebarLayout />}>
@@ -34,7 +35,7 @@ function App() {
             <Route path={`/`} element={<Landing />} />
           </Routes>
         </BrowserRouter >
-      </div >
+      </ProfileProvider>
     </>
   )
 }

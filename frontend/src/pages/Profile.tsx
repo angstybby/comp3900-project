@@ -7,16 +7,11 @@ import ButtonUtility from "../components/ButtonUtility";
 import ButtonSubmit from "../components/ButtonSubmit";
 import { Options } from "browser-image-compression";
 import imageCompression from "browser-image-compression";
+import { useProfile } from "../contexts/ProfileContext";
 
 export default function Profile() {
-  const [profile, setProfile] = useState({
-    zid: "",
-    profilePicture: "",
-    fullname: "",
-    description: "",
-    resume: "",
-  });
-
+  const { profileData, fetchProfileData, updateProfileContext } = useProfile();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [editProfileInfo, setEditProfileInfo] = useState({
     zid: "",
     profilePicture: "",
@@ -29,22 +24,24 @@ export default function Profile() {
   const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
+  /**
+   * Two useEffects used to get the profile data from the context
+   */
   useEffect(() => {
-    fetchProfile();
+    fetchProfileData();
   }, []);
-
-  const fetchProfile = async () => {
-    try {
-      const response = await axiosInstanceWithAuth.get("/profile");
-      const profileData = response.data;
-      setProfile(profileData);
-      setEditProfileInfo(profileData);
-    } catch (error) {
-      console.error("Error fetching profile", error);
+  
+  useEffect(() => {
+    if (profileData) {
+      setEditProfileInfo({
+        zid: profileData.zid || '',
+        profilePicture: profileData.profilePicture || '',
+        fullname: profileData.fullname || '',
+        description: profileData.description || '',
+        resume: profileData.resume || '',
+      })
     }
-  };
+  }, [profileData])
 
   /**
    * Handles the changing and editing of profile details
@@ -60,11 +57,15 @@ export default function Profile() {
     }));
   };
 
+  /**
+   * Handles the saving profile details
+   * @param e 
+   */
   const handleSaveEditProfile = async (e: FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await axiosInstanceWithAuth.put(
+      await axiosInstanceWithAuth.put(
         "/profile/update-profile",
         editProfileInfo,
         {
@@ -73,9 +74,7 @@ export default function Profile() {
           },
         },
       );
-      setProfile(response.data);
-      fetchProfile();
-      console.log("Profile updated", editProfileInfo);
+      updateProfileContext();
     } catch (error) {
       console.error("Error updating profile", error);
     }
@@ -118,22 +117,21 @@ export default function Profile() {
     e.preventDefault();
     if (!selectedFile) {
       // No file has been selected! Return gracefully.
+      alert('Please select a file!')
       return;
     }
     // Change the selected image to string data (base64)
     const imageDataURL = await imageCompression.getDataUrlFromFile(selectedFile)
-    console.log(imageDataURL.length)
     try {
       setLoading(true);
-      const response = await axiosInstanceWithAuth.put('/profile/update-profile', { 
-        zid: profile.zid,
+      await axiosInstanceWithAuth.put('/profile/update-profile', { 
+        zid: profileData.zid,
         profilePicture: imageDataURL,
-        fullname: profile.fullname,
-        description: profile.description,
-        resume: profile.resume
+        fullname: profileData.fullname,
+        description: profileData.description,
+        resume: profileData.resume
       });
       setLoading(false);
-      console.log(response);
       setShowChangeProfPicModal(false);
     } catch (error) {
       setLoading(false);
@@ -145,11 +143,10 @@ export default function Profile() {
   return (
     <div className="h-screen flex items-center justify-start flex-col">
       <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
-
       <div className="flex flex-col items-center justify-center mt-10 relative group">
         <div className="relative w-32 h-32">
           <img
-            src={profile.profilePicture}
+            src={profileData.profilePicture}
             alt="Profile Picture"
             className="w-full h-full rounded-full cursor-pointer"
             onClick={() => setShowChangeProfPicModal(true)}
@@ -167,15 +164,13 @@ export default function Profile() {
             </svg>
           </div>
         </div>
-        <h2 className="text-2xl font-semibold mt-4">{profile.fullname}</h2>
-        <p className="text-xl text-gray-600 mt-2">{profile.description}</p>
-        <h3 className="text-sm text-gray-500 mt-2">{profile.zid}</h3>
+        <h2 className="text-2xl font-semibold mt-4">{profileData.fullname}</h2>
+        <p className="text-xl text-gray-600 mt-2">{profileData.description}</p>
+        <h3 className="text-sm text-gray-500 mt-2">{profileData.zid}</h3>
       </div>
 
       <div className="mt-8 w-80 mx-auto" title="Edit Profile Button">
-        {loading ? ( <ButtonLoading />
-        ) : (<ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} /> )
-        }
+        <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
       </div>
 
       {/* Edit profile details modal */}
@@ -302,7 +297,7 @@ export default function Profile() {
             </div>
             <div className="p-4 space-y-4">
               <form onSubmit={handleSaveProfilePic}>
-                <div>
+                <div className="mb-3">
                   <label
                     htmlFor="profilePic"
                     className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
@@ -317,12 +312,7 @@ export default function Profile() {
                     onChange={handleFileChange}
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  Save
-                </button>
+                {loading ? <ButtonLoading /> : <ButtonSubmit text={"Save"} />}
               </form>
             </div>
           </div>
