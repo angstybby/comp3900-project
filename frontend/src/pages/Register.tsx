@@ -29,6 +29,7 @@ export default function Register() {
       email: "",
       password: "",
       confirmPassword: "",
+      userType: "student",
     },
   });
 
@@ -40,6 +41,7 @@ export default function Register() {
         password: data.password,
         fullname: data.name,
         zid: data.zId,
+        userType: data.userType,
       });
       navigate("/upload");
     } catch (error) {
@@ -98,6 +100,32 @@ export default function Register() {
                 {errors.zId && (
                   <p className="text-red-600 text-sm">{errors.zId.message}</p>
                 )}
+              </div>
+            </div>
+            <div className="mt-3">
+              <label
+                htmlFor="userType"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                User Type
+              </label>
+              <div className="mt-3">
+                <input 
+                  id="student" 
+                  type="radio" 
+                  value="student" 
+                  {...register("userType")} 
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                <label htmlFor="student" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Student</label>
+              </div>
+              <div className="mt-3">
+                <input 
+                  id="academic" 
+                  type="radio" 
+                  value="academic" 
+                  {...register("userType")} 
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                <label htmlFor="academic" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Academic</label>
               </div>
             </div>
             <div>
