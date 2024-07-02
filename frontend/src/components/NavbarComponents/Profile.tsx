@@ -34,10 +34,9 @@ export default function Profile() {
             <p className='font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-36'>
               {fetched ? `${profileData.fullname}` : <ButtonLoading/>}
             </p>
-            {/* TODO: Implement showing userType */}
-            {/* {profile.userType ?
-              <p>{`${profile.userType}`}</p> : <p>Student</p>
-            } */}
+            {Cookies.get('userType') ?
+              <p>{`${Cookies.get('userType')}`}</p> : <p>{''}</p>
+            }
           </div>
         </MenuButton>
       </div>
