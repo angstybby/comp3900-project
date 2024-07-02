@@ -5,17 +5,6 @@ import ButtonLoading from "../components/ButtonLoading";
 import 'flowbite/dist/flowbite.min.css'; 
 
 export default function Profile() {
-  // const profileTemp = {
-  //     name: 'Edrick Koda',
-  //     userType: 'Student',
-  //     bio: 'insert bio here or some other details',
-  //     email: 'z12345@student.unsw.edu',
-  //     profilePic: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png'
-  // };
-
-  // const [profile, setProfile] = useState(profileTemp);
-  // fields: zid, profilePicture, userType, fullname, description, resume
-  // const accessToken = localStorage.getItem(accessToken);
   const [profile, setProfile] = useState({
     zid: "",
     profilePicture: "",
@@ -111,29 +100,27 @@ export default function Profile() {
   };
 
     const handleSaveProfilePic = async (e: FormEvent) => {
-        e.preventDefault();
-        if (selectedFile) {
-            const formData = new FormData();
-            formData.append('profilePicture', selectedFile);
-
-            try {
-                const response = await axiosInstanceWithAuth.post('/profile/update-profile', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
-            
-                setProfile(prevProfile => ({
-                    ...prevProfile,
-                    profilePic: response.data.profilePicture
-                }));
-                console.log('profile picture changed successfuly', response.data.profilePicture);
-            } catch (error) {
-                console.error('Error updating profile picture.')
+      e.preventDefault();
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('profilePicture', selectedFile);
+        try {
+          const response = await axiosInstanceWithAuth.post('/profile/update-profile', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
             }
+          });
+      
+          setProfile(prevProfile => ({
+            ...prevProfile,
+            profilePic: response.data.profilePicture
+          }));
+          console.log('profile picture changed successfuly', response.data.profilePicture);
+        } catch (error) {
+            console.error('Error updating profile picture.')
         }
-        setShowChangeProfPicModal(false);
-        
+      }
+      setShowChangeProfPicModal(false);    
     }
 
   return (
