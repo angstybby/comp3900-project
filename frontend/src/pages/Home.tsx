@@ -1,4 +1,9 @@
+import { useEffect } from "react";
+import { useProfile } from "../contexts/ProfileContext"
+
 const Home = () => {
+  const { updateProfileContext } = useProfile();
+  useEffect(() => { updateProfileContext() },[])
   return (
     <div className="h-screen flex">
       <div className="w-96 max-h-40 flex flex-wrap p-2 rounded-md mx-auto my-auto">

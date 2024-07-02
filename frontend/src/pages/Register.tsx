@@ -10,6 +10,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import ButtonLoading from "../components/ButtonLoading";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { getToken } from "../api/Axios";
+import Cookies from "js-cookie";
+import { JwtUser } from "../utils/interfaces";
 
 type RegisterProps = z.infer<typeof registerSchema>;
 
@@ -43,6 +47,8 @@ export default function Register() {
         zid: data.zId,
         userType: data.userType,
       });
+      const decoded: JwtUser = jwtDecode(getToken());
+      Cookies.set('userType', decoded.userType);
       navigate("/upload");
     } catch (error) {
       console.error(error);

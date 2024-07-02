@@ -8,7 +8,9 @@ import { BASE_URL } from "../utils/constants";
  * @returns {String} The token of the current user
 */
 const getToken = () => {
-  return Cookies.get('token');
+  const token = Cookies.get('token');
+  if (token) return token;
+  return '';
 }
 
 /**
