@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { $Enums, PrismaClient, User, UserType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -6,12 +6,14 @@ export interface JwtUser {
     zid: string;
     email: string;
     fullname: string;
+    userType: UserType;
 }
 
 export const dbAddUser = async (
     zid: string,
     email: string,
     password: string,
+    userType: UserType,
 ) => {
     try {
         const createdUser = await prisma.user.create({
@@ -19,6 +21,7 @@ export const dbAddUser = async (
                 zid,
                 email,
                 password,
+                userType,
             },
         });
         console.log("User created", createdUser);
@@ -44,6 +47,7 @@ export const dbFindJwtUserByZid = async (zid: string): Promise<JwtUser> => {
         select: {
             zid: true,
             email: true,
+            userType: true,
             profile: {
                 select: {
                     fullname: true,
@@ -63,7 +67,9 @@ export const dbFindJwtUserByZid = async (zid: string): Promise<JwtUser> => {
     return {
         zid: jwtUser.zid,
         email: jwtUser.email,
+        userType: jwtUser.userType,
         fullname: jwtUser.profile.fullname,
+        
     };
 }
 

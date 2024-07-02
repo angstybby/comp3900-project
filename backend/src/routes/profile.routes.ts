@@ -49,7 +49,6 @@ router.put("/update-profile", async (req, res) => {
     const profile: Profile = {
         zid,
         profilePicture,
-        userType,
         fullname,
         description,
         resume,

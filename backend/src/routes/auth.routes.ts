@@ -22,10 +22,10 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
     console.log("Registering user");
     // Gets the email and password from the request body
-    const { email, password, fullname, zid } = req.body;
+    const { email, password, fullname, zid, userType } = req.body;
 
     // Check if the email or password is missing
-    if (!email || !password || !fullname || !zid) {
+    if (!email || !password || !fullname || !zid || !userType) {
         return res.status(400).send("Some details are missing");
     }
 
@@ -61,7 +61,7 @@ router.post("/register", async (req, res) => {
     const hashedPassword = sha256(password);
 
     // Adds the user to the database
-    await dbAddUser(zid, email, hashedPassword).catch((error) => {
+    await dbAddUser(zid, email, hashedPassword, userType).catch((error) => {
         return res.status(500).send(error);
     });
     await dbAddProfile(zid, fullname).catch((error) => {
@@ -101,6 +101,7 @@ router.post("/login", async (req, res) => {
     if (!user || user.password !== passwordHash) {
         return res.status(400).send("Email or password is incorrect");
     }
+    
 
     // Makes the token and sends it to the user
     if (!process.env.JWT_HASH) {
@@ -112,6 +113,8 @@ router.post("/login", async (req, res) => {
     const token = sign(jwtUser, process.env.JWT_HASH, { expiresIn: "1d" });
     res.cookie("token", token);
     res.status(200).send("Successful login");
+
+    
 });
 
 router.post("/reset-password", async (req, res) => {
