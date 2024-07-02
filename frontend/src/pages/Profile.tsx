@@ -94,6 +94,7 @@ export default function Profile() {
     if (!file) {
       return;
     }
+    // Compress the image to 5mb at most
     const imageOptions: Options = {
       maxSizeMB: 5
     }
@@ -131,12 +132,12 @@ export default function Profile() {
         description: profileData.description,
         resume: profileData.resume
       });
-      setLoading(false);
-      setShowChangeProfPicModal(false);
+      updateProfileContext();
     } catch (error) {
-      setLoading(false);
       console.log(error)
     }
+    setLoading(false);
+    setShowChangeProfPicModal(false);
     return;    
   }
 
