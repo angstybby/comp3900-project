@@ -10,6 +10,7 @@ datasource db {
 model User {
   zid        String   @id
   email      String   @unique
+  userType   UserType
   password   String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -29,7 +30,6 @@ model Profile {
   profileOwner User   @relation(fields: [zid], references: [zid])
 
   profilePicture String?
-  userType       UserType?
   fullname       String
   description    String?
   resume         String?

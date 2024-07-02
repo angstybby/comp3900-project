@@ -20,6 +20,8 @@ export const registerSchema = z
     confirmPassword: z
       .string()
       .min(8, "Password confirmation must be at least 8 characters"),
+    userType: z.enum(["student", "academic"]),
+
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
