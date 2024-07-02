@@ -43,7 +43,6 @@ router.get("/:zid", async (req: Request, res: Response) => {
     }
 });
 
-// Works
 router.put("/update-profile", async (req, res) => {
     // Check token is valid
     const customReq = req as CustomRequest;
@@ -52,12 +51,16 @@ router.put("/update-profile", async (req, res) => {
     }
 
     // Check all the fields are present or correct
-    let { zid, profilePicture, userType, fullname, description, resume } =
+    let { zid, profilePicture, fullname, description, resume } =
         req.body;
 
     // Checks if zid matches
     if (customReq.token.zid !== zid) {
         throw new Error("Zid is not valid");
+    }
+
+    if (profilePicture.length > 5*1024*1024) {
+        return res.status(413).send("Image payload too large");
     }
 
     // Construct the profile object
@@ -72,9 +75,8 @@ router.put("/update-profile", async (req, res) => {
     try {
         // Update the user's profile in the database
         await dbUpdateProfile(profile);
-
         // Return a success message
-        res.status(200).send("Profile updated successfully");
+        res.status(200).send("Profile details updated successfully");
     } catch (error) {
         console.error(error);
         res.status(500).send("An error occurred while updating the profile");

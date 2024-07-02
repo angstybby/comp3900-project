@@ -3,24 +3,28 @@ import "flowbite/dist/flowbite.min.css";
 import { axiosInstanceWithAuth } from "../api/Axios";
 import ButtonLoading from "../components/ButtonLoading";
 import 'flowbite/dist/flowbite.min.css'; 
+import ButtonUtility from "../components/ButtonUtility";
+import ButtonSubmit from "../components/ButtonSubmit";
+import { Options } from "browser-image-compression";
+import imageCompression from "browser-image-compression";
 
 export default function Profile() {
   const [profile, setProfile] = useState({
     zid: "",
     profilePicture: "",
-    // userType: '',
     fullname: "",
     description: "",
     resume: "",
   });
+
   const [editProfileInfo, setEditProfileInfo] = useState({
     zid: "",
     profilePicture: "",
-    userType: "",
     fullname: "",
     description: "",
     resume: "",
   });
+
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,22 +46,10 @@ export default function Profile() {
     }
   };
 
-  const handleOpenEditProfileModal = () => {
-    setShowEditProfileModal(true);
-  };
-
-  const handleCloseEditProfileModal = () => {
-    setShowEditProfileModal(false);
-  };
-
-  const handleOpenChangeProfPicModal = () => {
-    setShowChangeProfPicModal(true);
-  };
-
-  const handleCloseChangeProfPicModal = () => {
-    setShowChangeProfPicModal(false);
-  };
-
+  /**
+   * Handles the changing and editing of profile details
+   * @param e 
+   */
   const handleEditProfileChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -71,7 +63,7 @@ export default function Profile() {
   const handleSaveEditProfile = async (e: FormEvent) => {
     e.preventDefault();
     try {
-    setLoading(true);
+      setLoading(true);
       const response = await axiosInstanceWithAuth.put(
         "/profile/update-profile",
         editProfileInfo,
@@ -85,43 +77,70 @@ export default function Profile() {
       fetchProfile();
       console.log("Profile updated", editProfileInfo);
     } catch (error) {
-      // setShowEditProfileModal(false);
       console.error("Error updating profile", error);
     }
     setLoading(false);
     setShowEditProfileModal(false);
   };
 
+  /**
+   * Code for handling selected file change. NOTE THAT THIS DOES NOT SUBMIT THE CHANGE
+   * Function for handling the submit is handleSaveProfilePic
+   * 
+   * @param e 
+   * @returns {void}
+   */
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
+    if (!file) {
+      return;
     }
+    const imageOptions: Options = {
+      maxSizeMB: 5
+    }
+    imageCompression(file, imageOptions)
+    .then( function (compressed){
+      setSelectedFile(compressed);
+    })
+    .catch( function(error) {
+      console.log(error.message);
+    })
+    return;
   };
 
-    const handleSaveProfilePic = async (e: FormEvent) => {
-      e.preventDefault();
-      if (selectedFile) {
-        const formData = new FormData();
-        formData.append('profilePicture', selectedFile);
-        try {
-          const response = await axiosInstanceWithAuth.post('/profile/update-profile', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-      
-          setProfile(prevProfile => ({
-            ...prevProfile,
-            profilePic: response.data.profilePicture
-          }));
-          console.log('profile picture changed successfuly', response.data.profilePicture);
-        } catch (error) {
-            console.error('Error updating profile picture.')
-        }
-      }
-      setShowChangeProfPicModal(false);    
+  /**
+   * Function to submit the new profile pic and save the change. 
+   * 
+   * @param e 
+   * @returns {void}
+   */
+  const handleSaveProfilePic = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!selectedFile) {
+      // No file has been selected! Return gracefully.
+      return;
     }
+    // Change the selected image to string data (base64)
+    const imageDataURL = await imageCompression.getDataUrlFromFile(selectedFile)
+    console.log(imageDataURL.length)
+    try {
+      setLoading(true);
+      const response = await axiosInstanceWithAuth.put('/profile/update-profile', { 
+        zid: profile.zid,
+        profilePicture: imageDataURL,
+        fullname: profile.fullname,
+        description: profile.description,
+        resume: profile.resume
+      });
+      setLoading(false);
+      console.log(response);
+      setShowChangeProfPicModal(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error)
+    }
+    return;    
+  }
 
   return (
     <div className="h-screen flex items-center justify-start flex-col">
@@ -133,11 +152,11 @@ export default function Profile() {
             src={profile.profilePicture}
             alt="Profile Picture"
             className="w-full h-full rounded-full cursor-pointer"
-            onClick={handleOpenChangeProfPicModal}
+            onClick={() => setShowChangeProfPicModal(true)}
           />
           <div
             className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-80 bg-black bg-opacity-50 rounded-full transition-opacity duration-300"
-            onClick={handleOpenChangeProfPicModal}
+            onClick={() => setShowChangeProfPicModal(true)}
           >
             <svg
               className="w-8 h-8 text-white"
@@ -149,21 +168,17 @@ export default function Profile() {
           </div>
         </div>
         <h2 className="text-2xl font-semibold mt-4">{profile.fullname}</h2>
-        {/* <h2 className="text-xl mt-2">{profile.userType}</h2> */}
         <p className="text-xl text-gray-600 mt-2">{profile.description}</p>
         <h3 className="text-sm text-gray-500 mt-2">{profile.zid}</h3>
       </div>
 
       <div className="mt-8 w-80 mx-auto" title="Edit Profile Button">
-        <button
-          onClick={handleOpenEditProfileModal}
-          className="flex w-full justify-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Edit Profile
-        </button>
+        {loading ? ( <ButtonLoading />
+        ) : (<ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} /> )
+        }
       </div>
 
-      {/* edit profile details modal */}
+      {/* Edit profile details modal */}
       {showEditProfileModal && (
         <div
           id="edit-profile-modal"
@@ -174,10 +189,11 @@ export default function Profile() {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Edit Profile
               </h3>
+              {/* Button to Exit the Modal */}
               <button
                 type="button"
                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={handleCloseEditProfileModal}
+                onClick={() => setShowEditProfileModal(false)}
               >
                 <svg
                   className="w-5 h-5"
@@ -244,12 +260,7 @@ export default function Profile() {
                 {loading ? (
                   <ButtonLoading />
                 ) : (
-                  <button
-                    type="submit"
-                    className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                  >
-                    Save
-                  </button>
+                  <ButtonSubmit text={"Save"} />
                 )}
               </form>
             </div>
@@ -257,7 +268,7 @@ export default function Profile() {
         </div>
       )}
 
-      {/* change profile picture modal */}
+      {/* Change profile picture modal */}
       {showChangeProfPicModal && (
         <div
           id="change-profile-pic-modal"
@@ -271,7 +282,7 @@ export default function Profile() {
               <button
                 type="button"
                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={handleCloseChangeProfPicModal}
+                onClick={() => setShowChangeProfPicModal(false)}
               >
                 <svg
                   className="w-5 h-5"
