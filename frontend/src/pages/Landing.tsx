@@ -14,15 +14,18 @@ import { JwtUser } from "../utils/interfaces";
 import { jwtDecode } from "jwt-decode";
 import { getToken } from "../api/Axios";
 import Cookies from "js-cookie";
+import { useProfile } from "../contexts/ProfileContext";
 
 type LoginProps = z.infer<typeof loginSchema>;
 
 axios.defaults.withCredentials = true;
 
 export default function Landing() {
+  const navigate = useNavigate();      
   const [isError, setIsError] = useState(false);
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  const { updateProfileContext } = useProfile();
 
   const {
     register,
@@ -45,6 +48,7 @@ export default function Landing() {
       });
       const decoded: JwtUser = jwtDecode(getToken());
       Cookies.set('userType', decoded.userType);
+      updateProfileContext();
       navigate("/dashboard");
     } catch (error) {
       console.log(error);
