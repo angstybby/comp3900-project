@@ -39,8 +39,16 @@ export const dbFindUserByEmail = async (email: string) => {
     });
 };
 
+export const dbFindUserByZid = async (zid: string) => {
+    return await prisma.user.findFirst({
+        where: {
+            zid: zid,
+        },
+    });
+};
+
 export const dbFindJwtUserByZid = async (zid: string): Promise<JwtUser> => {
-    const jwtUser =  await prisma.user.findFirst({
+    const jwtUser = await prisma.user.findFirst({
         where: {
             zid: zid,
         },
@@ -53,7 +61,7 @@ export const dbFindJwtUserByZid = async (zid: string): Promise<JwtUser> => {
                     fullname: true,
                 },
             },
-        }
+        },
     });
 
     if (!jwtUser) {
@@ -69,9 +77,8 @@ export const dbFindJwtUserByZid = async (zid: string): Promise<JwtUser> => {
         email: jwtUser.email,
         userType: jwtUser.userType,
         fullname: jwtUser.profile.fullname,
-        
     };
-}
+};
 
 export const dbSetResetToken = async (email: string, resetToken: string) => {
     try {
@@ -87,9 +94,12 @@ export const dbSetResetToken = async (email: string, resetToken: string) => {
         console.log(error);
         throw new Error("An database error occurred");
     }
-}
+};
 
-export const dbSetNewPassword = async (resetToken: string, newPassword: string) => {
+export const dbSetNewPassword = async (
+    resetToken: string,
+    newPassword: string,
+) => {
     try {
         await prisma.user.update({
             where: {
@@ -99,10 +109,10 @@ export const dbSetNewPassword = async (resetToken: string, newPassword: string) 
                 password: newPassword,
                 resetToken: null,
             },
-        })
-        console.log("updated")
+        });
+        console.log("updated");
     } catch (error) {
         console.log(error);
         throw error;
     }
-}
+};
