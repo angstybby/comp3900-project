@@ -29,7 +29,7 @@ model Profile {
   zid          String @id
   profileOwner User   @relation(fields: [zid], references: [zid])
 
-  profilePicture String?
+  profilePicture String? @db.LongText
   fullname       String
   description    String?
   resume         String?
