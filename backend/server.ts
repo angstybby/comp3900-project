@@ -3,6 +3,7 @@ import cors from "cors";
 import auth from "./src/routes/auth.routes";
 import {authMiddleWare} from "./src/middleware/auth.middleware";
 import profile from "./src/routes/profile.routes";
+import course from "./src/routes/course.routes";
 
 // Create an Express application
 const app = express();
@@ -22,6 +23,7 @@ app.use(cookieParser());
 
 app.use("/auth", auth);
 app.use("/profile", authMiddleWare, profile);
+app.use("/course", authMiddleWare, course);
 
 
 app.listen(PORT, () => {
