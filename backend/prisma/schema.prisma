@@ -8,16 +8,15 @@ datasource db {
 }
 
 model User {
-  zid         String        @id
-  email       String        @unique
-  userType    UserType
-  password    String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  profile     Profile?
-  isAdmin     Boolean       @default(false)
-  resetToken  String?       @unique
-  CourseTaken CourseTaken[]
+  zid        String   @id
+  email      String   @unique
+  userType   UserType
+  password   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  profile    Profile?
+  isAdmin    Boolean  @default(false)
+  resetToken String?  @unique
 }
 
 enum UserType {
@@ -30,10 +29,11 @@ model Profile {
   zid          String @id
   profileOwner User   @relation(fields: [zid], references: [zid])
 
-  profilePicture String? @db.LongText
+  profilePicture String?       @db.LongText
   fullname       String
   description    String?
   resume         String?
+  CourseTaken    CourseTaken[]
 }
 
 model Course {
@@ -43,10 +43,10 @@ model Course {
 }
 
 model CourseTaken {
-  userZid  String
-  user     User   @relation(fields: [userZid], references: [zid])
-  courseId String
-  course   Course @relation(fields: [courseId], references: [id])
+  zid          String
+  profileOwner Profile @relation(fields: [zid], references: [zid])
+  courseId     String
+  course       Course  @relation(fields: [courseId], references: [id])
 
-  @@id([userZid, courseId])
+  @@id([zid, courseId])
 }

@@ -1,5 +1,6 @@
 import express from "express";
-import { dbFindCourseByString } from "../models/course.models";
+import { dbAddCourse, dbDeleteCourse, dbFindCourseByString } from "../models/course.models";
+import { CustomRequest } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
@@ -13,6 +14,42 @@ router.post("/search", async (req, res) => {
 
     const courses = await dbFindCourseByString(name);
     return res.status(200).send(courses);
+});
+
+router.post("/add", async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const { course } = req.body;
+    const zid = customReq.token.zid;
+
+    try {
+        await dbAddCourse(zid, course);
+        res.status(200).send("Course added successfully");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error occurred while adding course");
+    }
+});
+
+router.delete("/delete", async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const { course } = req.body;
+    const zid = customReq.token.zid;
+
+    try {
+        await dbDeleteCourse(course, zid);
+        res.status(200).send("Course deleted successfully");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error occurred while deleting course");
+    }
 });
 
 export default router;
