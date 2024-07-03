@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const dbFindCourseByString = async (name: string) => {
+export const dbFindCourseByString = async (name: string) => {
     return await prisma.course.findMany({
         where: {
             OR: [
