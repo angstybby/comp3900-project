@@ -53,3 +53,14 @@ export const dbDeleteCourse = async (courseId: string, zid: string) => {
         },
     });
 };
+
+export const dbGetUserCourses = async (zid: string) => {
+    return await prisma.courseTaken.findMany({
+        where: {
+            zid,
+        },
+        select: {
+            course: true,
+        },
+    });
+};

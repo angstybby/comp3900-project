@@ -1,5 +1,10 @@
 import express from "express";
-import { dbAddCourse, dbDeleteCourse, dbFindCourseByString } from "../models/course.models";
+import {
+    dbAddCourse,
+    dbDeleteCourse,
+    dbFindCourseByString,
+    dbGetUserCourses,
+} from "../models/course.models";
 import { CustomRequest } from "../middleware/auth.middleware";
 
 const router = express.Router();
@@ -49,6 +54,23 @@ router.delete("/delete", async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).send("An error occurred while deleting course");
+    }
+});
+
+router.get("/user", async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+
+    try {
+        const courses = await dbGetUserCourses(zid);
+        res.status(200).send(courses);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error occurred while retrieving courses");
     }
 });
 
