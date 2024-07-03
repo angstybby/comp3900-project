@@ -54,9 +54,8 @@ model CourseTaken {
 }
 
 model Group {
-  id           String         @id
+  id           Int            @id @default(autoincrement())
   groupName    String         @unique
-  title        String
   description  String?
   groupOwnerId String
   GroupOwner   Profile        @relation(fields: [groupOwnerId], references: [zid])
@@ -69,14 +68,14 @@ model Group {
 model GroupJoined {
   zid          String
   profileOwner Profile @relation(fields: [zid], references: [zid])
-  groupId      String
+  groupId      Int
   group        Group   @relation(fields: [groupId], references: [id])
 
   @@id([zid, groupId])
 }
 
 model Project {
-  id             String         @id
+  id             Int            @id @default(autoincrement())
   title          String         @unique
   description    String?
   createdAt      DateTime       @default(now())
@@ -87,9 +86,9 @@ model Project {
 }
 
 model ProjectTaken {
-  projectId String
+  projectId Int
   project   Project          @relation(fields: [projectId], references: [id])
-  groupId   String
+  groupId   Int
   group     Group            @relation(fields: [groupId], references: [id])
   status    GroupEntryStatus @default(PENDING)
 
