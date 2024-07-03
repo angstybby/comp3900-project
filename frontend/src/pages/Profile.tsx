@@ -25,7 +25,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
 
   /**
-   * Two useEffects used to get the profile data from the context
+   * Two useEffects used to get the profile data from the context and apply it to the edit modal
    */
   useEffect(() => {
     fetchProfileData();

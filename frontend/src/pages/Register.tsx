@@ -14,16 +14,12 @@ import { jwtDecode } from "jwt-decode";
 import { getToken } from "../api/Axios";
 import Cookies from "js-cookie";
 import { JwtUser } from "../utils/interfaces";
-import { useProfile } from "../contexts/ProfileContext";
 
 type RegisterProps = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-
-  const { updateProfileContext } = useProfile();
-
   const {
     register,
     handleSubmit,
@@ -52,7 +48,6 @@ export default function Register() {
       });
       const decoded: JwtUser = jwtDecode(getToken());
       Cookies.set('userType', decoded.userType);
-      updateProfileContext();
       navigate("/upload");
     } catch (error) {
       console.error(error);
