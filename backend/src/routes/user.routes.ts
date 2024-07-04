@@ -34,6 +34,7 @@ router.delete("/remove/:zid", async (req: Request, res: Response) => {
     await dbRemoveUser(zid)
     res.status(200).send("Deleted successfully")
   } catch (error) {
+    console.log(error);
     res.status(500).send("Error deleting user")
   }
 })
