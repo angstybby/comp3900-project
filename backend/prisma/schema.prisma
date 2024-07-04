@@ -26,9 +26,9 @@ enum UserType {
 }
 
 model Profile {
-  zid            String        @id
-  profileOwner   User          @relation(fields: [zid], references: [zid])
-  profilePicture String?       @db.LongText
+  zid            String          @id
+  profileOwner   User            @relation(fields: [zid], references: [zid])
+  profilePicture String?         @db.LongText
   fullname       String
   description    String?
   resume         String?
@@ -36,6 +36,7 @@ model Profile {
   ProjectOwner   Project[]
   CourseTaken    CourseTaken[]
   GroupJoined    GroupJoined[]
+  GroupInterest  GroupInterest[]
 }
 
 model Course {
@@ -54,15 +55,16 @@ model CourseTaken {
 }
 
 model Group {
-  id           Int            @id @default(autoincrement())
-  groupName    String         @unique
+  id           Int             @id @default(autoincrement())
+  groupName    String          @unique
   description  String?
   groupOwnerId String
-  GroupOwner   Profile        @relation(fields: [groupOwnerId], references: [zid])
+  GroupOwner   Profile         @relation(fields: [groupOwnerId], references: [zid])
   GroupMembers GroupJoined[]
   projects     ProjectTaken[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  interests    GroupInterest[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 }
 
 model GroupJoined {
@@ -72,6 +74,24 @@ model GroupJoined {
   group        Group   @relation(fields: [groupId], references: [id])
 
   @@id([zid, groupId])
+}
+
+model GroupInterest {
+  id           Int            @id @default(autoincrement())
+  groupId      Int
+  group        Group          @relation(fields: [groupId], references: [id])
+  zid          String
+  profileOwner Profile        @relation(fields: [zid], references: [zid])
+  status       InterestStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
+
+  @@unique([groupId, zid])
+}
+
+enum InterestStatus {
+  PENDING
+  ACCEPTED
+  DENIED
 }
 
 model Project {
