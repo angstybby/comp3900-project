@@ -9,7 +9,7 @@ function classNames(...classes: string[]) {
 }
 
 export default function Profile() {
-  const { profileData, updateProfileContext } = useProfile();
+  const { profileData } = useProfile();
   
   const logout = () => {
     const allCookieFields = Cookies.get();
@@ -23,7 +23,6 @@ export default function Profile() {
     if (profileData.fullname !== undefined) {
       setFetched(true);
     }
-    updateProfileContext();
   }, [profileData])
 
   return (
@@ -43,7 +42,7 @@ export default function Profile() {
             </div>
           </MenuButton>
         : 
-          <div className="justify-center flex mb-5">
+          <div className="justify-center flex mb-5 mt-5 align-middle">
             <LoadingCircle/>
           </div>
         }

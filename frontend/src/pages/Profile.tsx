@@ -89,22 +89,14 @@ export default function Profile() {
    * @param e 
    * @returns {void}
    */
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0];
-    if (!file) {
-      return;
-    }
+    if (!file) return;
     // Compress the image to 5mb at most
-    const imageOptions: Options = {
-      maxSizeMB: 5
-    }
+    const imageOptions: Options = { maxSizeMB: 5 }
     imageCompression(file, imageOptions)
-    .then( function (compressed){
-      setSelectedFile(compressed);
-    })
-    .catch( function(error) {
-      console.log(error.message);
-    })
+    .then(compressed => {setSelectedFile(compressed)})
+    .catch(error => {console.log(error)})
     return;
   };
 
@@ -114,10 +106,9 @@ export default function Profile() {
    * @param e 
    * @returns {void}
    */
-  const handleSaveProfilePic = async (e: FormEvent) => {
+  const handleSaveProfilePic = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     if (!selectedFile) {
-      // No file has been selected! Return gracefully.
       alert('Please select a file!')
       return;
     }

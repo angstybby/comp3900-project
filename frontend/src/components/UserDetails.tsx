@@ -29,12 +29,13 @@ const UserDetails: React.FC<UserDetailsProps> = ({zid, fullname, userType, creat
       <p className="w-1/5 overflow-hidden">{fullname}</p>
       <p className="w-1/12 mr-2 font-bold">{userType}</p>
       <p className="w-1/5 overflow-hidden">{`User since: ${userSince.toLocaleDateString()}`}</p>
-      {
-        loading ? <LoadingCircle/> :
+      {loading ? ( 
+        <LoadingCircle/> 
+      ) : (
         <div title='Delete User' onClick={deleteUser}>
           <TrashIcon className='h-[24px] hover:text-red-500 hover:scale-105 cursor-pointer'/>
         </div>
-      }
+      )}
     </div>
   )
 }
