@@ -19,9 +19,18 @@ export default function Profile() {
   }
 
   const [fetched, setFetched] = useState(false);
+  const [userType, setUserType] = useState('');
   useEffect(() => {
     if (profileData.fullname !== undefined) {
       setFetched(true);
+    }
+    const type = Cookies.get('userType');
+    if (type === 'student') {
+      setUserType('Student');
+    } else if (type === 'academic') {
+      setUserType('Academic');
+    } else if (type === 'admin') {
+      setUserType('Admin');
     }
   }, [profileData])
 
@@ -37,7 +46,7 @@ export default function Profile() {
                 {profileData.fullname}
               </p>
               {Cookies.get('userType') ?
-                <p>{`${Cookies.get('userType')}`}</p> : <p>{''}</p>
+                <p>{userType}</p> : <p>{''}</p>
               }
             </div>
           </MenuButton>
