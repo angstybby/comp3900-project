@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
+import { useProfile } from '../contexts/ProfileContext';
 
 const Sidebar = () => {
   const navigation = useNavigate()
@@ -20,6 +21,11 @@ const Sidebar = () => {
 			navigation('/')
 		}
   }, [token]);
+
+  const { updateProfileContext } = useProfile();
+  useEffect(() => {
+    updateProfileContext();
+  },[])
 
   return (
     <div className='fixed flex flex-col w-64 bg-white items-center h-screen shadow-xl rounded-r-xl pt-10'>
