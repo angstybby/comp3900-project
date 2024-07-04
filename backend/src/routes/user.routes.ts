@@ -2,7 +2,7 @@ import express from "express";
 import { Request, Response } from "express";
 import { CustomRequest } from "../middleware/auth.middleware";
 import { dbFindJwtUserByZid } from "../models/auth.models";
-import { dbGetAllUsersExcept } from "../models/user.models";
+import { dbGetAllUsersExcept, dbRemoveUser } from "../models/user.models";
 import { removeUnwantedFields } from "../utils/user.utils";
 
 const router = express.Router();
@@ -17,14 +17,25 @@ router.get("/all", async (req: Request, res: Response) => {
     if (user.userType !== 'admin') {
       throw new Error("You do not have permission to view these informations!")
     }
-    const otherUsers = await dbGetAllUsersExcept(user.zid);
-    console.log(otherUsers[0])
-    const cleanedUsers = removeUnwantedFields(otherUsers);
-    console.log(cleanedUsers[0])
+    const cleanedUsers = removeUnwantedFields(await dbGetAllUsersExcept(user.zid));
 
-    res.status(200).send();
+    res.status(200).send(cleanedUsers);
   } catch (error) {
     res.status(500).send("Error retrieving users");
+  }
+})
+
+router.delete("/remove/:zid", async (req: Request, res: Response) => {
+  try {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+      throw new Error("Token is not valid");
+    }
+    const { zid } =  req.params;
+    await dbRemoveUser(zid)
+    res.status(200).send("Deleted successfully")
+  } catch (error) {
+    res.status(500).send("Error deleting user")
   }
 })
 
