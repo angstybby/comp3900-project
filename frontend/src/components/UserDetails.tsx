@@ -4,6 +4,7 @@ import {
 import { axiosInstanceWithAuth } from '../api/Axios';
 import { useState } from 'react';
 import LoadingCircle from './LoadingCircle';
+import { useModal } from '../contexts/DeleteModalContext';
 
 interface UserDetailsProps {
   zid: string;
@@ -23,6 +24,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({zid, fullname, userType, creat
     refetchData();
   }
 
+  const { openCloseModal } = useModal();
+
   return (
     <div className="p-4 mt-3 rounded-md bg-slate-100 shadow-md flex justify-between gap-2">
       <p className="w-1/12">{zid}</p>
@@ -32,7 +35,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({zid, fullname, userType, creat
       {loading ? ( 
         <LoadingCircle/> 
       ) : (
-        <div title='Delete User' onClick={deleteUser}>
+        <div title='Delete User' onClick={openCloseModal}>
           <TrashIcon className='h-[24px] hover:text-red-500 hover:scale-105 cursor-pointer'/>
         </div>
       )}

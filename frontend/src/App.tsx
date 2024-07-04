@@ -13,10 +13,11 @@ import CourseReco from './pages/CourseReco'
 import Admin from './pages/Admin'
 import ResetPassword from './pages/ResetPassword'
 import { ProfileProvider } from './contexts/ProfileContext'
+import { ModalProvider } from './contexts/DeleteModalContext'
 
 function App() {
   return (
-    <>
+    <ModalProvider>
       <ProfileProvider>
         <BrowserRouter>
           <Routes>
@@ -36,7 +37,7 @@ function App() {
           </Routes>
         </BrowserRouter >
       </ProfileProvider>
-    </>
+    </ModalProvider>
   )
 }
 

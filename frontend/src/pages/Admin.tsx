@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { axiosInstanceWithAuth } from "../api/Axios";
 import UserDetails from "../components/UserDetails";
 import LoadingCircle from "../components/LoadingCircle";
+import DeleteConfirmationModal from "../components/modals/DeleteConfirmationModal";
+import { useModal } from "../contexts/DeleteModalContext";
 
 interface Profile {
   zid: string,
@@ -25,6 +27,7 @@ export default function Admin() {
   const navigate = useNavigate();
   const [usersData, setUsersData] = useState<UserDetails[]>([]);
   const [loading, setLoading] = useState(false);
+  const { isModalOpen, openCloseModal } = useModal();
   let userType = Cookies.get('userType');
   const fetchData = async () => {
     setLoading(true);
@@ -41,23 +44,26 @@ export default function Admin() {
   }, [userType]);
 
   return (
-    <div className="p-5">
-      <p className="text-3xl font-bold mb-5">Showing All Active Users!</p>
-      {loading ? 
-        <div className="flex justify-center"><LoadingCircle/></div> 
-        : 
-        <>
-          {usersData.map((user) => (
-            <UserDetails 
+    <>
+      <div className="p-5">
+        <DeleteConfirmationModal open={isModalOpen} close={openCloseModal}/>
+        <p className="text-3xl font-bold mb-5">Showing All Active Users!</p>
+        {loading ? 
+          <div className="flex justify-center"><LoadingCircle/></div> 
+          : 
+          <>
+            {usersData.map((user) => (
+              <UserDetails 
               zid={user.zid} 
               fullname={user.profile.fullname} 
               userType={user.userType} 
               createdAt={user.createdAt} 
               refetchData={fetchData}
-            />
-          ))}
-        </>
-      }
-    </div>
+              />
+            ))}
+          </>
+        }
+      </div>
+    </>
   )
 }
