@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { CustomRequest } from "../middleware/auth.middleware";
 import { dbFindJwtUserByZid } from "../models/auth.models";
 import { dbGetAllUsersExcept, dbRemoveUser } from "../models/user.models";
-import { removeUnwantedFields } from "../utils/user.utils";
 
 const router = express.Router();
 
@@ -17,9 +16,9 @@ router.get("/all", async (req: Request, res: Response) => {
     if (user.userType !== 'admin') {
       throw new Error("You do not have permission to view these informations!")
     }
-    const cleanedUsers = removeUnwantedFields(await dbGetAllUsersExcept(user.zid));
+    const users = await dbGetAllUsersExcept(user.zid);
 
-    res.status(200).send(cleanedUsers);
+    res.status(200).send(users);
   } catch (error) {
     res.status(500).send("Error retrieving users");
   }

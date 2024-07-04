@@ -10,9 +10,16 @@ export const dbGetAllUsersExcept = async (toExclude: string): Promise<any> => {
           not: toExclude,
         }
       },
-      include: {
-        profile: true,
-      }
+      select: {
+        zid: true,
+        userType: true,
+        createdAt: true,
+        profile: {
+          select: {
+            fullname: true,
+          },
+        },
+    },  
     });
     if (!users) {
       throw new Error('Failed in retrieving users')
