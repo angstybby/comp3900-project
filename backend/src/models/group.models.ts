@@ -151,9 +151,20 @@ export const dbLeaveGroup = async (groupId: number, zId: string) => {
 export const dbUpdateGroup = async (
     groupId: number,
     groupName: string,
+    groupOwnerId: string,
     description: string,
 ) => {
     try {
+        const group = await prisma.group.findUnique({
+            where: {
+                id: groupId,
+            },
+        });
+
+        if (!group || group.groupOwnerId !== groupOwnerId) {
+            throw new Error("Only the group owner can update the group.");
+        }
+
         const updatedGroup = await prisma.group.update({
             where: {
                 id: groupId,
@@ -269,6 +280,95 @@ export const dbGroupExpressInterstProject = async (
         return newInterest;
     } catch (error) {
         console.error("Error expressing interest in project:", error);
+        throw error;
+    }
+};
+
+export const dbAcceptUserToGroup = async (
+    groupId: number,
+    groupOwnerId: string,
+    zId: string,
+) => {
+    try {
+        const group = await prisma.group.findUnique({
+            where: {
+                id: groupId,
+            },
+        });
+
+        if (!group || group.groupOwnerId !== groupOwnerId) {
+            throw new Error(
+                "Only the group owner can accept users to the group.",
+            );
+        }
+
+        const groupInterest = await prisma.groupInterest.findUnique({
+            where: {
+                groupId_zid: { groupId, zid: zId },
+            },
+        });
+
+        if (!groupInterest) {
+            throw new Error("User has not expressed interest in the group.");
+        }
+
+        await prisma.groupInterest.delete({
+            where: {
+                groupId_zid: { groupId, zid: zId },
+            },
+        });
+
+        await prisma.groupJoined.create({
+            data: {
+                groupId,
+                zid: zId,
+            },
+        });
+
+        return;
+    } catch (error) {
+        console.error("Error accepting user to group:", error);
+        throw error;
+    }
+};
+
+export const dbDeclineUserToGroup = async (
+    groupId: number,
+    groupOwnerId: string,
+    zId: string,
+) => {
+    try {
+        const group = await prisma.group.findUnique({
+            where: {
+                id: groupId,
+            },
+        });
+
+        if (!group || group.groupOwnerId !== groupOwnerId) {
+            throw new Error(
+                "Only the group owner can decline users to the group.",
+            );
+        }
+
+        const groupInterest = await prisma.groupInterest.findUnique({
+            where: {
+                groupId_zid: { groupId, zid: zId },
+            },
+        });
+
+        if (!groupInterest) {
+            throw new Error("User has not expressed interest in the group.");
+        }
+
+        await prisma.groupInterest.delete({
+            where: {
+                groupId_zid: { groupId, zid: zId },
+            },
+        });
+
+        return;
+    } catch (error) {
+        console.error("Error declining user to group:", error);
         throw error;
     }
 };

@@ -191,7 +191,7 @@ router.put("/update", async (req, res) => {
     const zid = customReq.token.zid;
 
     try {
-        await dbUpdateGroup(groupId, groupName, description);
+        await dbUpdateGroup(groupId, groupName, zid, description);
         return res.status(200).send("Group updated successfully");
     } catch (error) {
         console.error(error);
@@ -233,3 +233,5 @@ router.post("/kick", async (req, res) => {
             .send("An error occurred while kicking user from group");
     }
 });
+
+export default router;
