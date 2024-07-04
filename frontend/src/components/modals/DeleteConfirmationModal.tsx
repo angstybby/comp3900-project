@@ -1,10 +1,33 @@
 import { 
   Dialog, 
   DialogBackdrop, 
-  DialogPanel 
+  DialogPanel, 
+  DialogTitle
 } from '@headlessui/react'
+import ButtonWarning from '../ButtonWarning'
+import { useState } from 'react';
+import { axiosInstanceWithAuth } from '../../api/Axios';
+import LoadingCircle from '../LoadingCircle';
 
-const DeleteConfirmationModal = ({ open, close }: {open:boolean, close: () => void}) => {
+interface DeleteModalProps {
+  open: boolean;
+  close: () => void;
+  zid?: string;
+  refetchData: () => void;
+}
+
+const DeleteConfirmationModal: React.FC<DeleteModalProps> = ({ open, close, zid, refetchData }) => {
+  const [loading, setLoading] = useState(false);
+  
+  const confirmDeleteUser = async () => {
+    console.log(`deleting user of ${zid}`);
+    setLoading(true);
+    await axiosInstanceWithAuth.delete(`/user/remove/${zid}`);
+    setLoading(false);
+    refetchData();
+    close();
+  }
+
   return (
     <>
       <Dialog
@@ -24,7 +47,19 @@ const DeleteConfirmationModal = ({ open, close }: {open:boolean, close: () => vo
               transition
               className="w-full max-w-2xl rounded-xl bg-white/60 p-6 px-8 backdrop-blur-2xl duration-150 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
             >
-              
+              <DialogTitle className='mb-3'>
+                <span>
+                  Are you sure you want to delete this user 
+                </span>
+                <span className='font-bold'>
+                  {` (${zid}) `}
+                </span>
+                <span>?</span>
+              </DialogTitle>
+              <div onClick={confirmDeleteUser}>
+                {loading ? <div className='w-full flex justify-center'><LoadingCircle/></div> : <ButtonWarning text={'Yes'}/>}
+                
+              </div>
             </DialogPanel>
           </div>
         </div>
