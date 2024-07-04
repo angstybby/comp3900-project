@@ -20,8 +20,8 @@ type LoginProps = z.infer<typeof loginSchema>;
 axios.defaults.withCredentials = true;
 
 export default function Landing() {
+  const navigate = useNavigate();      
   const [isError, setIsError] = useState(false);
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const {
