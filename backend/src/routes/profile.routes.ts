@@ -51,15 +51,14 @@ router.put("/update-profile", async (req, res) => {
     }
 
     // Check all the fields are present or correct
-    let { zid, profilePicture, fullname, description, resume } =
-        req.body;
+    let { zid, profilePicture, fullname, description, resume } = req.body;
 
     // Checks if zid matches
     if (customReq.token.zid !== zid) {
         throw new Error("Zid is not valid");
     }
 
-    if (profilePicture.length > 5*1024*1024) {
+    if (profilePicture.length > 5 * 1024 * 1024) {
         return res.status(413).send("Image payload too large");
     }
 
