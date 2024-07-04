@@ -34,6 +34,12 @@ export const dbGetAllUsersExcept = async (toExclude: string): Promise<any> => {
 export const dbRemoveUser = async (zid: string): Promise<any> => {
   try {
     await prisma.$transaction(async (prisma) => {
+      await prisma.courseTaken.deleteMany({
+        where: {
+          zid: zid,
+        },
+      });
+      
       await prisma.profile.delete({
         where: {
           zid: zid,
