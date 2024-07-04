@@ -1,6 +1,9 @@
 import express from "express";
 import {
+    dbAcceptUserToGroup,
     dbCreateGroup,
+    dbDeclineUserToGroup,
+    dbGetGroupApplications,
     dbInviteUserToGroup,
     dbKickUserFromGroup,
     dbLeaveGroup,
@@ -8,7 +11,7 @@ import {
     dbUserExpressInterest,
 } from "../models/group.models";
 import { dbFindUserByZid } from "../models/auth.models";
-import { CustomRequest } from "../middleware/auth.middleware";
+import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
 
 const router = express.Router();
@@ -231,6 +234,81 @@ router.post("/kick", async (req, res) => {
         return res
             .status(500)
             .send("An error occurred while kicking user from group");
+    }
+});
+
+router.post("/accept", async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const { groupId, zId } = req.body;
+    if (!groupId) {
+        return res.status(400).send("Missing required fields");
+    }
+
+    const groupOwnerId = customReq.token.zid;
+
+    try {
+        await dbAcceptUserToGroup(groupId, groupOwnerId, zId);
+        return res.status(200).send("User accepted to group");
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .send("An error occurred while accepting user to group");
+    }
+});
+
+router.post("/decline", async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const { groupId, zId } = req.body;
+    if (!groupId) {
+        return res.status(400).send("Missing required fields");
+    }
+
+    const groupOwnerId = customReq.token.zid;
+
+    try {
+        await dbDeclineUserToGroup(groupId, groupOwnerId, zId);
+        return res.status(200).send("User rejected from group");
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .send("An error occurred while rejecting user from group");
+    }
+});
+
+router.get("/group-applications/:groupId", authMiddleWare, async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        return res.status(401).send("Unauthorized");
+    }
+
+    const { groupId } = req.params;
+    if (!groupId) {
+        return res.status(400).send("Missing required fields");
+    }
+
+    const groupOwnerId = customReq.token.zid;
+
+    try {
+        const groupApplications = await dbGetGroupApplications(
+            parseInt(groupId),
+            groupOwnerId,
+        );
+        return res.status(200).send(groupApplications);
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .send("An error occurred while fetching group applications");
     }
 });
 

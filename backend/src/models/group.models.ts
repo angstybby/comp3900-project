@@ -372,3 +372,52 @@ export const dbDeclineUserToGroup = async (
         throw error;
     }
 };
+
+export const dbFindGroupByString = async (name: string) => {
+    return await prisma.group.findMany({
+        where: {
+            groupName: {
+                contains: name,
+            },
+        },
+        select: {
+            id: true,
+            groupName: true,
+            description: true,
+            groupOwnerId: true,
+        },
+    });
+};
+
+export const dbGetGroupApplications = async (
+    groupId: number,
+    groupOwnerId: string,
+) => {
+    try {
+        const group = await prisma.group.findUnique({
+            where: {
+                id: groupId,
+            },
+        });
+
+        if (!group || group.groupOwnerId !== groupOwnerId) {
+            throw new Error(
+                "Only the group owner can view group applications.",
+            );
+        }
+
+        const groupInterests = await prisma.groupInterest.findMany({
+            where: {
+                groupId,
+            },
+            select: {
+                zid: true,
+            },
+        });
+
+        return groupInterests;
+    } catch (error) {
+        console.error("Error getting group applications:", error);
+        throw error;
+    }
+};
