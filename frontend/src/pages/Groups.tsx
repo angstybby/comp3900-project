@@ -1,25 +1,50 @@
-import GroupCard from "@/components/GroupsComponents/GroupCard";
-import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import GroupCard from "@/components/GroupsComponents/GroupCard";
 
-const responsive = {
-  superLargeDesktop: {
-    breakpoint: { max: 4000, min: 3000 },
-    items: 5
+// Group Data Placeholders
+const groups = [
+  {
+    id: 1,
+    name: "Group Name 1",
+    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
+    members: 1,
+    maxMembers: 5
   },
-  desktop: {
-    breakpoint: { max: 3000, min: 1024 },
-    items: 3
+  {
+    id: 2,
+    name: "Group Name 2",
+    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
+    members: 2,
+    maxMembers: 5
   },
-  tablet: {
-    breakpoint: { max: 1024, min: 464 },
-    items: 1
+  {
+    id: 3,
+    name: "Group Name 3",
+    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
+    members: 3,
+    maxMembers: 5
   },
-  mobile: {
-    breakpoint: { max: 464, min: 0 },
-    items: 1
-  }
-};
+  {
+    id: 4,
+    name: "Group Name 4",
+    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
+    members: 4,
+    maxMembers: 5
+  },
+  {
+    id: 5,
+    name: "Group Name 5",
+    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
+    members: 5,
+    maxMembers: 5
+  },
+]
 
 
 export default function Groups() {
@@ -28,17 +53,24 @@ export default function Groups() {
       <div className="w-full flex flex-col p-14">
         <div className="h-1/3 flex flex-col">
           <h1 className="text-4xl font-medium">Your Groups</h1>
-          <Carousel sliderClass="h-full" containerClass=" my-5 flex-1" responsive={responsive}>
-            <GroupCard />
-            <GroupCard />
-            <GroupCard />
+          <Carousel className="mt-5 w-full max-w-[95%] mx-auto" opts={{
+            align: "start"
+          }}>
+            <CarouselContent>
+              {groups.map((group) => (
+                <GroupCard key={group.id} group={group} inCarousel={true} />
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
           </Carousel>
         </div>
         <div className="h-2/3">
           <h1 className="text-4xl font-medium">Groups for you</h1>
-          <div className="h-full grid lg:grid-cols-3 md:grid-cols-1 grid-rows-3 mt-5">
-            <GroupCard />
-            <GroupCard />
+          <div className="w-[95%] mx-auto grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 grid-rows-2 mt-5 gap-y-14 gap-x-5">
+            {groups.map((group) => (
+              <GroupCard key={group.id} group={group} inCarousel={false} />
+            ))}
           </div>
         </div>
       </div>
