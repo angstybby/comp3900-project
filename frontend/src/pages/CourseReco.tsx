@@ -1,4 +1,4 @@
-import ButtonPrimary from "@/components/ButtonPrimary";
+import ButtonPrimary from "@/components/Buttons/ButtonPrimary";
 
 export default function CourseReco() {
   return (

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import UserDetails from "@/components/UserDetails";
 import LoadingCircle from "@/components/LoadingCircle";
-import DeleteConfirmationModal from "@/components/modals/DeleteConfirmationModal";
+import DeleteConfirmationModal from "@/components/Modals/DeleteConfirmationModal";
 import { useDeleteModal } from "@/contexts/DeleteModalContext";
 
 interface Profile {

@@ -7,8 +7,7 @@ export default {
     "./src/**/*.{ts,tsx}",
   ],
   theme: {
-    extend: {
-    },
+    extend: {},
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [require("@tailwindcss/forms"), require("@tailwindcss/line-clamp")],
 };

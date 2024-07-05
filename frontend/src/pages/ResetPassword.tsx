@@ -1,5 +1,5 @@
-import ButtonSubmit from "@/components/ButtonSubmit";
-import Textbox from "@/components/Textbox";
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
+import Textbox from "@/components/Inputs/Textbox";
 import { forgetPasswordSchema, resetPasswordSchema } from "@/utils/auth.schema";
 
 import { useForm } from "react-hook-form";
@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { axiosNoAuth } from "@/api/Axios";
 import axios from "axios";
 import { useState } from "react";
-import ButtonLoading from "@/components/ButtonLoading";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
 
 
 type ForgetPasswordProps = z.infer<typeof forgetPasswordSchema>;

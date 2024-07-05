@@ -4,7 +4,7 @@ import {
   DialogPanel,
   DialogTitle
 } from '@headlessui/react'
-import ButtonWarning from "@/components/ButtonWarning";
+import ButtonWarning from "@/components/Buttons/ButtonWarning";
 import { useState } from 'react';
 import { axiosInstanceWithAuth } from '@/api/Axios';
 import LoadingCircle from '@/components/LoadingCircle';

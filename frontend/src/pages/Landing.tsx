@@ -1,6 +1,6 @@
 // Local Imports
-import ButtonSubmit from "@/components/ButtonSubmit";
-import Textbox from "@/components/Textbox";
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
+import Textbox from "@/components/Inputs/Textbox";
 import { loginSchema } from "@/utils/auth.schema";
 
 import { useForm } from "react-hook-form";
@@ -9,7 +9,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useState } from "react";
-import ButtonLoading from "@/components/ButtonLoading";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import { JwtUser } from "@/utils/interfaces";
 import { jwtDecode } from "jwt-decode";
 import { getToken } from "@/api/Axios";
