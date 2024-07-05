@@ -1,19 +1,19 @@
 // Local Imports
-import Textbox from "../components/Textbox";
-import ButtonSubmit from "../components/ButtonSubmit";
-import { registerSchema } from "../utils/auth.schema";
+import Textbox from "@/components/Textbox";
+import ButtonSubmit from "@/components/ButtonSubmit";
+import { registerSchema } from "@/utils/auth.schema";
 
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import ButtonLoading from "../components/ButtonLoading";
+import ButtonLoading from "@/components/ButtonLoading";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { getToken } from "../api/Axios";
+import { getToken } from "@/api/Axios";
 import Cookies from "js-cookie";
-import { JwtUser } from "../utils/interfaces";
+import { JwtUser } from "@/utils/interfaces";
 
 type RegisterProps = z.infer<typeof registerSchema>;
 

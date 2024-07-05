@@ -1,4 +1,4 @@
-import ButtonPrimary from "../components/ButtonPrimary";
+import ButtonPrimary from "@/components/ButtonPrimary";
 
 export default function CourseReco() {
   return (
@@ -23,17 +23,17 @@ export default function CourseReco() {
                 </label>
               </div>
               <div className="mt-4">
-                <ButtonPrimary text="Create Group" url="/Dashboard"/>
+                <ButtonPrimary text="Create Group" url="/Dashboard" />
               </div>
             </form>
           </div>
           <div className="mt-20 flex justify-end">
             <div className="w-1/6">
-              <ButtonPrimary text="Next" url="/Dashboard"/>
+              <ButtonPrimary text="Next" url="/Dashboard" />
             </div>
           </div>
         </div>
       </div>
     </>
-    );
-  }
+  );
+}

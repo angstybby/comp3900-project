@@ -1,7 +1,7 @@
 // Local Imports
-import ButtonSubmit from "../components/ButtonSubmit";
-import Textbox from "../components/Textbox";
-import { loginSchema } from "../utils/auth.schema";
+import ButtonSubmit from "@/components/ButtonSubmit";
+import Textbox from "@/components/Textbox";
+import { loginSchema } from "@/utils/auth.schema";
 
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
@@ -9,10 +9,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useState } from "react";
-import ButtonLoading from "../components/ButtonLoading";
-import { JwtUser } from "../utils/interfaces";
+import ButtonLoading from "@/components/ButtonLoading";
+import { JwtUser } from "@/utils/interfaces";
 import { jwtDecode } from "jwt-decode";
-import { getToken } from "../api/Axios";
+import { getToken } from "@/api/Axios";
 import Cookies from "js-cookie";
 
 type LoginProps = z.infer<typeof loginSchema>;
@@ -20,7 +20,7 @@ type LoginProps = z.infer<typeof loginSchema>;
 axios.defaults.withCredentials = true;
 
 export default function Landing() {
-  const navigate = useNavigate();      
+  const navigate = useNavigate();
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
 

@@ -1,13 +1,13 @@
-import { 
-  Dialog, 
-  DialogBackdrop, 
-  DialogPanel, 
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
   DialogTitle
 } from '@headlessui/react'
-import ButtonWarning from '../ButtonWarning'
+import ButtonWarning from "@/components/ButtonWarning";
 import { useState } from 'react';
-import { axiosInstanceWithAuth } from '../../api/Axios';
-import LoadingCircle from '../LoadingCircle';
+import { axiosInstanceWithAuth } from '@/api/Axios';
+import LoadingCircle from '@/components/LoadingCircle';
 
 interface DeleteModalProps {
   open: boolean;
@@ -18,7 +18,7 @@ interface DeleteModalProps {
 
 const DeleteConfirmationModal: React.FC<DeleteModalProps> = ({ open, close, zid, refetchData }) => {
   const [loading, setLoading] = useState(false);
-  
+
   const confirmDeleteUser = async () => {
     try {
       setLoading(true);
@@ -58,10 +58,10 @@ const DeleteConfirmationModal: React.FC<DeleteModalProps> = ({ open, close, zid,
               <div onClick={confirmDeleteUser}>
                 {loading ? (
                   <div className='w-full flex justify-center'>
-                    <LoadingCircle/>
+                    <LoadingCircle />
                   </div>
                 ) : (
-                  <ButtonWarning text={'Yes'}/>
+                  <ButtonWarning text={'Yes'} />
                 )}
               </div>
             </DialogPanel>
