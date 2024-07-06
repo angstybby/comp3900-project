@@ -2,8 +2,8 @@ import ButtonSubmit from "../components/ButtonSubmit";
 import TextArea from "../components/TextArea";
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { axiosInstanceWithAuth } from "../api/Axios";
-import ButtonLoading from "../components/ButtonLoading";
 import { useNavigate } from "react-router-dom";
+import ButtonLoading from "../components/ButtonLoading";
 
 
 export default function Upload() {
@@ -11,10 +11,24 @@ export default function Upload() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
+      const formData = new FormData();
+      formData.append('pdfUpload', file);
+      setLoading(true);
+      try {
+        const response = await axiosInstanceWithAuth.post('profile/scrape-pdf', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        console.log(response.data.text)
+      } catch (error) {
+        console.error('Error uploading file', error);
+      }
+      setLoading(false);
     }
   }
 
@@ -33,22 +47,18 @@ export default function Upload() {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
-      }
-      )
-
+      })
       if (response.status === 200) {
-        setLoading(false);
         console.log('File uploaded successfully');
         navigate('/courseRecommendations');
       } else {
-        setLoading(false);
         console.error('Error uploading file');
 
       }
     } catch (error) {
       console.error('Error uploading file', error);
-      setLoading(false);
     }
+    setLoading(false);
   }
 
   return (
@@ -111,7 +121,6 @@ export default function Upload() {
               </div>
             </form>
           </div>
-
         </div >
       </div >
     </>

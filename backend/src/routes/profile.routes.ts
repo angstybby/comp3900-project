@@ -8,6 +8,8 @@ import { Profile } from "@prisma/client";
 
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
+import { readTextFromPdfFile } from "../utils/profile.utils";
+import PdfParse from "pdf-parse";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -81,6 +83,30 @@ router.put("/update-profile", async (req, res) => {
         res.status(500).send("An error occurred while updating the profile");
     }
 });
+
+router.post("/scrape-pdf", upload.single("pdfUpload"), async (req: Request, res: Response) => {
+    try {
+        const customReq = req as CustomRequest;
+        if (!customReq.token || typeof customReq.token === "string") {
+            throw new Error("Token is not valid");
+        }
+
+        const file = req.file;
+        // Check if file is present
+        if (!file) {
+            throw new Error("No file uploaded");
+        }
+        // Check if file is a pdf
+        if (file.mimetype !== "application/pdf") {
+            throw new Error("File is not a pdf");
+        }
+        const text = await PdfParse(file.buffer);
+        res.status(200).send(text);
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('An error occured when scraping the PDF File')
+    }
+})
 
 router.post(
     "/upload-transcript",
