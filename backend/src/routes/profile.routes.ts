@@ -8,7 +8,6 @@ import { Profile } from "@prisma/client";
 
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-import { readTextFromPdfFile } from "../utils/profile.utils";
 import PdfParse from "pdf-parse";
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -108,8 +107,7 @@ router.post("/scrape-pdf", upload.single("pdfUpload"), async (req: Request, res:
     }
 })
 
-router.post(
-    "/upload-transcript",
+router.post("/upload-transcript",
     upload.single("pdfUpload"),
     async (req, res) => {
         try {
