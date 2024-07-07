@@ -104,10 +104,14 @@ router.post(
                 throw new Error("File is not a pdf");
             }
 
-            console.log(file.buffer);
-
             const date = new Date().toISOString();
 
+            // TODO: Get every course from the transcript and put it into the Profile CourseTaken
+            // const courseTaken = await extractCoursesFromTranscript(file.buffer);
+
+            // courseTaken.forEach(async (course) => {
+            //     await dbAddCourseTaken(customReq.token.zid, course);
+            // });
             // Upload file to S3
             try {
                 const upload = new Upload({

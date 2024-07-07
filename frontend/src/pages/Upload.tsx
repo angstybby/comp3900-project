@@ -1,8 +1,8 @@
-import ButtonSubmit from "../components/ButtonSubmit";
-import TextArea from "../components/TextArea";
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
+import TextArea from "@/components/Inputs/TextArea";
 import { useState, ChangeEvent, FormEvent } from 'react';
-import { axiosInstanceWithAuth } from "../api/Axios";
-import ButtonLoading from "../components/ButtonLoading";
+import { axiosInstanceWithAuth } from "@/api/Axios";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import { useNavigate } from "react-router-dom";
 
 

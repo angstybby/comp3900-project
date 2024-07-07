@@ -1,7 +1,7 @@
 import {
   TrashIcon
 } from '@heroicons/react/24/outline';
-import { useDeleteModal } from '../contexts/DeleteModalContext';
+import { useDeleteModal } from '@/contexts/DeleteModalContext';
 
 interface UserDetailsProps {
   zid: string;
@@ -10,7 +10,7 @@ interface UserDetailsProps {
   createdAt: string;
 }
 
-const UserDetails: React.FC<UserDetailsProps> = ({zid, fullname, userType, createdAt}) => {
+const UserDetails: React.FC<UserDetailsProps> = ({ zid, fullname, userType, createdAt }) => {
   const userSince = new Date(createdAt);
   const { openCloseModal, updateTargetZid } = useDeleteModal();
 
@@ -21,10 +21,10 @@ const UserDetails: React.FC<UserDetailsProps> = ({zid, fullname, userType, creat
       <p className="w-1/12 mr-2 font-bold">{userType}</p>
       <p className="w-1/5 overflow-hidden">{`User since: ${userSince.toLocaleDateString()}`}</p>
       <div title='Delete User' onClick={() => {
-          updateTargetZid(zid);
-          openCloseModal();
-        }}>
-        <TrashIcon className='h-[24px] hover:text-red-500 hover:scale-105 cursor-pointer'/>
+        updateTargetZid(zid);
+        openCloseModal();
+      }}>
+        <TrashIcon className='h-[24px] hover:text-red-500 hover:scale-105 cursor-pointer' />
       </div>
     </div>
   )
