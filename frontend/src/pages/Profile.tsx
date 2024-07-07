@@ -1,13 +1,13 @@
 import { FormEvent, ChangeEvent, useState, useEffect } from "react";
 import "flowbite/dist/flowbite.min.css";
-import { axiosInstanceWithAuth } from "../api/Axios";
-import ButtonLoading from "../components/ButtonLoading";
-import 'flowbite/dist/flowbite.min.css'; 
-import ButtonUtility from "../components/ButtonUtility";
-import ButtonSubmit from "../components/ButtonSubmit";
+import { axiosInstanceWithAuth } from "@/api/Axios";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
+import 'flowbite/dist/flowbite.min.css';
+import ButtonUtility from "@/components/Buttons/ButtonUtility";
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
 import { Options } from "browser-image-compression";
 import imageCompression from "browser-image-compression";
-import { useProfile } from "../contexts/ProfileContext";
+import { useProfile } from "@/contexts/ProfileContext";
 
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
@@ -30,7 +30,7 @@ export default function Profile() {
   useEffect(() => {
     fetchProfileData();
   }, []);
-  
+
   useEffect(() => {
     if (profileData) {
       setEditProfileInfo({
@@ -95,8 +95,8 @@ export default function Profile() {
     // Compress the image to 5mb at most
     const imageOptions: Options = { maxSizeMB: 5 }
     imageCompression(file, imageOptions)
-    .then(compressed => {setSelectedFile(compressed)})
-    .catch(error => {console.log(error)})
+      .then(compressed => { setSelectedFile(compressed) })
+      .catch(error => { console.log(error) })
     return;
   };
 
@@ -116,7 +116,7 @@ export default function Profile() {
     const imageDataURL = await imageCompression.getDataUrlFromFile(selectedFile)
     try {
       setLoading(true);
-      await axiosInstanceWithAuth.put('/profile/update-profile', { 
+      await axiosInstanceWithAuth.put('/profile/update-profile', {
         zid: profileData.zid,
         profilePicture: imageDataURL,
         fullname: profileData.fullname,
@@ -129,7 +129,7 @@ export default function Profile() {
     }
     setLoading(false);
     setShowChangeProfPicModal(false);
-    return;    
+    return;
   }
 
   return (
