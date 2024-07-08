@@ -26,13 +26,17 @@ router.post("/add", async (req, res) => {
     if (!customReq.token || typeof customReq.token === "string") {
         throw new Error("Token is not valid");
     }
-
-    const { course } = req.body;
+    // changed it to req.body.id to get course id
+    const course = req.body.id;
     const zid = customReq.token.zid;
 
+    console.log(course);
+    console.log(zid);
+
     try {
-        await dbAddCourse(zid, course);
+        await dbAddCourse(course, zid);
         res.status(200).send("Course added successfully");
+        console.log("COMPLETED");
     } catch (error) {
         console.log(error);
         res.status(500).send("An error occurred while adding course");
