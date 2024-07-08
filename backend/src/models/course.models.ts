@@ -27,21 +27,28 @@ export const dbFindCourseByString = async (name: string) => {
 };
 
 export const dbAddCourse = async (courseId: string, zid: string) => {
-    prisma.courseTaken.create({
-        data: {
-            course: {
-                connect: {
-                    id: courseId,
-                },
-            },
-            profileOwner: {
-                connect: {
-                    zid,
-                },
-            },
+  try {
+    await prisma.courseTaken.create({
+      data: {
+        course: {
+          connect: {
+            id: courseId,
+          },
         },
+        profileOwner: {
+          connect: {
+            zid,
+          },
+        },
+      },
     });
+    console.log(`Course ${courseId} added for user ${zid}`);
+  } catch (error) {
+    console.error("Error in dbAddCourse:", error);
+    throw error;
+  }
 };
+
 
 export const dbDeleteCourse = async (courseId: string, zid: string) => {
     prisma.courseTaken.delete({
