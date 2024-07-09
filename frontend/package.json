@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@fontsource/roboto": "^5.0.13",
     "@headlessui/react": "^2.0.4",
     "@heroicons/react": "^2.1.4",
@@ -22,7 +24,16 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.52.0",
     "react-router-dom": "^6.23.1",
-    "zod": "^3.23.8"
+    "styled-components": "^6.1.11",
+    "zod": "^3.23.8",
+    "@mui/icons-material": "^5.15.20",
+    "@mui/material": "^5.15.20",
+    "@reduxjs/toolkit": "^2.2.5",
+    "@trycourier/courier": "^6.2.1",
+    "@trycourier/react-inbox": "^6.0.0",
+    "@trycourier/react-provider": "^6.0.0",
+    "react-redux": "^9.1.2",
+    "react-toastify": "^10.0.5"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

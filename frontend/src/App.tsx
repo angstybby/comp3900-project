@@ -12,6 +12,7 @@ import Profile from './pages/Profile'
 import CourseReco from './pages/CourseReco'
 import Admin from './pages/Admin'
 import ResetPassword from './pages/ResetPassword'
+import Notification from './pages/Notification'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
               <Route path={`/groups`} element={<Groups />} />
               <Route path={`/projects`} element={<Projects />} />
               <Route path={`/profile`} element={<Profile />} />
+              <Route path={`/notifications`} element={<Notification />} />
               <Route path={`/manage-users`} element={<Admin />} />
             </Route>
             <Route path={`/register`} element={<Register />} />
