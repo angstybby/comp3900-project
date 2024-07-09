@@ -9,6 +9,15 @@ import { CustomRequest } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
+/**
+ * @route POST /course/search
+ * @desc Search for a course
+ * @access Public
+ * @returns {Array} Array of courses
+ * @returns {String} Error message
+ * @throws {400} If no search string is provided
+ * @throws {500} If an error occurs while searching for course
+ */
 router.post("/search", async (req, res) => {
     console.log("Searching for course");
     const { name } = req.body;
@@ -21,6 +30,15 @@ router.post("/search", async (req, res) => {
     return res.status(200).send(courses);
 });
 
+/**
+ * @route POST /course/add
+ * @desc Add a course to user
+ * @access Private
+ * @returns {String} Success message
+ * @returns {String} Error message
+ * @throws {400} If no course is provided
+ * @throws {500} If an error occurs while adding course
+ */
 router.post("/add", async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -39,6 +57,15 @@ router.post("/add", async (req, res) => {
     }
 });
 
+/**
+ * @route DELETE /course/delete
+ * @desc Delete a course from user
+ * @access Private
+ * @returns {String} Success message
+ * @returns {String} Error message
+ * @throws {400} If no course is provided
+ * @throws {500} If an error occurs while deleting course
+ */
 router.delete("/delete", async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
