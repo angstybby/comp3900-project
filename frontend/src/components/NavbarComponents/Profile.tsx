@@ -1,8 +1,8 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
 import Cookies from 'js-cookie'
-import { useProfile } from '../../contexts/ProfileContext'
+import { useProfile } from '@/contexts/ProfileContext'
 import { useEffect, useState } from 'react'
-import ButtonLoading from '../ButtonLoading'
+import LoadingCircle from '@/components/LoadingCircle'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -10,7 +10,7 @@ function classNames(...classes: string[]) {
 
 export default function Profile() {
   const { profileData } = useProfile();
-  
+
   const logout = () => {
     const allCookieFields = Cookies.get();
     Object.keys(allCookieFields).forEach((cookieName) => {
@@ -19,26 +19,42 @@ export default function Profile() {
   }
 
   const [fetched, setFetched] = useState(false);
+  const [userType, setUserType] = useState('');
   useEffect(() => {
     if (profileData.fullname !== undefined) {
       setFetched(true);
+    }
+    const type = Cookies.get('userType');
+    if (type === 'student') {
+      setUserType('Student');
+    } else if (type === 'academic') {
+      setUserType('Academic');
+    } else if (type === 'admin') {
+      setUserType('Admin');
     }
   }, [profileData])
 
   return (
     <Menu as="div" className="relative inline-block w-full text-left mt-auto bg-white hover:bg-gray-50">
       <div>
-        <MenuButton className="flex w-full justify-start items-center gap-x-5 rounded-md px-7 py-5 text-sm text-gray-900">
-          <img className="w-11 h-11 rounded-full" src={profileData.profilePicture} alt="Rounded avatar" />
-          <div className='flex flex-col justify-start items-start tracking-widest'>
-            <p className='font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-36'>
-              {fetched ? `${profileData.fullname}` : <ButtonLoading/>}
-            </p>
-            {Cookies.get('userType') ?
-              <p>{`${Cookies.get('userType')}`}</p> : <p>{''}</p>
-            }
+        {fetched
+          ?
+          <MenuButton className="flex w-full justify-start items-center gap-x-5 rounded-md px-7 py-5 text-sm text-gray-900">
+            <img className="w-11 h-11 rounded-full" src={profileData.profilePicture} alt="Rounded avatar" />
+            <div className='flex flex-col justify-start items-start tracking-widest'>
+              <p className='font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-36'>
+                {profileData.fullname}
+              </p>
+              {Cookies.get('userType') ?
+                <p>{userType}</p> : <p>{''}</p>
+              }
+            </div>
+          </MenuButton>
+          :
+          <div className="justify-center flex mb-5 mt-5 align-middle">
+            <LoadingCircle />
           </div>
-        </MenuButton>
+        }
       </div>
       <Transition
         enter="transition ease-out duration-100"

@@ -1,22 +1,23 @@
 import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import './App.css'
-import Landing from './pages/Landing'
-import Register from './pages/Register'
-import Home from './pages/Home'
-import Upload from './pages/Upload'
-import SidebarLayout from './components/SidebarLayout'
-import Courses from './pages/Courses'
-import Groups from './pages/Groups'
-import Projects from './pages/Projects'
-import Profile from './pages/Profile'
-import CourseReco from './pages/CourseReco'
-import Admin from './pages/Admin'
-import ResetPassword from './pages/ResetPassword'
-import { ProfileProvider } from './contexts/ProfileContext'
+import Landing from '@/pages/Landing'
+import Register from '@/pages/Register'
+import Home from '@/pages/Home'
+import Upload from '@/pages/Upload'
+import SidebarLayout from './components/Sidebar/SidebarLayout'
+import Courses from '@/pages/Courses'
+import Groups from '@/pages/Groups'
+import Projects from '@/pages/Projects'
+import Profile from '@/pages/Profile'
+import CourseReco from '@/pages/CourseReco'
+import Admin from '@/pages/Admin'
+import ResetPassword from '@/pages/ResetPassword'
+import { ProfileProvider } from '@/contexts/ProfileContext'
+import { ModalProvider } from '@/contexts/DeleteModalContext'
 
 function App() {
   return (
-    <>
+    <ModalProvider>
       <ProfileProvider>
         <BrowserRouter>
           <Routes>
@@ -36,7 +37,7 @@ function App() {
           </Routes>
         </BrowserRouter >
       </ProfileProvider>
-    </>
+    </ModalProvider>
   )
 }
 
