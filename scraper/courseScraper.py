@@ -1,8 +1,6 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import json
-import requests
-import re
 import time
 
 url = "https://unilectives.devsoc.app/"
