@@ -22,10 +22,11 @@ const Courses: React.FC = () => {
         <h1 className="text-4xl font-medium">Courses</h1>
         {userType === 'student' && (
           <div className="flex items-center space-x-4" title="Add Course Button">
-            <ButtonUtility text={"Upload Courses"} onClick={() => navigate('/Upload')} />
-            <ButtonUtility text={"Add Course"} onClick={() => setShowAddCourseModal(true)} />
+            <ButtonUtility text={"Upload Courses Taken"} onClick={() => navigate('/Upload')} />
+            <ButtonUtility text={"Add Courses Taken"} onClick={() => setShowAddCourseModal(true)} />
           </div>
         )}
+        {/* subject to change, not sure how admin/acadmics are done */}
         {userType === 'admin' && (
           <div className="flex items-center space-x-4" title="Add Course Button">
             <ButtonUtility text={"admin Scrape Course"} onClick={() => null} />

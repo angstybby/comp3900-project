@@ -36,7 +36,7 @@ router.post("/add", async (req, res) => {
     try {
         await dbAddCourse(course, zid);
         res.status(200).send("Course added successfully");
-        console.log("COMPLETED");
+        console.log("Course added");
     } catch (error) {
         console.log(error);
         res.status(500).send("An error occurred while adding course");
