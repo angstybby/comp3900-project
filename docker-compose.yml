@@ -8,6 +8,8 @@ services:
     ports:
       - "3000:3000"
       - "5555:5555"
+    environment:
+      DATABASE_URL: mysql://root:password@db:3306/mydb?schema=public
     env_file:
       - .env
 
