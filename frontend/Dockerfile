@@ -1,6 +1,9 @@
 # Build stage
 FROM --platform=linux/amd64 node:21-alpine as build
 
+ARG BACKEND_URL
+ENV BACKEND_URL=http://backend:3000:
+
 WORKDIR /usr/src/app
 
 COPY package*.json ./
