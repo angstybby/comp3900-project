@@ -14,8 +14,7 @@ import { JwtUser } from "../utils/interfaces";
 import { jwtDecode } from "jwt-decode";
 import { getToken } from "../api/Axios";
 import Cookies from "js-cookie";
-// import { BASE_URL } from "../utils/constants";
-import { loadEnv } from 'vite';
+import { BASE_URL } from "../utils/constants";
 
 
 type LoginProps = z.infer<typeof loginSchema>;
@@ -42,7 +41,7 @@ export default function Landing() {
   const onSubmit = async (data: LoginProps) => {
     try {
       setLoading(true);
-      await axios.post(import.meta.env.BASE_URL + "/auth/login", {
+      await axios.post(BASE_URL + "/auth/login", {
         email: data.email,
         password: data.password,
       });

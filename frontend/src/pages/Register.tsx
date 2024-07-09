@@ -14,7 +14,7 @@ import { jwtDecode } from "jwt-decode";
 import { getToken } from "../api/Axios";
 import Cookies from "js-cookie";
 import { JwtUser } from "../utils/interfaces";
-// import { BASE_URL } from "../utils/constants";
+import { BASE_URL } from "../utils/constants";
 
 type RegisterProps = z.infer<typeof registerSchema>;
 
@@ -43,7 +43,7 @@ export default function Register() {
   const onSubmit = async (data: RegisterProps) => {
     try {
       setLoading(true);
-      await axios.post(import.meta.env.BASE_URL + "/auth/register", {
+      await axios.post(BASE_URL + "/auth/register", {
         email: data.email,
         password: data.password,
         fullname: data.name,
