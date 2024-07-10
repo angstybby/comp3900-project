@@ -1,6 +1,5 @@
 import "react-multi-carousel/lib/styles.css";
 import CourseCard from "@/components/CoursesComponents/CourseCard";
-import { useNavigate } from 'react-router-dom';
 import SearchBar from "@/components/Inputs/SearchBar";
 import { useEffect, useState } from "react";
 import { axiosInstanceWithAuth } from "@/api/Axios";
@@ -12,7 +11,6 @@ interface Course {
 }
 
 export default function Courses() {
-  const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   useEffect(() => {
     const fetchCourses = async () => {

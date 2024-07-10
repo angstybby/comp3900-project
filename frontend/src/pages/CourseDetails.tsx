@@ -6,7 +6,6 @@ import { useParams } from "react-router-dom"
 
 const CourseDetails = () => {
   const { courseId } = useParams<{ courseId: string }>();
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
