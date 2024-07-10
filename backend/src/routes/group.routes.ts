@@ -4,6 +4,7 @@ import {
     dbCreateGroup,
     dbDeclineUserToGroup,
     dbGetGroupApplications,
+    dbGetUserInGroup,
     dbInviteUserToGroup,
     dbKickUserFromGroup,
     dbLeaveGroup,
@@ -237,6 +238,16 @@ router.post("/kick", async (req, res) => {
     }
 });
 
+/**
+ * @route POST /group/accept
+ * @desc Accept a user to a group
+ * @access Private
+ * @type RequestHandler
+ * @param {number} groupId - The id of the group
+ * @param {string} zId - The zid of the user to accept
+ * @returns {string} - Success message
+ * @throws {Error} - If the request body is missing required fields
+ */
 router.post("/accept", async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -261,6 +272,16 @@ router.post("/accept", async (req, res) => {
     }
 });
 
+/**
+ * @route POST /group/decline
+ * @desc Decline a user from a group
+ * @access Private
+ * @type RequestHandler
+ * @param {number} groupId - The id of the group
+ * @param {string} zId - The zid of the user to decline
+ * @returns {string} - Success message
+ * @throws {Error} - If the request body is missing required fields
+ */
 router.post("/decline", async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -285,6 +306,16 @@ router.post("/decline", async (req, res) => {
     }
 });
 
+/**
+ * @route GET /group/group-applications/:groupId
+ * @desc Get all the applications for a group
+ * @access Private
+ * @type RequestHandler
+ * @param {number} groupId - The id of the group
+ * @returns {GroupApplication[]} - Array of group applications
+ * @throws {Error} - If the request body is missing required fields
+ * @throws {Error} - If an error occurs while fetching group applications
+ */
 router.get("/group-applications/:groupId", authMiddleWare, async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -309,6 +340,23 @@ router.get("/group-applications/:groupId", authMiddleWare, async (req, res) => {
         return res
             .status(500)
             .send("An error occurred while fetching group applications");
+    }
+});
+
+router.get("/groups", authMiddleWare, async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        return res.status(401).send("Unauthorized");
+    }
+
+    const zid = customReq.token.zid;
+
+    try {
+        const groups = await dbGetUserInGroup(zid);
+        return res.status(200).send(groups);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("An error occurred while fetching groups");
     }
 });
 
