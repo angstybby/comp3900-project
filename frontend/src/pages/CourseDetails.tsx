@@ -19,19 +19,21 @@ const CourseDetails = () => {
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
-      const formData = new FormData();
-      formData.append('pdfUpload', file);
       setLoading(true);
+      setSelectedFile(file);
+      const formData = new FormData().append('pdfUpload', file);
       try {
-        const response = await axiosInstanceWithAuth.post('/course/parse-outline', formData, {
+        const response = await axiosInstanceWithAuth.post('/course/parse-outline', 
+          formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         })
         setSummary(response.data.summary);
-        const skillsSplit = response.data.skills.split('-').map((skill: string) => skill.trim());
-        setSkills(skillsSplit);
+        setSkills(response.data.skills
+          .split('- ')
+          .map((skill: string) => skill
+          .trim()));
       } catch (error) {
         console.error('Error uploading file', error);
       }
