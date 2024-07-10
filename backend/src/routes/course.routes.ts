@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import {
     dbAddCourse,
     dbDeleteCourse,
@@ -13,6 +13,13 @@ import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
+/**
+ * Search for a course by their course code or title
+ * @name POST /search
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @returns {Response} A response object containing the courses matching the search string.
+ */
 router.post("/search", async (req, res) => {
     console.log("Searching for course");
     const { name } = req.body;
@@ -25,6 +32,14 @@ router.post("/search", async (req, res) => {
     return res.status(200).send(courses);
 });
 
+/**
+ * Adds the course to the list of courses taken by the user
+ * @name POST /add
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the token is not valid.
+ * @returns {Response} A response object indicating the success or failure of the course addition.
+ */
 router.post("/add", async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -43,6 +58,14 @@ router.post("/add", async (req, res) => {
     }
 });
 
+/**
+ * Removes the course from the list of courses taken by the user
+ * @name DELETE /add
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the token is not valid.
+ * @returns {Response} A response object indicating the success or failure of the course addition.
+ */
 router.delete("/delete", async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -61,6 +84,14 @@ router.delete("/delete", async (req, res) => {
     }
 });
 
+/**
+ * Given the zID of the user, returns the courses taken by the user
+ * @name GET /user
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the token is not valid.
+ * @returns {Response} A response object containing the courses taken by the user.
+ */
 router.get("/user", async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -86,11 +117,7 @@ router.get("/user", async (req, res) => {
  * @throws {Error} If the token is not valid, no file is uploaded, or the file is not a PDF.
  * @returns {Response} A response object containing the course summary and skills extracted from the PDF.
  */
-router.post(
-    "/parse-outline", 
-    upload.single("pdfUpload"), 
-    async (req: Request, res: Response) => {
-    
+router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
     try {
         const customReq = req as CustomRequest;
         if (!customReq.token || typeof customReq.token === "string") {

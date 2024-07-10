@@ -15,7 +15,6 @@ import ResetPassword from '@/pages/ResetPassword'
 import CourseDetails from '@/pages/CourseDetails'
 import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
-import CourseDetails from './pages/CourseDetailsStub'
 
 function App() {
   return (
@@ -30,6 +29,7 @@ function App() {
               <Route path={`/groups`} element={<Groups />} />
               <Route path={`/projects`} element={<Projects />} />
               <Route path={`/profile`} element={<Profile />} />
+              <Route path={`/course/:courseId`} element={<CourseDetails />} />
               <Route path={`/manage-users`} element={<Admin />} />
             </Route>
             <Route path={`/register`} element={<Register />} />
@@ -37,7 +37,6 @@ function App() {
             <Route path={`/reset-password`} element={<ResetPassword />} />
             <Route path={`/courseRecommendations`} element={<CourseReco />} />
             <Route path={`/`} element={<Landing />} />
-            <Route path="/course/:courseId" element={<CourseDetails />} />
           </Routes>
         </BrowserRouter >
       </ProfileProvider>

@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
  * This entire page is a stub! Just used to test functionality
  */
 
-const CourseDetails = () => {
+const CourseDetailsStub = () => {
   let { courseCode } = useParams();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -109,4 +109,4 @@ const CourseDetails = () => {
   )
 }
 
-export default CourseDetails
+export default CourseDetailsStub

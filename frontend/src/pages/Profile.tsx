@@ -9,8 +9,6 @@ import { Options } from "browser-image-compression";
 import imageCompression from "browser-image-compression";
 import { useProfile } from "@/contexts/ProfileContext";
 
-const MAX_WORDS = 255;
-
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
