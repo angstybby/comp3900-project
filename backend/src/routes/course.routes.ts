@@ -78,6 +78,14 @@ router.get("/user", async (req, res) => {
     }
 });
 
+/**
+ * Route for parsing the outline of a course from a PDF file.
+ * @name POST /parse-outline
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the token is not valid, no file is uploaded, or the file is not a PDF.
+ * @returns {Response} A response object containing the course summary and skills extracted from the PDF.
+ */
 router.post(
     "/parse-outline", 
     upload.single("pdfUpload"), 
