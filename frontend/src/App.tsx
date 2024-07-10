@@ -14,6 +14,7 @@ import Admin from '@/pages/Admin'
 import ResetPassword from '@/pages/ResetPassword'
 import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
+import CourseDetails from './pages/CourseDetails'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route element={<SidebarLayout />}>
               <Route path={`/dashboard`} element={<Home />} />
               <Route path={`/courses`} element={<Courses />} />
+              <Route path={`/course-details/:courseCode`} element={<CourseDetails />} />
               <Route path={`/groups`} element={<Groups />} />
               <Route path={`/projects`} element={<Projects />} />
               <Route path={`/profile`} element={<Profile />} />

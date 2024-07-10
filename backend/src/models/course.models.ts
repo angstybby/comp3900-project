@@ -26,6 +26,14 @@ export const dbFindCourseByString = async (name: string) => {
     });
 };
 
+export const dbFindCourseById = async (id: string) => {
+    return await prisma.course.findUnique({
+        where: {
+            id: id
+        }
+    })
+}
+
 export const dbAddCourse = async (courseId: string, zid: string) => {
     prisma.courseTaken.create({
         data: {

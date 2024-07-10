@@ -9,7 +9,7 @@ import { Profile } from "@prisma/client";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import PdfParse from "pdf-parse";
-import { AIModel, promptContext } from "../utils/ai";
+import { AIModel, getCompletedCourseContext } from "../utils/ai";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -107,7 +107,7 @@ router.post("/scrape-pdf", upload.single("pdfUpload"), async (req: Request, res:
         // 2. Start a chat with the AI model
         const chat = AIModel.startChat();
         // 3. Send the prompt to the AI model
-        const result = await chat.sendMessage(`${promptContext} Here is the text: ${text.text}`);
+        const result = await chat.sendMessage(`${getCompletedCourseContext} Here is the text: ${text.text}`);
         // 4. Print their response
         console.log('--------------------')
         console.log(result.response.text())
