@@ -3,6 +3,7 @@ import {
     dbAddCourse,
     dbDeleteCourse,
     dbFindCourseByString,
+    dbGetAllCourses,
     dbGetUserCourses,
 } from "../models/course.models";
 import { CustomRequest } from "../middleware/auth.middleware";
@@ -152,6 +153,19 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
         res.status(500).send('Failed updating course skills');
     }
 
+})
+
+router.get("/all", async (req, res) => {
+    try {
+        const customReq = req as CustomRequest;
+        if (!customReq.token || typeof customReq.token === "string") {
+            throw new Error("Token is not valid");
+        }
+        res.status(200).send(await dbGetAllCourses());
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Failed fetching courses');
+    }
 })
 
 export default router;

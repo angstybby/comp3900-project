@@ -72,3 +72,7 @@ export const dbGetUserCourses = async (zid: string) => {
         },
     });
 };
+
+export const dbGetAllCourses = async () => {
+    return await prisma.course.findMany();
+};
