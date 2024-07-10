@@ -101,7 +101,6 @@ const Notification = () => {
 
     const headerStyle: React.CSSProperties = {
         height: '60px',
-        marginTop: '90px',
         padding: '20px',
     };
 
