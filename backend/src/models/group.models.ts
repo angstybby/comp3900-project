@@ -380,12 +380,6 @@ export const dbFindGroupByString = async (name: string) => {
                 contains: name,
             },
         },
-        select: {
-            id: true,
-            groupName: true,
-            description: true,
-            groupOwnerId: true,
-        },
     });
 };
 
@@ -418,6 +412,24 @@ export const dbGetGroupApplications = async (
         return groupInterests;
     } catch (error) {
         console.error("Error getting group applications:", error);
+        throw error;
+    }
+};
+
+export const dbGetUserInGroup = async (zId: string) => {
+    try {
+        const groupMembers = await prisma.groupJoined.findMany({
+            where: {
+                zid: zId,
+            },
+            select: {
+                groupId: true,
+            },
+        });
+
+        return groupMembers;
+    } catch (error) {
+        console.error("Error getting user in group:", error);
         throw error;
     }
 };
