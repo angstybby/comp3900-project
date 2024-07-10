@@ -14,7 +14,7 @@ import Admin from '@/pages/Admin'
 import ResetPassword from '@/pages/ResetPassword'
 import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
-import CourseDetails from './pages/CourseDetails'
+import CourseDetails from './pages/CourseDetailsStub'
 
 function App() {
   return (

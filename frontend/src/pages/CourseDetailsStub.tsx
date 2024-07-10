@@ -94,7 +94,7 @@ const CourseDetails = () => {
         <p className="font-bold mt-5">
           Skills Learned:
         </p>
-        <p className="mt-3">
+        <div className="mt-3">
           {skills.length > 0 ? 
           (
             skills.filter(skill => skill).map((skill, index) => (
@@ -103,7 +103,7 @@ const CourseDetails = () => {
           )
           : 
           'No skills found for this course'}
-        </p>
+        </div>
       </div>    
     </>
   )

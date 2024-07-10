@@ -9,6 +9,8 @@ import { Options } from "browser-image-compression";
 import imageCompression from "browser-image-compression";
 import { useProfile } from "@/contexts/ProfileContext";
 
+const MAX_WORDS = 255;
+
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -51,6 +53,9 @@ export default function Profile() {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
+    if (id === 'description') {
+      console.log(value.length);
+    }
     setEditProfileInfo((prevData) => ({
       ...prevData,
       [id]: value,
