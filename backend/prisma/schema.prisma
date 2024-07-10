@@ -3,6 +3,7 @@ generator client {
 }
 
 datasource db {
+  // provider = "postgresql"
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
@@ -41,7 +42,9 @@ model Profile {
 
 model Course {
   id          String        @id
-  courseName  String        @unique
+  courseName  String        
+  skills      Json?
+  // Skills here should store an array of strings
   CourseTaken CourseTaken[]
 }
 
