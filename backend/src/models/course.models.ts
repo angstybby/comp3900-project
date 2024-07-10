@@ -73,6 +73,13 @@ export const dbGetUserCourses = async (zid: string) => {
     });
 };
 
-export const dbGetAllCourses = async () => {
-    return await prisma.course.findMany();
+export const dbGetAllCourses = async (skip: number) => {
+    return await prisma.course.findMany({
+        skip,
+        take: 25,
+        select: {
+            id: true,
+            courseName: true,
+        }
+    });
 };

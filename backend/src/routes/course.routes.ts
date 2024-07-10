@@ -161,7 +161,12 @@ router.get("/all", async (req, res) => {
         if (!customReq.token || typeof customReq.token === "string") {
             throw new Error("Token is not valid");
         }
-        res.status(200).send(await dbGetAllCourses());
+        const offsetStr = req.query.offset as string;
+        let offset = 0;
+        if (offsetStr !== undefined) {
+          offset = parseInt(offsetStr);
+        }
+        res.status(200).send(await dbGetAllCourses(offset));
     } catch (error) {
         console.log(error);
         res.status(500).send('Failed fetching courses');
