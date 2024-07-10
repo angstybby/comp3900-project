@@ -12,6 +12,7 @@ import Profile from '@/pages/Profile'
 import CourseReco from '@/pages/CourseReco'
 import Admin from '@/pages/Admin'
 import ResetPassword from '@/pages/ResetPassword'
+import CourseDetails from '@/pages/CourseDetails'
 import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
 
@@ -34,6 +35,7 @@ function App() {
             <Route path={`/reset-password`} element={<ResetPassword />} />
             <Route path={`/courseRecommendations`} element={<CourseReco />} />
             <Route path={`/`} element={<Landing />} />
+            <Route path="/course/:courseId" element={<CourseDetails />} />
           </Routes>
         </BrowserRouter >
       </ProfileProvider>
