@@ -4,17 +4,14 @@ import courseDataJson from "../src/data/courseCodesAndTitle.json";
 const prisma = new PrismaClient();
 const seedCourses = async () => {
   const courseData = courseDataJson;
-  for (const course of courseData) {
-    const courseCode = course.Code;
-    const courseTitle = course.Title;
-    console.log(`Seeding ${courseCode}-${courseTitle}`)
-    const stubSkills = [""];
-    await prisma.course.create({
-      data: {
-        id: courseCode,
-        courseName: courseTitle,
-        skills: stubSkills 
-      },
+
+  // Only do this when the database in completely reset
+  if (courseData.length > 0) {
+    await prisma.course.createMany({
+      data: courseData.map(course => ({
+        id: course.Code,
+        courseName: course.Title
+      }))
     })
   }
 }
