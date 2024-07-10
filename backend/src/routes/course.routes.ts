@@ -1,7 +1,8 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import {
     dbAddCourse,
     dbDeleteCourse,
+    dbFindCourseById,
     dbFindCourseByString,
     dbGetAllCourses,
     dbGetUserCourses,
@@ -155,6 +156,14 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
 
 })
 
+/**
+ * Route for fetching all courses
+ * @name GET /all
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the token is not valid.
+ * @returns {Response} A response object containing the course summary and skills extracted from the PDF.
+ */
 router.get("/all", async (req, res) => {
     try {
         const customReq = req as CustomRequest;
@@ -172,5 +181,27 @@ router.get("/all", async (req, res) => {
         res.status(500).send('Failed fetching courses');
     }
 })
+
+/**
+ * Route for fetching details of a specific course
+ * @name GET /course-details/:courseId
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the token is not valid.
+ * @returns {Response} A response object containing the course summary and skills extracted from the PDF.
+ */
+router.get("/course-details/:courseId", async (req: Request, res: Response) => {
+    try {
+        const customReq = req as CustomRequest;
+        if (!customReq.token || typeof customReq.token === "string") {
+            throw new Error("Token is not valid");
+        }
+        const { courseId } = req.params;
+        res.status(200).send(await dbFindCourseById(courseId));
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error occurred while fetching course details");
+    }
+});
 
 export default router;

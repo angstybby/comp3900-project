@@ -1,8 +1,14 @@
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
+
+interface CourseDetails {
+  id: string;
+  courseName: string;
+  skills: string[];
+}
 
 const CourseDetails = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -11,6 +17,12 @@ const CourseDetails = () => {
 
   const [summary, setSummary] = useState<string | null>();
   const [skills, setSkills] = useState<string[]>([]);
+
+  const [courseDetails, setCourseDetails] = useState<CourseDetails>({
+    id: "",
+    courseName: "",
+    skills: [],
+  });
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,10 +54,32 @@ const CourseDetails = () => {
     window.location.reload();
   }
 
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const response = await axiosInstanceWithAuth.get(`/course/course-details/${courseId}`);
+        setCourseDetails(response.data);
+      } catch (error) {
+        console.error('Failed to fetch course details:', error);
+      }
+    }
+    
+    fetchDetails();
+  }, [])
+
   return (
     <>
       <div className="px-10 py-5">
         <p className="mt=8 text-2xl font-bold mb-5">{`CourseDetails for ${courseId}`}</p>
+        <p>
+          {`Course Code: ${courseDetails.id} \n`}
+        </p>
+        <p>
+          {`Course Title: ${courseDetails.courseName} \n`}
+        </p>
+        <p>
+          {`${courseDetails.skills}`}
+        </p>
         
         <form className="max-w-l mx-auto space-y-4" onSubmit={resetPage}>
           <div className="text-left">
