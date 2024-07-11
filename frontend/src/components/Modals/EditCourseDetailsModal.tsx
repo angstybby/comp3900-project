@@ -5,7 +5,7 @@ import {
   DialogTitle
 } from '@headlessui/react'
 import TextArea from '../Inputs/TextArea';
-import { ChangeEvent, FormEvent, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { axiosInstanceWithAuth } from '@/api/Axios';
 import ButtonLoading from '../Buttons/ButtonLoading';
 import ButtonSubmit from '../Buttons/ButtonSubmit';
@@ -15,16 +15,25 @@ interface EditCourseDetailsModalProps {
   close: () => void;
   courseId: string | undefined;
   refetchData: () => void;
+  initialValues: {
+    summary: string;
+    skills: string;
+  }
 }
 
-const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, close, courseId, refetchData }) => {
+const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, close, courseId, refetchData, initialValues }) => {
   const errorRef = useRef<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>('An error occured when parsing the file! Please try again.')
+  const [errorMessage, setErrorMessage] = useState<string>('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [summary, setSummary] = useState<string>('');
   const [skills, setSkills] = useState<string>('');
+
+  useEffect(() => {
+    setSummary(initialValues.summary);
+    setSkills(initialValues.skills);
+  }, [open])
   
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,7 +51,7 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
         })
         setSummary(response.data.summary);
         // Formatting AI output to be displayed as an array
-        console.log(typeof(response.data.skills));
+        // AI output is a string with skills separated by '- '
         setSkills(response.data.skills
           .split('- ')
           .filter((skill: string) => skill)
@@ -127,8 +136,8 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
                 placeholder={'Enter course summary here...'} 
                 value={summary}
                 valueChange={handleSummaryChange}
-                id={''} 
-                name={''} 
+                id={'courseSummary'} 
+                name={'courseSummary'} 
                 autoComplete={'off'} 
                 disabled={loading}
               />
@@ -137,8 +146,8 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
                 placeholder={'Enter skills here separated by a comma...'} 
                 value={skills}
                 valueChange={handleSkillsChange}
-                id={''} 
-                name={''} 
+                id={'courseSkills'} 
+                name={'courseSkills'} 
                 autoComplete={'off'} 
                 disabled={loading}
               />
@@ -174,9 +183,7 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
                 </div>
                 <div className="mt-15 flex justify-end">
                   { errorRef.current && (
-                    <p className='mr-3 self-center font-thin text-sm text-red-500'>
-                      {errorMessage}
-                    </p>
+                    <p className='mr-3 self-center font-thin text-sm text-red-500'>{errorMessage}</p>
                   )}
                   <div className="w-1/6">
                     {loading ? <ButtonLoading /> : <ButtonSubmit text="Update" />}

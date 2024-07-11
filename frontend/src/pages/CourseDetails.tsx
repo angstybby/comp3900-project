@@ -14,7 +14,6 @@ interface CourseDetails {
 const CourseDetails = () => {
   const [open, setOpen] = useState(false);
   const openCloseModal = () => setOpen(!open);
-  
   const { courseId } = useParams<{ courseId: string }>();
   const [courseDetails, setCourseDetails] = useState<CourseDetails>({
     id: "",
@@ -49,6 +48,10 @@ const CourseDetails = () => {
         close={openCloseModal} 
         courseId={courseId}
         refetchData={() => {}}
+        initialValues={{
+          summary: courseDetails.summary,
+          skills: courseDetails.skills.join(', ')
+        }}
       />
       <div className="px-10 py-5">
         <p className="mt=8 text-2xl font-bold mb-5">{`CourseDetails for ${courseId}`}</p>
