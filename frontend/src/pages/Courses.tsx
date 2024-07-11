@@ -1,6 +1,11 @@
 import "react-multi-carousel/lib/styles.css";
 import CourseCard from "@/components/CoursesComponents/CourseCard";
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
+import AddCourseModal from "@/components/Modals/AddCourseModal";
+import ButtonUtility from "@/components/Buttons/ButtonUtility";
+
 
 // stubs
 const courses = [
@@ -32,29 +37,6 @@ const courses = [
 ]
 
 
-export default function Courses() {
-    const navigate = useNavigate();
-    return (
-      <div className="h-screen flex justify-center">
-        <div className="w-full flex flex-col p-14">
-          <div className="h-2/3">
-            <h1 className="text-4xl font-medium pb-8">Courses</h1>
-            <div className="w-[90%] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course) => (
-                <CourseCard key={course.id} course={course} onClick={() => navigate(`/course/${course.id}`)} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div >
-    )
-}
-import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
-import AddCourseModal from "@/components/Modals/AddCourseModal";
-import ButtonUtility from "@/components/Buttons/ButtonUtility";
-import { useNavigate } from "react-router-dom";
-
 type UserType = 'admin' | 'student' | 'academic' | null;
 
 const Courses: React.FC = () => {
@@ -68,29 +50,44 @@ const Courses: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full flex flex-col p-14">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-4xl font-medium">Courses</h1>
-        {userType === 'student' && (
-          <div className="flex items-center space-x-4" title="Add Course Button">
-            <ButtonUtility text={"Upload Courses Taken"} onClick={() => navigate('/Upload')} />
-            <ButtonUtility text={"Add Courses Taken"} onClick={() => setShowAddCourseModal(true)} />
-          </div>
-        )}
-        {/* subject to change, not sure how admin/acadmics are done */}
-        {userType === 'admin' && (
-          <div className="flex items-center space-x-4" title="Add Course Button">
-            <ButtonUtility text={"admin Scrape Course"} onClick={() => null} />
-            <ButtonUtility text={"admin Add Course"} onClick={() => null} />
-          </div>
-        )}
-      </div>
-
-      <AddCourseModal
-        isVisible={showAddCourseModal}
-        onClose={() => setShowAddCourseModal(false)}
-      />
+  <div className="w-full flex flex-col p-14">
+    <div className="flex items-center justify-between mb-4">
+      <h1 className="text-4xl font-medium">Courses</h1>
+      {userType === 'student' && (
+        <div className="flex items-center space-x-4" title="Add Course Button">
+          <ButtonUtility text={"Upload Courses Taken"} onClick={() => navigate('/Upload')} />
+          <ButtonUtility text={"Add Courses Taken"} onClick={() => setShowAddCourseModal(true)} />
+        </div>
+      )}
+      {/* subject to change, not sure how admin/acadmics are done */}
+      {userType === 'admin' && (
+        <div className="flex items-center space-x-4" title="Add Course Button">
+          <ButtonUtility text={"admin Scrape Course"} onClick={() => null} />
+          <ButtonUtility text={"admin Add Course"} onClick={() => null} />
+        </div>
+      )}
     </div>
+
+    <AddCourseModal
+      isVisible={showAddCourseModal}
+      onClose={() => setShowAddCourseModal(false)}
+    />
+
+    <div className="h-screen flex justify-center">
+      <div className="w-full flex flex-col">
+        <div className="h-2/3">
+          <div className="w-[90%] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map((course) => (
+              <CourseCard key={course.id} course={course} onClick={() => navigate(`/course/${course.id}`)} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    
+
+
   );
 };
 
