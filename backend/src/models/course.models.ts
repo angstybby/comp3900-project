@@ -83,3 +83,15 @@ export const dbGetAllCourses = async (skip: number) => {
         }
     });
 };
+
+export const dbUpdateCourse = async (id: string, summary: string, skills: string[]) => {
+    return await prisma.course.update({
+        where: {
+            id: id
+        },
+        data: {
+            summary: summary,
+            skills: skills
+        }
+    })
+}

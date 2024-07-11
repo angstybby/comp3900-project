@@ -31,7 +31,7 @@ model Profile {
   profileOwner   User            @relation(fields: [zid], references: [zid])
   profilePicture String?         @db.LongText
   fullname       String
-  description    String?
+  description    String?         @db.Text
   resume         String?
   GroupOwner     Group[]
   ProjectOwner   Project[]
@@ -44,7 +44,7 @@ model Course {
   id          String        @id
   courseName  String        
   skills      Json?
-  summary     String?
+  summary     String?       @db.Text
   // Skills here should store an array of strings
   CourseTaken CourseTaken[]
 }

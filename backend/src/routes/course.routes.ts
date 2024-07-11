@@ -6,6 +6,7 @@ import {
     dbFindCourseByString,
     dbGetAllCourses,
     dbGetUserCourses,
+    dbUpdateCourse,
 } from "../models/course.models";
 import { CustomRequest } from "../middleware/auth.middleware";
 import PdfParse from "pdf-parse";
@@ -162,7 +163,7 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
  * @param {Request} req - The request object.
  * @param {Response} res - The response object.
  * @throws {Error} If the token is not valid.
- * @returns {Response} A response object containing the course summary and skills extracted from the PDF.
+ * @returns {Response} A response object containing all courses
  */
 router.get("/all", async (req, res) => {
     try {
@@ -188,7 +189,7 @@ router.get("/all", async (req, res) => {
  * @param {Request} req - The request object.
  * @param {Response} res - The response object.
  * @throws {Error} If the token is not valid.
- * @returns {Response} A response object containing the course summary and skills extracted from the PDF.
+ * @returns {Response} A response object containing the course summary and skills of a certain course
  */
 router.get("/course-details/:courseId", async (req: Request, res: Response) => {
     try {
@@ -203,5 +204,29 @@ router.get("/course-details/:courseId", async (req: Request, res: Response) => {
         res.status(500).send("An error occurred while fetching course details");
     }
 });
+
+/**
+ * Route for fetching details of a specific course
+ * @name POST /update-details
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the token is not valid.
+ * @returns {Response} Succesful update or failure message
+ */
+router.post("/update-details", async (req, res) => {
+    try {
+        const customReq = req as CustomRequest;
+        if (!customReq.token || typeof customReq.token === "string") {
+            throw new Error("Token is not valid");
+        }
+
+        const { course, summary, skills } = req.body;
+        await dbUpdateCourse(course, summary, skills);
+        res.status(200).send("Course details updated successfully");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error occurred while updating course details");
+    }
+})
 
 export default router;

@@ -27,7 +27,13 @@ const CourseDetails = () => {
     const fetchDetails = async () => {
       try {
         const response = await axiosInstanceWithAuth.get(`/course/course-details/${courseId}`);
-        setCourseDetails(response.data);
+        const details = {
+          id: response.data.id,
+          courseName: response.data.courseName,
+          skills: response.data.skills ? response.data.skills : [],
+          summary: response.data.summary,
+        }
+        setCourseDetails(details);
       } catch (error) {
         console.error('Failed to fetch course details:', error);
       }
@@ -41,6 +47,7 @@ const CourseDetails = () => {
       <EditCourseDetailsModal 
         open={open} 
         close={openCloseModal} 
+        courseId={courseId}
         refetchData={() => {}}
       />
       <div className="px-10 py-5">
@@ -58,10 +65,7 @@ const CourseDetails = () => {
               {`${courseDetails.courseName}`}
             </span>
           </p>
-          <p className="mb-5">
-            {`${courseDetails.skills}`}
-          </p>
-          <p className="font-bold">Course Summary:</p>
+          <p className="font-bold mt-5">Course Summary:</p>
           <p className="mb-5">{courseDetails.summary ? courseDetails.summary : 'No summary for this course.'}</p>
           <p className="font-bold">Course Skills:</p>
           <div>

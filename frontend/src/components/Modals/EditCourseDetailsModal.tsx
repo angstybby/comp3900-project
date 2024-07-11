@@ -10,18 +10,21 @@ import { axiosInstanceWithAuth } from '@/api/Axios';
 import ButtonLoading from '../Buttons/ButtonLoading';
 import ButtonSubmit from '../Buttons/ButtonSubmit';
 
-interface DeleteModalProps {
+interface EditCourseDetailsModalProps {
   open: boolean;
   close: () => void;
+  courseId: string | undefined;
   refetchData: () => void;
 }
 
-const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refetchData }) => {
+const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, close, courseId, refetchData }) => {
+  const errorRef = useRef<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
-  const fileParseError = useRef<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('An error occured when parsing the file! Please try again.')
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [summary, setSummary] = useState<string>('');
-  const [skills, setSkills] = useState<string[]>([]);
+  const [skills, setSkills] = useState<string>('');
   
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -38,23 +41,56 @@ const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refet
           }
         })
         setSummary(response.data.summary);
+        // Formatting AI output to be displayed as an array
+        console.log(typeof(response.data.skills));
         setSkills(response.data.skills
           .split('- ')
           .filter((skill: string) => skill)
-          .map((skill: string) => skill.trim()) as string[]);
-        fileParseError.current = false;
+          .map((skill: string) => skill.trim()));
+        errorRef.current = false;
       } catch (error) {
         console.error('Error uploading file', error);
-        fileParseError.current = true;
+        errorRef.current = true;
         setSelectedFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
       setLoading(false);
     }
   }
 
+  const handleSummaryChange = (value: string) => {
+    setSummary(value);
+  };
+
+  const handleSkillsChange = (value: string) => {
+    setSkills(value);
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    window.location.reload();
+    setLoading(true);
+    if (!summary || !skills) {
+      setErrorMessage('Summary and skills cannot be blank!');
+      setLoading(false);
+      errorRef.current = true;
+      return;
+    }
+    try {
+      // Formatting the string of skills into an array
+      const skillsArray = skills.split(',').map((skill: string) => skill.trim());
+      await axiosInstanceWithAuth.post("course/update-details", {
+        course: courseId,
+        summary: summary,
+        skills: skillsArray,
+      })
+    } catch (error) {
+      setErrorMessage('An error occured when parsing the file! Please try again.')
+      console.error('Failed to update course details:', error);
+    }
+    setLoading(false);
+    close();
   }
   
   return (
@@ -68,8 +104,8 @@ const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refet
           close();
           setSelectedFile(null);
           setSummary('');
-          setSkills([]);
-          fileParseError.current = false;
+          setSkills('');
+          errorRef.current = false;
         }}
       >
         <DialogBackdrop
@@ -90,6 +126,7 @@ const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refet
               <TextArea 
                 placeholder={'Enter course summary here...'} 
                 value={summary}
+                valueChange={handleSummaryChange}
                 id={''} 
                 name={''} 
                 autoComplete={'off'} 
@@ -98,7 +135,8 @@ const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refet
               <p className="my-2 font-bold">Course Skills</p>
               <TextArea 
                 placeholder={'Enter skills here separated by a comma...'} 
-                value={skills.join(', ')}
+                value={skills}
+                valueChange={handleSkillsChange}
                 id={''} 
                 name={''} 
                 autoComplete={'off'} 
@@ -121,6 +159,7 @@ const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refet
                       </svg>
                     </button>
                     <input
+                      ref={fileInputRef}
                       id="pdfUpload"
                       name="pdfUpload"
                       type="file"
@@ -134,9 +173,9 @@ const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refet
                   <p>Selected file: {selectedFile?.name}</p>
                 </div>
                 <div className="mt-15 flex justify-end">
-                  { fileParseError.current && (
-                    <p className='mr-3 self-center font-thin text-sm text-red-400'>
-                      An error occured when parsing the file! Please try again.
+                  { errorRef.current && (
+                    <p className='mr-3 self-center font-thin text-sm text-red-500'>
+                      {errorMessage}
                     </p>
                   )}
                   <div className="w-1/6">
