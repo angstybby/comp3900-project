@@ -144,6 +144,7 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
         
         const skillsResult = await chat.sendMessage(`${getCourseSkillsContext} Here is the text: ${text.text}`);
         const courseSkills = skillsResult.response.text();
+        console.log(courseSkills)
 
         const response = {
             summary: courseSummary,

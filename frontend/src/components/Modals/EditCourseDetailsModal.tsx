@@ -58,20 +58,20 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
           }
         })
         setSummary(response.data.summary);
-        // Formatting AI output to be displayed as an array
-        // AI output is a string with skills separated by '- '
+        // Formatting AI output
         setSkills(response.data.skills
           .split('- ')
           .filter((skill: string) => skill)
-          .map((skill: string) => skill.trim()));
+          .map((skill: string) => skill.trim())
+          .join(', '));
         errorRef.current = false;
       } catch (error) {
-        console.error('Error uploading file', error);
         errorRef.current = true;
         setSelectedFile(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
+        console.error('Error uploading file', error);
       }
       setLoading(false);
     }
