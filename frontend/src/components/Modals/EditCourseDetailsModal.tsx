@@ -18,7 +18,7 @@ interface DeleteModalProps {
 
 const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refetchData }) => {
   const [loading, setLoading] = useState(false);
-  const error = useRef<boolean>(false);
+  const fileParseError = useRef<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [summary, setSummary] = useState<string>('');
   const [skills, setSkills] = useState<string[]>([]);
@@ -42,8 +42,11 @@ const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refet
           .split('- ')
           .filter((skill: string) => skill)
           .map((skill: string) => skill.trim()) as string[]);
+        fileParseError.current = false;
       } catch (error) {
         console.error('Error uploading file', error);
+        fileParseError.current = true;
+        setSelectedFile(null);
       }
       setLoading(false);
     }
@@ -66,6 +69,7 @@ const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refet
           setSelectedFile(null);
           setSummary('');
           setSkills([]);
+          fileParseError.current = false;
         }}
       >
         <DialogBackdrop
@@ -130,6 +134,11 @@ const EditCourseDetailsModal: React.FC<DeleteModalProps> = ({ open, close, refet
                   <p>Selected file: {selectedFile?.name}</p>
                 </div>
                 <div className="mt-15 flex justify-end">
+                  { fileParseError.current && (
+                    <p className='mr-3 self-center font-thin text-sm text-red-400'>
+                      An error occured when parsing the file! Please try again.
+                    </p>
+                  )}
                   <div className="w-1/6">
                     {loading ? <ButtonLoading /> : <ButtonSubmit text="Update" />}
                   </div>
