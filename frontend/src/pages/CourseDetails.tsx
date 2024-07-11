@@ -1,6 +1,7 @@
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import EditCourseDetailsModal from "@/components/Modals/EditCourseDetailsModal";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 
@@ -22,24 +23,27 @@ const CourseDetails = () => {
     summary: "",
   });
 
-  useEffect(() => {
-    const fetchDetails = async () => {
-      try {
-        const response = await axiosInstanceWithAuth.get(`/course/course-details/${courseId}`);
-        const details = {
-          id: response.data.id,
-          courseName: response.data.courseName,
-          skills: response.data.skills ? response.data.skills : [],
-          summary: response.data.summary,
-        }
-        setCourseDetails(details);
-      } catch (error) {
-        console.error('Failed to fetch course details:', error);
+  const fetchDetails = async () => {
+    try {
+      const response = await axiosInstanceWithAuth.get(`/course/course-details/${courseId}`);
+      const details = {
+        id: response.data.id,
+        courseName: response.data.courseName,
+        skills: response.data.skills ? response.data.skills : [],
+        summary: response.data.summary,
       }
+      setCourseDetails(details);
+    } catch (error) {
+      console.error('Failed to fetch course details:', error);
     }
-    
+  }
+
+  useEffect(() => {
     fetchDetails();
   }, [])
+
+  // Page auth protection
+  let userType = Cookies.get('userType');
 
   return (
     <>
@@ -47,7 +51,7 @@ const CourseDetails = () => {
         open={open} 
         close={openCloseModal} 
         courseId={courseId}
-        refetchData={() => {}}
+        refetchData={fetchDetails}
         initialValues={{
           summary: courseDetails.summary,
           skills: courseDetails.skills.join(', ')
@@ -82,8 +86,8 @@ const CourseDetails = () => {
             'No skills found for this course'}
           </div> 
         </div>
-
-        <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />
+        
+        {userType === 'student' ? <></> : <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />}
       </div>    
     </>
   )

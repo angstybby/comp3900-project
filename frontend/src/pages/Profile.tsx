@@ -51,9 +51,9 @@ export default function Profile() {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
-    if (id === 'description') {
-      console.log(value.length);
-    }
+    // if (id === 'description') {
+    //   console.log(value.length);
+    // }
     setEditProfileInfo((prevData) => ({
       ...prevData,
       [id]: value,

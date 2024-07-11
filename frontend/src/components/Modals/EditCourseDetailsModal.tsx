@@ -34,6 +34,14 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
     setSummary(initialValues.summary);
     setSkills(initialValues.skills);
   }, [open])
+
+  const handleSummaryChange = (value: string) => {
+    setSummary(value);
+  };
+
+  const handleSkillsChange = (value: string) => {
+    setSkills(value);
+  };
   
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -69,14 +77,6 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
     }
   }
 
-  const handleSummaryChange = (value: string) => {
-    setSummary(value);
-  };
-
-  const handleSkillsChange = (value: string) => {
-    setSkills(value);
-  };
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setLoading(true);
@@ -88,7 +88,10 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
     }
     try {
       // Formatting the string of skills into an array
-      const skillsArray = skills.split(',').map((skill: string) => skill.trim());
+      const skillsArray = skills
+        .split(',')
+        .map((skill: string) => skill.trim())
+        .filter((skill: string) => skill);
       await axiosInstanceWithAuth.post("course/update-details", {
         course: courseId,
         summary: summary,
@@ -100,6 +103,7 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
     }
     setLoading(false);
     close();
+    refetchData();
   }
   
   return (
