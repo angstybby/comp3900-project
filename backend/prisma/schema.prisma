@@ -44,6 +44,7 @@ model Course {
   id          String        @id
   courseName  String        
   skills      Json?
+  summary     String?
   // Skills here should store an array of strings
   CourseTaken CourseTaken[]
 }
