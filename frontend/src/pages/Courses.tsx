@@ -70,7 +70,12 @@ export default function Courses() {
     };
 
     const loadOnScroll = () => {
-      if (window.scrollY === document.body.scrollHeight - window.innerHeight) {
+      const scrollY = window.scrollY;
+      const targetScroll = document.body.scrollHeight - window.innerHeight;
+      const leeway = 5; // Allow for a leeway of ±5 pixels
+    
+      if (Math.abs(scrollY - targetScroll) <= leeway) {
+        console.log("INSIDE LOAD ON SCROLL Loadmore")
         loadMore(indexRef.current);
         indexRef.current += paginate;
       }
@@ -140,14 +145,14 @@ export default function Courses() {
             </div>
           }
           <div className="mt-8">
-            <h2 className="text-2xl font-medium">Your Courses</h2>
+            <h2 className="text-2xl font-medium mb-4">Your Courses</h2>
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-5">
               {userCourses.map((course) => (
                 <CourseCard key={course.id} id={course.id} courseName={course.courseName} />
               ))}
             </div>
           </div>
-          <h2 className="text-2xl font-medium">All courses</h2>
+          <h2 className="text-2xl font-medium mb-4">All courses</h2>
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-5">
             {courses.map((course) => (
               <CourseCard key={course.id} id={course.id} courseName={course.courseName} />
