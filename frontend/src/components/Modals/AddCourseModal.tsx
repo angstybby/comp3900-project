@@ -8,7 +8,8 @@ import SearchCourse from "../Inputs/SearchCourse";
 
 interface AddCourseModalProps {
   isVisible: boolean;
-  onClose: () => void;
+  close: () => void;
+  refetchData: () => void;
 }
 
 interface Course {
@@ -16,11 +17,12 @@ interface Course {
   courseName: string;
 }
 
-const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, onClose }) => {
+const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, close, refetchData }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<Course[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (searchTerm) {
       const fetchSuggestions = async () => {
@@ -72,7 +74,8 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, onClose }) =
         );
       }
       setLoading(false);
-      onClose();
+      close();
+      refetchData();
       setSelectedCourses([]);
     } catch (error) {
       console.error("Error adding courses", error);
@@ -92,7 +95,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, onClose }) =
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
             Add Course
           </h3>
-          <ButtonExit onClick={onClose}/>
+          <ButtonExit onClick={close}/>
         </div>
         <div className="p-4 md:p-5">
           <div className="space-y-4">

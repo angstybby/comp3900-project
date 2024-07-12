@@ -30,19 +30,19 @@ export default function Courses() {
     setUserType(userTypeFromCookie);
   }, []);
 
-  useEffect(() => {
-    const fetchUserCourses = async () => {
-      setLoading(true);
-      try {
-        const response = await axiosInstanceWithAuth.get('/course/user');
-        const userCourses = response.data.map((item: any) => item.course)
-        setUserCourses(userCourses);
-      } catch (error) {
-        console.error('Failed to fetch user courses:', error);
-      }
-      setLoading(false);
-    };
+  const fetchUserCourses = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstanceWithAuth.get('/course/user');
+      const userCourses = response.data.map((item: any) => item.course)
+      setUserCourses(userCourses);
+    } catch (error) {
+      console.error('Failed to fetch user courses:', error);
+    }
+    setLoading(false);
+  };
 
+  useEffect(() => {
     fetchUserCourses();
   }, []);
 
@@ -52,7 +52,8 @@ export default function Courses() {
     <div className="h-screen flex justify-center">
       <AddCourseModal
         isVisible={showAddCourseModal}
-        onClose={() => setShowAddCourseModal(false)}
+        close={() => setShowAddCourseModal(false)}
+        refetchData={fetchUserCourses}
       />
       <div className="w-full flex flex-col p-14">
         <div className="h-2/3">
