@@ -81,12 +81,9 @@ router.post("/add", async (req, res) => {
     if (!customReq.token || typeof customReq.token === "string") {
         throw new Error("Token is not valid");
     }
-    // changed it to req.body.id to get course id
+    
     const course = req.body.id;
     const zid = customReq.token.zid;
-
-    console.log(course);
-    console.log(zid);
 
     try {
         await dbAddCourse(course, zid);
@@ -187,7 +184,6 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
             `${getCourseSkillsContext} Here is the text: ${text.text}`,
         );
         const courseSkills = skillsResult.response.text();
-        console.log(courseSkills);
 
         const response = {
             summary: courseSummary,

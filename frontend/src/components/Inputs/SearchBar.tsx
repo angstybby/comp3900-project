@@ -3,13 +3,8 @@ import { ChangeEvent } from "react";
 
 const SearchBar = () => {
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-    axiosInstanceWithAuth.get(`api/course/search?query=${e.target.value}`)
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error('Failed to search for courses:', error);
-      });
+    console.log(e.target.value);
+    // await axiosInstanceWithAuth.get(`api/course/search?query=${e.target.value}`)
   }
 
   return (
