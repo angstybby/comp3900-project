@@ -25,6 +25,13 @@ export default function Courses() {
   const [userType, setUserType] = useState<UserType>(null);
   const navigate = useNavigate();
 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    console.log(searchTerm);
+    setSearchTerm(e.target.value);
+  };
+
   useEffect(() => {
     const userTypeFromCookie = Cookies.get('userType') as UserType;
     setUserType(userTypeFromCookie);
@@ -102,9 +109,7 @@ export default function Courses() {
 
           {/* temporary value and onChange */}
           <div className="w-[95%]">
-            <SearchBar value={""} onChange={function (event: ChangeEvent<HTMLInputElement>): void {
-              console.log(event.target.value);
-            } } />
+            <SearchBar value={searchTerm} onChange={handleSearchChange} />
           </div>
 
           {loading && 

@@ -4,6 +4,7 @@ import ButtonSubmitWithClick from "@/components/Buttons/ButtonSubmitWClick";
 import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import ButtonExit from "../Buttons/ButtonExit";
+import SearchBar from "@/components/Inputs/SearchBar";
 
 interface AddCourseModalProps {
   isVisible: boolean;
@@ -40,7 +41,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, onClose }) =
 
   // Set Search Change Field
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("Input changing");
+    console.log(e.target.value);
     setSearchTerm(e.target.value);
   };
 
@@ -104,14 +105,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, onClose }) =
               >
                 Search Courses
               </label>
-              <input
-                type="text"
-                id="search"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                value={searchTerm}
-                onChange={handleSearchChange}
-                autoComplete="off"
-              />
+              <SearchBar value={searchTerm} onChange={handleSearchChange} />
               {suggestions.length > 0 && (
                 <ul className="bg-white border border-gray-300 rounded-lg shadow-md mt-2 max-h-48 overflow-y-auto">
                   {suggestions.map((course) => (
