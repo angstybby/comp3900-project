@@ -19,12 +19,13 @@ type UserType = 'admin' | 'student' | 'academic' | null;
 export default function Courses() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
-
+  const [userCourses, setUserCourses] = useState<Course[]>([]);
 
   const [showAddCourseModal, setShowAddCourseModal] = useState(false);
   const [userType, setUserType] = useState<UserType>(null);
   const navigate = useNavigate();
 
+  // temporary for now, should be searching for courses i think
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -37,11 +38,13 @@ export default function Courses() {
     setUserType(userTypeFromCookie);
   }, []);
   
+  // 
   const indexRef = useRef(25);
   const paginate = 25;
 
   const loadMore = async (startIndex: number) => {
     console.log(startIndex)
+    console.log("LoadMore!")
     try {
       const response = await axiosInstanceWithAuth.get(`/course/all?offset=${startIndex}`);
       setCourses((prev) => [...prev, ...response.data]);
@@ -78,7 +81,26 @@ export default function Courses() {
     return () => window.removeEventListener("scroll", loadOnScroll);
   
   }, []);
+
+
+  useEffect(() => {
+    const fetchUserCourses = async () => {
+      try {
+        const response = await axiosInstanceWithAuth.get('/course/user');
+        console.log("User courses fetched successfully");
+        const userCourses = response.data.map((item: any) => item.course)
+        console.log(userCourses);
+        setUserCourses(userCourses);
+      } catch (error) {
+        console.error('Failed to fetch user courses:', error);
+      }
+    };
+
+    fetchUserCourses();
+  }, []);
+
   
+  // TODO: If courses are added then dont show it
   return (
     <div className="h-screen flex justify-center">
 
@@ -117,6 +139,15 @@ export default function Courses() {
               <LoadingCircle/>
             </div>
           }
+          <div className="mt-8">
+            <h2 className="text-2xl font-medium">Your Courses</h2>
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-5">
+              {userCourses.map((course) => (
+                <CourseCard key={course.id} id={course.id} courseName={course.courseName} />
+              ))}
+            </div>
+          </div>
+          <h2 className="text-2xl font-medium">All courses</h2>
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-5">
             {courses.map((course) => (
               <CourseCard key={course.id} id={course.id} courseName={course.courseName} />

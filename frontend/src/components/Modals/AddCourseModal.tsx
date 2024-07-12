@@ -21,12 +21,11 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, onClose }) =
   const [suggestions, setSuggestions] = useState<Course[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     if (searchTerm) {
       const fetchSuggestions = async () => {
         try {
-          const response = await axiosInstanceWithAuth.post("/course/search", { name: searchTerm });
+          const response = await axiosInstanceWithAuth.post("/course/searchExc", { name: searchTerm });
           setSuggestions(response.data);
         } catch (error) {
           console.error("Error fetching course suggestions", error);

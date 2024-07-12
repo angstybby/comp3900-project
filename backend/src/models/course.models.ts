@@ -26,6 +26,52 @@ export const dbFindCourseByString = async (name: string) => {
     });
 };
 
+
+export const dbFindCourseByStringExcTaken = async (name: string, zid: string) => {
+  const takenCourses = await prisma.courseTaken.findMany({
+      where: {
+          zid,
+      },
+      select: {
+          courseId: true,
+      },
+  });
+
+  const takenCourseIds = takenCourses.map(course => course.courseId);
+
+  return await prisma.course.findMany({
+      where: {
+          AND: [
+              {
+                  OR: [
+                      {
+                          id: {
+                              contains: name,
+                          },
+                      },
+                      {
+                          courseName: {
+                              contains: name,
+                          },
+                      },
+                  ],
+              },
+              {
+                  id: {
+                      notIn: takenCourseIds,
+                  },
+              },
+          ],
+      },
+      select: {
+          id: true,
+          courseName: true,
+      },
+      take: 10,
+  });
+};
+
+
 export const dbFindCourseById = async (id: string) => {
     return await prisma.course.findUnique({
         where: {

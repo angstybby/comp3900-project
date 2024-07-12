@@ -4,6 +4,7 @@ import {
     dbDeleteCourse,
     dbFindCourseById,
     dbFindCourseByString,
+    dbFindCourseByStringExcTaken,
     dbGetAllCourses,
     dbGetUserCourses,
     dbUpdateCourse,
@@ -34,6 +35,33 @@ router.post("/search", async (req, res) => {
     const courses = await dbFindCourseByString(name);
     return res.status(200).send(courses);
 });
+
+/**
+ * Search for courses by name excluding courses already taken by the user
+ * @name POST /course/search
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the token is not valid.
+ * @returns {Response} A response object containing the matching courses.
+ */
+router.post("/searchExc", async (req, res) => {
+  const customReq = req as CustomRequest;
+  if (!customReq.token || typeof customReq.token === "string") {
+      throw new Error("Token is not valid");
+  }
+
+  const zid = customReq.token.zid;
+  const { name } = req.body;
+
+  try {
+      const courses = await dbFindCourseByStringExcTaken(name, zid);
+      res.status(200).send(courses);
+  } catch (error) {
+      console.log(error);
+      res.status(500).send("An error occurred while searching for courses");
+  }
+});
+
 
 /**
  * Adds the course to the list of courses taken by the user
