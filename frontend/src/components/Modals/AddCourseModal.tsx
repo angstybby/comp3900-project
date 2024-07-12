@@ -4,7 +4,6 @@ import ButtonSubmitWithClick from "@/components/Buttons/ButtonSubmitWClick";
 import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import ButtonExit from "../Buttons/ButtonExit";
-import SearchBar from "@/components/Inputs/SearchBar";
 import SearchCourse from "../Inputs/SearchCourse";
 
 interface AddCourseModalProps {
@@ -41,7 +40,6 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, onClose }) =
 
   // Set Search Change Field
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     setSearchTerm(e.target.value);
   };
 

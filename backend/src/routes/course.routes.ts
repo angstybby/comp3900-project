@@ -30,14 +30,17 @@ const router = express.Router();
  * @returns {Response} A response object containing the courses matching the search string.
  */
 router.post("/search", async (req, res) => {
-    console.log("Searching for course");
     const { name } = req.body;
 
     if (!name) {
         return res.status(400).send("No search string provided");
     }
-
-    const courses = await dbFindCourseByString(name);
+	const offsetStr = req.query.offset as string;
+    let offset = 0;
+    if (offsetStr !== undefined) {
+        offset = parseInt(offsetStr);
+    }
+    const courses = await dbFindCourseByString(name, offset);
     return res.status(200).send(courses);
 });
 
@@ -50,21 +53,21 @@ router.post("/search", async (req, res) => {
  * @returns {Response} A response object containing the matching courses.
  */
 router.post("/searchExc", async (req, res) => {
-  const customReq = req as CustomRequest;
-  if (!customReq.token || typeof customReq.token === "string") {
-      throw new Error("Token is not valid");
-  }
+	const customReq = req as CustomRequest;
+	if (!customReq.token || typeof customReq.token === "string") {
+		throw new Error("Token is not valid");
+	}
 
-  const zid = customReq.token.zid;
-  const { name } = req.body;
+	const zid = customReq.token.zid;
+	const { name } = req.body;
 
-  try {
-      const courses = await dbFindCourseByStringExcTaken(name, zid);
-      res.status(200).send(courses);
-  } catch (error) {
-      console.log(error);
-      res.status(500).send("An error occurred while searching for courses");
-  }
+	try {
+		const courses = await dbFindCourseByStringExcTaken(name, zid);
+		res.status(200).send(courses);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("An error occurred while searching for courses");
+	}
 });
 
 

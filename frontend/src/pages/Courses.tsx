@@ -22,6 +22,7 @@ export default function Courses() {
   const [userCourses, setUserCourses] = useState<Course[]>([]);
   const [showAddCourseModal, setShowAddCourseModal] = useState(false);
   const [userType, setUserType] = useState<UserType>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -85,10 +86,10 @@ export default function Courses() {
             </div>
           </div>
           <div className="w-[95%] my-5">
-            <SearchBar/>
+            <SearchBar onSearchTermChange={setSearchTerm} />
           </div>
           <h2 className="text-2xl font-medium mb-4">All courses</h2>
-          <CourseList/>
+          <CourseList searchTerm={searchTerm}/>
         </div>
       </div>
     </div >
