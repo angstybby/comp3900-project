@@ -31,6 +31,8 @@ function App() {
               <Route path={`/groups`} element={<Groups />} />
               <Route path={`/projects`} element={<Projects />} />
               <Route path={`/profile`} element={<Profile />} />
+              <Route path={`/course/:courseId`} element={<CourseDetails />} />
+              <Route path={`/project/:projectId`} element={<ProjectDetails />} />
               <Route path={`/manage-users`} element={<Admin />} />
             </Route>
             <Route path={`/register`} element={<Register />} />
@@ -38,8 +40,6 @@ function App() {
             <Route path={`/reset-password`} element={<ResetPassword />} />
             <Route path={`/courseRecommendations`} element={<CourseReco />} />
             <Route path={`/`} element={<Landing />} />
-            <Route path="/course/:courseId" element={<CourseDetails />} />
-            <Route path="/project/:projectId" element={<ProjectDetails />} />
           </Routes>
         </BrowserRouter >
       </ProfileProvider>

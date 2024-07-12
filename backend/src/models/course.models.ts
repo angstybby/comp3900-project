@@ -26,6 +26,14 @@ export const dbFindCourseByString = async (name: string) => {
     });
 };
 
+export const dbFindCourseById = async (id: string) => {
+    return await prisma.course.findUnique({
+        where: {
+            id: id
+        }
+    })
+}
+
 export const dbAddCourse = async (courseId: string, zid: string) => {
     prisma.courseTaken.create({
         data: {
@@ -64,3 +72,26 @@ export const dbGetUserCourses = async (zid: string) => {
         },
     });
 };
+
+export const dbGetAllCourses = async (skip: number) => {
+    return await prisma.course.findMany({
+        skip,
+        take: 25,
+        select: {
+            id: true,
+            courseName: true,
+        }
+    });
+};
+
+export const dbUpdateCourse = async (id: string, summary: string, skills: string[]) => {
+    return await prisma.course.update({
+        where: {
+            id: id
+        },
+        data: {
+            summary: summary,
+            skills: skills
+        }
+    })
+}
