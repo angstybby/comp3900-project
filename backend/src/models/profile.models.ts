@@ -40,7 +40,12 @@ export const dbUpdateProfile = async (profile: Profile): Promise<Profile> => {
             where: {
                 zid: profile.zid,
             },
-            data: profile,
+            data: {
+                profilePicture: profile.profilePicture,
+                fullname: profile.fullname,
+                description: profile.description,
+                resume: profile.resume,
+            },
         });
         return user;
     } catch (e) {

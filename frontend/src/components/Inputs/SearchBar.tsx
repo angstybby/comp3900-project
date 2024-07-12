@@ -1,8 +1,15 @@
+import { axiosInstanceWithAuth } from "@/api/Axios";
 import { ChangeEvent } from "react";
 
 const SearchBar = () => {
-  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
+  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    axiosInstanceWithAuth.get(`api/course/search?query=${e.target.value}`)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error('Failed to search for courses:', error);
+      });
   }
 
   return (
@@ -15,7 +22,7 @@ const SearchBar = () => {
         autoComplete='off'
         onChange={handleOnChange}
         disabled={false}
-        />
+      />
     </div>
   )
 }
