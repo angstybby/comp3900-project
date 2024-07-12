@@ -57,10 +57,10 @@ const CourseDetails = () => {
           skills: courseDetails.skills.join(', ')
         }}
       />
-      <div className="px-10 py-5">
-        <p className="mt=8 text-2xl font-bold mb-5">{`CourseDetails for ${courseId}`}</p>
+      <div className="px-14 py-5">
+        <p className="mt-8 text-2xl font-bold mb-5">{`CourseDetails for ${courseId}`}</p>
         <div className="mb-5">
-          <p>
+          <p className="mb-2">
             {`Course Code: `}
             <span className="font-bold">
               {`${courseDetails.id}`}
