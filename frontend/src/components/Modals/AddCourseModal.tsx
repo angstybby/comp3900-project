@@ -5,6 +5,7 @@ import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import ButtonExit from "../Buttons/ButtonExit";
 import SearchBar from "@/components/Inputs/SearchBar";
+import SearchCourse from "../Inputs/SearchCourse";
 
 interface AddCourseModalProps {
   isVisible: boolean;
@@ -104,7 +105,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, onClose }) =
               >
                 Search Courses
               </label>
-              <SearchBar value={searchTerm} onChange={handleSearchChange} />
+              <SearchCourse value={searchTerm} onChange={handleSearchChange} />
               {suggestions.length > 0 && (
                 <ul className="bg-white border border-gray-300 rounded-lg shadow-md mt-2 max-h-48 overflow-y-auto">
                   {suggestions.map((course) => (

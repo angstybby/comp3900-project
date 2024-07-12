@@ -75,10 +75,10 @@ export const dbFindCourseByStringExcTaken = async (name: string, zid: string) =>
 export const dbFindCourseById = async (id: string) => {
     return await prisma.course.findUnique({
         where: {
-            id: id
-        }
-    })
-}
+            id: id,
+        },
+    });
+};
 
 export const dbAddCourse = async (courseId: string, zid: string) => {
   try {
@@ -101,6 +101,31 @@ export const dbAddCourse = async (courseId: string, zid: string) => {
     console.error("Error in dbAddCourse:", error);
     throw error;
   }
+
+    // Add skills to user
+    const course = await prisma.course.findUnique({
+        where: {
+            id: courseId,
+        },
+        select: {
+            skills: true,
+        },
+    });
+
+    if (course) {
+        const skills = course.skills;
+
+        prisma.profile.update({
+            where: {
+                zid,
+            },
+            data: {
+                Skills: {
+                    set: skills,
+                },
+            },
+        });
+    }
 };
 
 
@@ -133,18 +158,22 @@ export const dbGetAllCourses = async (skip: number) => {
         select: {
             id: true,
             courseName: true,
-        }
+        },
     });
 };
 
-export const dbUpdateCourse = async (id: string, summary: string, skills: string[]) => {
+export const dbUpdateCourse = async (
+    id: string,
+    summary: string,
+    skills: string[],
+) => {
     return await prisma.course.update({
         where: {
-            id: id
+            id: id,
         },
         data: {
             summary: summary,
-            skills: skills
-        }
-    })
-}
+            skills: skills,
+        },
+    });
+};

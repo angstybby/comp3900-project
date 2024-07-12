@@ -25,20 +25,6 @@ export default function Courses() {
   const [userType, setUserType] = useState<UserType>(null);
   const navigate = useNavigate();
 
-  // temporary for now, should be searching for courses i think
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(searchTerm);
-    setSearchTerm(e.target.value);
-  };
-
-  useEffect(() => {
-    const userTypeFromCookie = Cookies.get('userType') as UserType;
-    setUserType(userTypeFromCookie);
-  }, []);
-  
-  // 
   const indexRef = useRef(25);
   const paginate = 25;
 
@@ -55,6 +41,11 @@ export default function Courses() {
       return;
     }
   }
+
+  useEffect(() => {
+    const userTypeFromCookie = Cookies.get('userType') as UserType;
+    setUserType(userTypeFromCookie);
+  }, []);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -136,7 +127,7 @@ export default function Courses() {
 
           {/* temporary value and onChange */}
           <div className="w-[95%]">
-            <SearchBar value={searchTerm} onChange={handleSearchChange} />
+            <SearchBar/>
           </div>
 
           {loading && 
