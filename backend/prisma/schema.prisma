@@ -36,13 +36,14 @@ model Profile {
   GroupOwner     Group[]
   ProjectOwner   Project[]
   CourseTaken    CourseTaken[]
+  Skills         Json?
   GroupJoined    GroupJoined[]
   GroupInterest  GroupInterest[]
 }
 
 model Course {
   id          String        @id
-  courseName  String        
+  courseName  String
   skills      Json?
   summary     String?       @db.Text
   // Skills here should store an array of strings

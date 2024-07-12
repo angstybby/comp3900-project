@@ -10,7 +10,12 @@ import {
 } from "../models/course.models";
 import { CustomRequest } from "../middleware/auth.middleware";
 import PdfParse from "pdf-parse";
-import { AIModel, getCourseSkillsContext, summarizeCourseOutlineContext } from "../utils/ai";
+import {
+    model,
+    getCourseSkillsContext,
+    summarizeCourseOutlineContext,
+    generationConfig,
+} from "../utils/ai";
 import multer from "multer";
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -126,7 +131,7 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
         if (!customReq.token || typeof customReq.token === "string") {
             throw new Error("Token is not valid");
         }
-    
+
         const file = req.file;
         // Check if file is present
         if (!file) {
@@ -137,26 +142,31 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
             throw new Error("File is not a pdf");
         }
         const text = await PdfParse(file.buffer);
-        const chat = AIModel.startChat();
+        const chat = model.startChat({
+            generationConfig,
+        });
 
-        const summaryResult = await chat.sendMessage(`${summarizeCourseOutlineContext} Here is the text: ${text.text}`);
+        const summaryResult = await chat.sendMessage(
+            `${summarizeCourseOutlineContext} Here is the text: ${text.text}`,
+        );
         const courseSummary = summaryResult.response.text();
-        
-        const skillsResult = await chat.sendMessage(`${getCourseSkillsContext} Here is the text: ${text.text}`);
+
+        const skillsResult = await chat.sendMessage(
+            `${getCourseSkillsContext} Here is the text: ${text.text}`,
+        );
         const courseSkills = skillsResult.response.text();
-        console.log(courseSkills)
+        console.log(courseSkills);
 
         const response = {
             summary: courseSummary,
             skills: courseSkills,
-        }
-        res.status(200).send(response)
+        };
+        res.status(200).send(response);
     } catch (error) {
         console.log(error);
-        res.status(500).send('Failed updating course skills');
+        res.status(500).send("Failed updating course skills");
     }
-
-})
+});
 
 /**
  * Route for fetching all courses
@@ -175,14 +185,14 @@ router.get("/all", async (req, res) => {
         const offsetStr = req.query.offset as string;
         let offset = 0;
         if (offsetStr !== undefined) {
-          offset = parseInt(offsetStr);
+            offset = parseInt(offsetStr);
         }
         res.status(200).send(await dbGetAllCourses(offset));
     } catch (error) {
         console.log(error);
-        res.status(500).send('Failed fetching courses');
+        res.status(500).send("Failed fetching courses");
     }
-})
+});
 
 /**
  * Route for fetching details of a specific course
@@ -228,6 +238,6 @@ router.post("/update-details", async (req, res) => {
         console.log(error);
         res.status(500).send("An error occurred while updating course details");
     }
-})
+});
 
 export default router;
