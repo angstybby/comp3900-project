@@ -117,6 +117,7 @@ router.delete("/delete", async (req, res) => {
 
     try {
         await dbDeleteCourse(course, zid);
+        console.log("Course deleted");
         res.status(200).send("Course deleted successfully");
     } catch (error) {
         console.log(error);

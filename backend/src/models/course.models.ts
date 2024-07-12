@@ -131,11 +131,11 @@ export const dbAddCourse = async (courseId: string, zid: string) => {
 
 
 export const dbDeleteCourse = async (courseId: string, zid: string) => {
-    prisma.courseTaken.delete({
+    return await prisma.courseTaken.delete({
         where: {
             zid_courseId: {
-                courseId,
-                zid,
+                zid: zid,
+                courseId: courseId
             },
         },
     });
