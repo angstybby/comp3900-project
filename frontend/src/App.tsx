@@ -13,8 +13,11 @@ import CourseReco from '@/pages/CourseReco'
 import Admin from '@/pages/Admin'
 import ResetPassword from '@/pages/ResetPassword'
 import CourseDetails from '@/pages/CourseDetails'
+import ProjectDetails from './pages/ProjectDetails'
 import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
+
+
 
 function App() {
   return (
@@ -36,6 +39,7 @@ function App() {
             <Route path={`/courseRecommendations`} element={<CourseReco />} />
             <Route path={`/`} element={<Landing />} />
             <Route path="/course/:courseId" element={<CourseDetails />} />
+            <Route path="/project/:projectId" element={<ProjectDetails />} />
           </Routes>
         </BrowserRouter >
       </ProfileProvider>

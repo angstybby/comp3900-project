@@ -17,20 +17,20 @@ const CourseDetails = () => {
   };
 
   return (
-     <div className="p-14">
+    <div className="p-14">
       <h1 className="text-4xl font-medium">{course.name}</h1>
-      <section className="mt-8">
+      <div className="mt-8">
         <h2 className="text-2xl font-medium">Description</h2>
         <p className="mt-4 text-lg">{course.description}</p>
-      </section>
-      <section className="mt-8">
+      </div>
+      <div className="mt-8">
         <h2 className="text-2xl font-medium">Skills</h2>
         <ul className="mt-4 list-disc list-inside text-lg">
           {course.skills.map((skill, index) => (
             <li key={index}>{skill}</li>
           ))}
         </ul>
-      </section>
+      </div>
     </div>
   )
 }
