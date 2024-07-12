@@ -26,6 +26,52 @@ export const dbFindCourseByString = async (name: string) => {
     });
 };
 
+
+export const dbFindCourseByStringExcTaken = async (name: string, zid: string) => {
+  const takenCourses = await prisma.courseTaken.findMany({
+      where: {
+          zid,
+      },
+      select: {
+          courseId: true,
+      },
+  });
+
+  const takenCourseIds = takenCourses.map(course => course.courseId);
+
+  return await prisma.course.findMany({
+      where: {
+          AND: [
+              {
+                  OR: [
+                      {
+                          id: {
+                              contains: name,
+                          },
+                      },
+                      {
+                          courseName: {
+                              contains: name,
+                          },
+                      },
+                  ],
+              },
+              {
+                  id: {
+                      notIn: takenCourseIds,
+                  },
+              },
+          ],
+      },
+      select: {
+          id: true,
+          courseName: true,
+      },
+      take: 10,
+  });
+};
+
+
 export const dbFindCourseById = async (id: string) => {
     return await prisma.course.findUnique({
         where: {
@@ -35,20 +81,26 @@ export const dbFindCourseById = async (id: string) => {
 };
 
 export const dbAddCourse = async (courseId: string, zid: string) => {
-    prisma.courseTaken.create({
-        data: {
-            course: {
-                connect: {
-                    id: courseId,
-                },
-            },
-            profileOwner: {
-                connect: {
-                    zid,
-                },
-            },
+  try {
+    await prisma.courseTaken.create({
+      data: {
+        course: {
+          connect: {
+            id: courseId,
+          },
         },
+        profileOwner: {
+          connect: {
+            zid,
+          },
+        },
+      },
     });
+    console.log(`Course ${courseId} added for user ${zid}`);
+  } catch (error) {
+    console.error("Error in dbAddCourse:", error);
+    throw error;
+  }
 
     // Add skills to user
     const course = await prisma.course.findUnique({
@@ -75,6 +127,7 @@ export const dbAddCourse = async (courseId: string, zid: string) => {
         });
     }
 };
+
 
 export const dbDeleteCourse = async (courseId: string, zid: string) => {
     prisma.courseTaken.delete({
