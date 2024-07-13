@@ -61,15 +61,13 @@ export const dbAddCourse = async (courseId: string, zid: string) => {
     });
 
     if (course) {
-        const skills = course.skills;
-
         prisma.profile.update({
             where: {
                 zid,
             },
             data: {
                 Skills: {
-                    set: skills,
+                    set: course.skills,
                 },
             },
         });
@@ -114,13 +112,34 @@ export const dbUpdateCourse = async (
     summary: string,
     skills: string[],
 ) => {
-    return await prisma.course.update({
+    await prisma.course.update({
         where: {
             id: id,
         },
         data: {
             summary: summary,
-            skills: skills,
         },
     });
+
+    // Check if the skills is in the database, if not skip
+    const SkillFound = await prisma.skills.findMany({
+        where: {
+            skillName: {
+                in: skills,
+            },
+        },
+    });
+
+    if (SkillFound.length > 0) {
+        await prisma.course.update({
+            where: {
+                id: id,
+            },
+            data: {
+                skills: {
+                    set: SkillFound,
+                },
+            },
+        });
+    }
 };
