@@ -1,8 +1,9 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import {
     dbAcceptUserToGroup,
     dbCreateGroup,
     dbDeclineUserToGroup,
+    dbGetGroup,
     dbGetGroupApplications,
     dbGetUserInGroup,
     dbInviteUserToGroup,
@@ -14,6 +15,7 @@ import {
 import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
+import { model } from "../utils/ai";
 
 const router = express.Router();
 
@@ -343,6 +345,14 @@ router.get("/group-applications/:groupId", authMiddleWare, async (req, res) => {
     }
 });
 
+/**
+ * @route GET /group/groups
+ * @desc Get all the groups the user is in
+ * @access Private
+ * @type RequestHandler
+ * @returns {Group[]} - Array of groups the user is in
+ * @throws {Error} - If an error occurs while fetching groups
+ */
 router.get("/groups", authMiddleWare, async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -359,5 +369,43 @@ router.get("/groups", authMiddleWare, async (req, res) => {
         return res.status(500).send("An error occurred while fetching groups");
     }
 });
+
+router.get("/details/:groupId", authMiddleWare, async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        return res.status(401).send("Unauthorized");
+    }
+
+    const { groupId } = req.params;
+    
+    const groupIdInt = parseInt(groupId);
+
+    try {
+        const group = await dbGetGroup(groupIdInt);
+        return res.status(200).send(group);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("An error occured while fetching group details");
+    }
+});
+
+///////////////////////////// STUB!!! DELETE LATER /////////////////////////////
+router.post("/stub", authMiddleWare, async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        return res.status(401).send("Unauthorized");
+    }
+
+    const prompt = req.body.prompt;
+
+    try {
+        const chat = model.startChat();
+        const result = await chat.sendMessage(`${prompt}`);
+        return res.status(200).send(result.response.text());
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Failed to get recommendations");
+    }
+})
 
 export default router;

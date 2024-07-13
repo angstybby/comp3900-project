@@ -6,6 +6,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import GroupCard from "@/components/GroupsComponents/GroupCard";
+import { useEffect, useState } from "react";
+import { axiosInstanceWithAuth } from "@/api/Axios";
 
 // Group Data Placeholders
 const groups = [
@@ -46,8 +48,27 @@ const groups = [
   },
 ]
 
+interface Group {
+  id: number,
+  name: string,
+  description: string,
+  members: number,
+  maxMembers: number
+}
 
 export default function Groups() {
+  const [yourGroups, setYourGroups] = useState<Group[]>([]) 
+
+  useEffect(() => {
+    const fetchYourGroups = async () => {
+      const response = await axiosInstanceWithAuth.get("/group/groups");
+      console.log(response.data);
+      setYourGroups(response.data);
+    }
+
+    fetchYourGroups();
+  }, [])
+
   return (
     <div className="h-screen flex">
       <div className="w-full flex flex-col p-14">
@@ -57,8 +78,8 @@ export default function Groups() {
             align: "start"
           }}>
             <CarouselContent>
-              {groups.map((group) => (
-                <GroupCard key={group.id} group={group} inCarousel={true} />
+              {yourGroups.map((group) => (
+                <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} />
               ))}
             </CarouselContent>
             <CarouselPrevious />
@@ -69,7 +90,7 @@ export default function Groups() {
           <h1 className="text-4xl font-medium">Groups for you</h1>
           <div className="w-[95%] mx-auto grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 grid-rows-2 mt-5 gap-y-14 gap-x-5">
             {groups.map((group) => (
-              <GroupCard key={group.id} group={group} inCarousel={false} />
+              <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={false} />
             ))}
           </div>
         </div>
