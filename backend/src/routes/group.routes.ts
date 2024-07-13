@@ -15,6 +15,7 @@ import {
 import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
+import { model } from "../utils/ai";
 
 const router = express.Router();
 
@@ -387,5 +388,24 @@ router.get("/details/:groupId", authMiddleWare, async (req, res) => {
         return res.status(500).send("An error occured while fetching group details");
     }
 });
+
+///////////////////////////// STUB!!! DELETE LATER /////////////////////////////
+router.post("/stub", authMiddleWare, async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        return res.status(401).send("Unauthorized");
+    }
+
+    const prompt = req.body.prompt;
+
+    try {
+        const chat = model.startChat();
+        const result = await chat.sendMessage(`${prompt}`);
+        return res.status(200).send(result.response.text());
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Failed to get recommendations");
+    }
+})
 
 export default router;
