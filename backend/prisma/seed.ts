@@ -4,11 +4,6 @@ import courseDataJson from "../src/data/courseCodesAndTitle.json";
 const prisma = new PrismaClient();
 const seedCourses = async () => {
     const courseData = courseDataJson;
-
-    for (let course of courseData) {
-        // add a new field ot the course object
-    }
-
     // Only do this when the database in completely reset
     if (courseData.length > 0) {
         await prisma.course.createMany({
