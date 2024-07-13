@@ -9,7 +9,7 @@ const seedCourses = async () => {
   // Only do this when the database in completely reset
   if (filtered.length > 0) {
     await prisma.course.createMany({
-      data: courseData.map(course => ({
+      data: filtered.map(course => ({
         id: course.Code,
         courseName: course.Title
       }))

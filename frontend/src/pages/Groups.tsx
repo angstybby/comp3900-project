@@ -6,6 +6,8 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import GroupCard from "@/components/GroupsComponents/GroupCard";
+import { useEffect, useState } from "react";
+import { axiosInstanceWithAuth } from "@/api/Axios";
 
 // Group Data Placeholders
 const groups = [
@@ -46,8 +48,22 @@ const groups = [
   },
 ]
 
+interface Group {
+  groupID: number,
+}
 
 export default function Groups() {
+  const [yourGrous, setYourGroups] = useState<Group[]>([]) 
+
+  useEffect(() => {
+    const fetchYourGroups = async () => {
+      const response = await axiosInstanceWithAuth.get("/group/groups");
+      console.log(response.data);
+    }
+
+    fetchYourGroups();
+  }, [])
+
   return (
     <div className="h-screen flex">
       <div className="w-full flex flex-col p-14">

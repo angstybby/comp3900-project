@@ -343,6 +343,14 @@ router.get("/group-applications/:groupId", authMiddleWare, async (req, res) => {
     }
 });
 
+/**
+ * @route GET /group/groups
+ * @desc Get all the groups the user is in
+ * @access Private
+ * @type RequestHandler
+ * @returns {Group[]} - Array of groups the user is in
+ * @throws {Error} - If an error occurs while fetching groups
+ */
 router.get("/groups", authMiddleWare, async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {

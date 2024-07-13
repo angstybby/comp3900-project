@@ -418,7 +418,7 @@ export const dbGetGroupApplications = async (
 
 export const dbGetUserInGroup = async (zId: string) => {
     try {
-        const groupMembers = await prisma.groupJoined.findMany({
+        const groupsPartOf = await prisma.groupJoined.findMany({
             where: {
                 zid: zId,
             },
@@ -427,7 +427,15 @@ export const dbGetUserInGroup = async (zId: string) => {
             },
         });
 
-        return groupMembers;
+        const groups = await prisma.group.findMany({
+            where: {
+                id: {
+                    in: groupsPartOf.map((group) => group.groupId),
+                },
+            },
+        });
+
+        return groups;
     } catch (error) {
         console.error("Error getting user in group:", error);
         throw error;
