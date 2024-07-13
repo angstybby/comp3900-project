@@ -1,8 +1,9 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import {
     dbAcceptUserToGroup,
     dbCreateGroup,
     dbDeclineUserToGroup,
+    dbGetGroup,
     dbGetGroupApplications,
     dbGetUserInGroup,
     dbInviteUserToGroup,
@@ -365,6 +366,25 @@ router.get("/groups", authMiddleWare, async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).send("An error occurred while fetching groups");
+    }
+});
+
+router.get("/details/:groupId", authMiddleWare, async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        return res.status(401).send("Unauthorized");
+    }
+
+    const { groupId } = req.params;
+    
+    const groupIdInt = parseInt(groupId);
+
+    try {
+        const group = await dbGetGroup(groupIdInt);
+        return res.status(200).send(group);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("An error occured while fetching group details");
     }
 });
 

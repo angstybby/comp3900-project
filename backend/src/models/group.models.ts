@@ -441,3 +441,21 @@ export const dbGetUserInGroup = async (zId: string) => {
         throw error;
     }
 };
+
+export const dbGetGroup = async (groupId: number) => {
+    try {
+        return await prisma.group.findFirst({
+            where: {
+                id: groupId,
+            }, 
+            select: {
+                id: true,
+                groupName: true,
+                description: true,
+            }
+        });
+    } catch (error) {
+        console.error("Error getting group:", error);
+        throw error;
+    }
+}

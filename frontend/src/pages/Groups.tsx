@@ -49,16 +49,21 @@ const groups = [
 ]
 
 interface Group {
-  groupID: number,
+  id: number,
+  name: string,
+  description: string,
+  members: number,
+  maxMembers: number
 }
 
 export default function Groups() {
-  const [yourGrous, setYourGroups] = useState<Group[]>([]) 
+  const [yourGroups, setYourGroups] = useState<Group[]>([]) 
 
   useEffect(() => {
     const fetchYourGroups = async () => {
       const response = await axiosInstanceWithAuth.get("/group/groups");
       console.log(response.data);
+      setYourGroups(response.data);
     }
 
     fetchYourGroups();
@@ -73,8 +78,8 @@ export default function Groups() {
             align: "start"
           }}>
             <CarouselContent>
-              {groups.map((group) => (
-                <GroupCard key={group.id} group={group} inCarousel={true} />
+              {yourGroups.map((group) => (
+                <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} />
               ))}
             </CarouselContent>
             <CarouselPrevious />
@@ -85,7 +90,7 @@ export default function Groups() {
           <h1 className="text-4xl font-medium">Groups for you</h1>
           <div className="w-[95%] mx-auto grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 grid-rows-2 mt-5 gap-y-14 gap-x-5">
             {groups.map((group) => (
-              <GroupCard key={group.id} group={group} inCarousel={false} />
+              <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={false} />
             ))}
           </div>
         </div>
