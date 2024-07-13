@@ -6,6 +6,7 @@ export default function SkillsGapAnalysis() {
                 <h1 className="text-2xl font-light">Your Skill Gap Analysis</h1>
             </div>
             <h2 className="text-sm font-light line-clamp-2">graphs and stuff here</h2>
+            {/* <div className="py-6" id="donut-chart"></div> */}
         </div>
       </div>
   );
