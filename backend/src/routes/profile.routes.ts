@@ -71,7 +71,6 @@ router.put("/update-profile", async (req, res) => {
         fullname,
         description,
         resume,
-        Skills: { set: [] }, // Just as a placeholder as we will not update skills here
     };
 
     try {
