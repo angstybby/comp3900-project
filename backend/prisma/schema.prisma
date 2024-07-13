@@ -20,6 +20,16 @@ model User {
   resetToken String?  @unique
 }
 
+model Skills {
+  id          Int      @id @default(autoincrement())
+  skillName   String
+  createdAt   DateTime @default(now())
+  Profile     Profile[]
+  Course      Course[]
+  Group       Group[]
+  Project     Project[]
+}
+
 enum UserType {
   student
   academic
@@ -36,7 +46,7 @@ model Profile {
   GroupOwner     Group[]
   ProjectOwner   Project[]
   CourseTaken    CourseTaken[]
-  Skills         Json?
+  Skills         Skills[]
   GroupJoined    GroupJoined[]
   GroupInterest  GroupInterest[]
 }
@@ -44,7 +54,7 @@ model Profile {
 model Course {
   id          String        @id
   courseName  String
-  skills      Json?
+  skills      Skills[]
   summary     String?       @db.Text
   // Skills here should store an array of strings
   CourseTaken CourseTaken[]
@@ -68,6 +78,7 @@ model Group {
   GroupMembers GroupJoined[]
   projects     ProjectTaken[]
   interests    GroupInterest[]
+  CombinedSkills Skills[]
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 }
@@ -108,6 +119,7 @@ model Project {
   ProjectOwner   Profile        @relation(fields: [projectOwnerId], references: [zid])
   projectOwnerId String
   projectMembers ProjectTaken[]
+  skills         Skills[]
 }
 
 model ProjectTaken {
