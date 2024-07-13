@@ -21,13 +21,13 @@ model User {
 }
 
 model Skills {
-  id          Int      @id @default(autoincrement())
-  skillName   String
-  createdAt   DateTime @default(now())
-  Profile     Profile[]
-  Course      Course[]
-  Group       Group[]
-  Project     Project[]
+  id        Int       @id @default(autoincrement())
+  skillName String
+  createdAt DateTime  @default(now())
+  Profile   Profile[]
+  Course    Course[]
+  Group     Group[]
+  Project   Project[]
 }
 
 enum UserType {
@@ -43,7 +43,7 @@ model Profile {
   fullname       String
   description    String?         @db.Text
   resume         String?
-  GroupOwner     Group[]
+  Group          Group?
   ProjectOwner   Project[]
   CourseTaken    CourseTaken[]
   Skills         Skills[]
@@ -70,17 +70,18 @@ model CourseTaken {
 }
 
 model Group {
-  id           Int             @id @default(autoincrement())
-  groupName    String          @unique
-  description  String?
-  groupOwnerId String
-  GroupOwner   Profile         @relation(fields: [groupOwnerId], references: [zid])
-  GroupMembers GroupJoined[]
-  projects     ProjectTaken[]
-  interests    GroupInterest[]
+  id             Int             @id @default(autoincrement())
+  groupName      String          @unique
+  description    String?
+  groupOwnerId   String          @unique
+  GroupOwner     Profile         @relation(fields: [groupOwnerId], references: [zid])
+  GroupMembers   GroupJoined[]
+  projects       ProjectTaken[]
+  interests      GroupInterest[]
   CombinedSkills Skills[]
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  MaxMembers     Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model GroupJoined {

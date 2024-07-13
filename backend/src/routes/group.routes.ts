@@ -36,9 +36,9 @@ router.post("/create", async (req, res) => {
         throw new Error("Token is not valid");
     }
 
-    const { groupName, description, zIds } = req.body;
+    const { groupName, description, zIds, maxMembers } = req.body;
     // Check if the request body contains the required fields
-    if (!groupName || !description || !zIds) {
+    if (!groupName || !description || !zIds || !maxMembers) {
         return res.status(400).send("Missing required fields");
     }
 
@@ -377,7 +377,7 @@ router.get("/details/:groupId", authMiddleWare, async (req, res) => {
     }
 
     const { groupId } = req.params;
-    
+
     const groupIdInt = parseInt(groupId);
 
     try {
@@ -385,7 +385,9 @@ router.get("/details/:groupId", authMiddleWare, async (req, res) => {
         return res.status(200).send(group);
     } catch (error) {
         console.error(error);
-        return res.status(500).send("An error occured while fetching group details");
+        return res
+            .status(500)
+            .send("An error occured while fetching group details");
     }
 });
 
@@ -406,6 +408,6 @@ router.post("/stub", authMiddleWare, async (req, res) => {
         console.error(error);
         return res.status(500).send("Failed to get recommendations");
     }
-})
+});
 
 export default router;

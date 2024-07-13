@@ -6,6 +6,7 @@ export const dbCreateGroup = async (
     groupName: string,
     description: string,
     groupOwnerId: string,
+    maxMembers: number,
     zIds?: string[],
 ) => {
     try {
@@ -23,6 +24,7 @@ export const dbCreateGroup = async (
                         },
                     })),
                 },
+                MaxMembers: maxMembers,
             },
         });
         return newGroup;
@@ -447,15 +449,15 @@ export const dbGetGroup = async (groupId: number) => {
         return await prisma.group.findFirst({
             where: {
                 id: groupId,
-            }, 
+            },
             select: {
                 id: true,
                 groupName: true,
                 description: true,
-            }
+            },
         });
     } catch (error) {
         console.error("Error getting group:", error);
         throw error;
     }
-}
+};
