@@ -2,7 +2,6 @@ import { useState, ChangeEvent, FormEvent } from 'react';
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
-import TextArea from "@/components/Inputs/TextArea";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from "@headlessui/react";
 
 interface UploadModalProps {
