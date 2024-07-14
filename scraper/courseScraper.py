@@ -38,6 +38,7 @@ try:
         course_object = {}
         course_object['Code'] = course_card.find("h2", class_="font-bold w-[8ch] text-black dark:text-white").text
         course_object['Title'] = course_card.find("p", class_="text-sm text-unilectives-headings dark:text-gray-200 h-16 line-clamp-3").text
+        course_object['handbook_url'] = 'https://www.handbook.unsw.edu.au/undergraduate/courses/2024/' + course_object['Code']
         course_objects.append(course_object)
         
     with open(file_path, 'w') as file:

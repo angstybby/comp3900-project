@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const dbFindCourseByString = async (name: string) => {
+export const dbFindCourseByString = async (name: string, skip: number) => {
     return await prisma.course.findMany({
         where: {
             OR: [
@@ -22,6 +22,7 @@ export const dbFindCourseByString = async (name: string) => {
             id: true,
             courseName: true,
         },
+        skip: skip,
         take: 10,
     });
 };
@@ -113,15 +114,13 @@ export const dbAddCourse = async (courseId: string, zid: string) => {
     });
 
     if (course) {
-        const skills = course.skills;
-
         prisma.profile.update({
             where: {
                 zid,
             },
             data: {
                 Skills: {
-                    set: skills,
+                    set: course.skills,
                 },
             },
         });
@@ -130,11 +129,11 @@ export const dbAddCourse = async (courseId: string, zid: string) => {
 
 
 export const dbDeleteCourse = async (courseId: string, zid: string) => {
-    prisma.courseTaken.delete({
+    return await prisma.courseTaken.delete({
         where: {
             zid_courseId: {
-                courseId,
-                zid,
+                zid: zid,
+                courseId: courseId
             },
         },
     });
@@ -167,13 +166,34 @@ export const dbUpdateCourse = async (
     summary: string,
     skills: string[],
 ) => {
-    return await prisma.course.update({
+    await prisma.course.update({
         where: {
             id: id,
         },
         data: {
             summary: summary,
-            skills: skills,
         },
     });
+
+    // Check if the skills is in the database, if not skip
+    const SkillFound = await prisma.skills.findMany({
+        where: {
+            skillName: {
+                in: skills,
+            },
+        },
+    });
+
+    if (SkillFound.length > 0) {
+        await prisma.course.update({
+            where: {
+                id: id,
+            },
+            data: {
+                skills: {
+                    set: SkillFound,
+                },
+            },
+        });
+    }
 };

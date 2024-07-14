@@ -30,14 +30,17 @@ const router = express.Router();
  * @returns {Response} A response object containing the courses matching the search string.
  */
 router.post("/search", async (req, res) => {
-    console.log("Searching for course");
     const { name } = req.body;
 
     if (!name) {
         return res.status(400).send("No search string provided");
     }
-
-    const courses = await dbFindCourseByString(name);
+	const offsetStr = req.query.offset as string;
+    let offset = 0;
+    if (offsetStr !== undefined) {
+        offset = parseInt(offsetStr);
+    }
+    const courses = await dbFindCourseByString(name, offset);
     return res.status(200).send(courses);
 });
 
@@ -50,21 +53,21 @@ router.post("/search", async (req, res) => {
  * @returns {Response} A response object containing the matching courses.
  */
 router.post("/searchExc", async (req, res) => {
-  const customReq = req as CustomRequest;
-  if (!customReq.token || typeof customReq.token === "string") {
-      throw new Error("Token is not valid");
-  }
+	const customReq = req as CustomRequest;
+	if (!customReq.token || typeof customReq.token === "string") {
+		throw new Error("Token is not valid");
+	}
 
-  const zid = customReq.token.zid;
-  const { name } = req.body;
+	const zid = customReq.token.zid;
+	const { name } = req.body;
 
-  try {
-      const courses = await dbFindCourseByStringExcTaken(name, zid);
-      res.status(200).send(courses);
-  } catch (error) {
-      console.log(error);
-      res.status(500).send("An error occurred while searching for courses");
-  }
+	try {
+		const courses = await dbFindCourseByStringExcTaken(name, zid);
+		res.status(200).send(courses);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("An error occurred while searching for courses");
+	}
 });
 
 
@@ -81,12 +84,9 @@ router.post("/add", async (req, res) => {
     if (!customReq.token || typeof customReq.token === "string") {
         throw new Error("Token is not valid");
     }
-    // changed it to req.body.id to get course id
+    
     const course = req.body.id;
     const zid = customReq.token.zid;
-
-    console.log(course);
-    console.log(zid);
 
     try {
         await dbAddCourse(course, zid);
@@ -117,6 +117,7 @@ router.delete("/delete", async (req, res) => {
 
     try {
         await dbDeleteCourse(course, zid);
+        console.log("Course deleted");
         res.status(200).send("Course deleted successfully");
     } catch (error) {
         console.log(error);
@@ -187,7 +188,6 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
             `${getCourseSkillsContext} Here is the text: ${text.text}`,
         );
         const courseSkills = skillsResult.response.text();
-        console.log(courseSkills);
 
         const response = {
             summary: courseSummary,

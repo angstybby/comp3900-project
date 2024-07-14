@@ -1,7 +1,9 @@
 import { UserGroupIcon } from "@heroicons/react/24/outline"
 import { CarouselItem } from "@/components/ui/carousel";
+import { useNavigate } from "react-router-dom";
 
 interface GroupCardProps {
+    groupId: number,
     group: {
         name: string,
         description: string,
@@ -11,9 +13,13 @@ interface GroupCardProps {
     inCarousel: boolean
 }
 
-export default function GroupCard({ group, inCarousel }: GroupCardProps) {
+export default function GroupCard({ groupId, group, inCarousel }: GroupCardProps) {
+    const navigate = useNavigate();
+    const handleClick = () => {
+        navigate(`/group/${groupId}`);
+    }
     const content = (
-        <div className="h-32 bg-gray-200 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-80 hover:cursor-pointer">
+        <div onClick={handleClick} className="h-32 bg-gray-200 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-80 hover:cursor-pointer">
             <div className="text-start flex flex-col gap-1">
                 <div className="flex flex-row justify-between items-center">
                     <h1 className="text-2xl font-light">{group.name}</h1>

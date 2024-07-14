@@ -1,5 +1,6 @@
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
+import CourseDetailsActions from "@/components/CoursesComponents/CourseDetailsActions";
 import EditCourseDetailsModal from "@/components/Modals/EditCourseDetailsModal";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
@@ -87,7 +88,7 @@ const CourseDetails = () => {
           </div> 
         </div>
         
-        {userType === 'student' ? <></> : <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />}
+        {userType === 'student' ? <CourseDetailsActions courseId={courseDetails.id}/> : <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />}
       </div>    
     </>
   )

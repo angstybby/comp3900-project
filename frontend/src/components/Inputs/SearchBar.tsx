@@ -1,15 +1,8 @@
-import { axiosInstanceWithAuth } from "@/api/Axios";
 import { ChangeEvent } from "react";
 
-const SearchBar = () => {
+const SearchBar = ({ onSearchTermChange }: { onSearchTermChange: (searchTerm: string) => void}) => {
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-    axiosInstanceWithAuth.get(`api/course/search?query=${e.target.value}`)
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error('Failed to search for courses:', error);
-      });
+    onSearchTermChange(e.target.value);
   }
 
   return (
