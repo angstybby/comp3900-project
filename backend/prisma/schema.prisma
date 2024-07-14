@@ -73,7 +73,7 @@ model Group {
   id             Int             @id @default(autoincrement())
   groupName      String          @unique
   description    String?
-  groupOwnerId   String         
+  groupOwnerId   String
   GroupOwner     Profile         @relation(fields: [groupOwnerId], references: [zid])
   GroupMembers   GroupJoined[]
   projects       ProjectTaken[]
