@@ -19,10 +19,8 @@ app.use((req, res, next) => {
 // Define the port to run the server on
 const PORT = 3000;
 
-console.log(process.env.PORT ? "https://80:80" : "http://localhost:5173")
-
 const corsOptions = {
-  origin: process.env.PORT ? "http://localhost:80" : "http://localhost:5173",
+  origin: process.env.NODE_ENV == "production" ? "http://localhost:80" : "http://localhost:5173",
   credentials: true, 
 };
 
@@ -30,11 +28,11 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/auth", auth);
-app.use("/group", authMiddleWare, group);
-app.use("/profile", authMiddleWare, profile);
-app.use("/user", authMiddleWare, user);
-app.use("/course", authMiddleWare, course);
+app.use("/api/auth", auth);
+app.use("/api/group", authMiddleWare, group);
+app.use("/api/profile", authMiddleWare, profile);
+app.use("/api/user", authMiddleWare, user);
+app.use("/api/course", authMiddleWare, course);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

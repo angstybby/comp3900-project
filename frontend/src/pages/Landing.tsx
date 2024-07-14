@@ -13,7 +13,7 @@ import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import { JwtUser } from "@/utils/interfaces";
 import { jwtDecode } from "jwt-decode";
 // import { axiosNoAuth, getToken } from "../api/Axios";
-import { getToken } from "../api/Axios";
+import { axiosNoAuth, getToken } from "../api/Axios";
 import Cookies from "js-cookie";
 
 
@@ -41,7 +41,7 @@ export default function Landing() {
   const onSubmit = async (data: LoginProps) => {
     try {
       setLoading(true);
-      await axios.post("/api/auth/login/", {
+      await axiosNoAuth.post("/auth/login/", {
         email: data.email,
         password: data.password,
       });

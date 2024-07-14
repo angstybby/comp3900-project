@@ -1,9 +1,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import { BASE_URL } from "../utils/constants";
 
 const axiosInstanceWithAuth = axios.create({
-  baseURL: BASE_URL,
+  baseURL: '/api',
 });
 
 
@@ -32,7 +31,7 @@ axiosInstanceWithAuth.interceptors.request.use((config) => {
  * Creating an Axios instance for register and login. Has no Auth headers attached
  */
 const axiosNoAuth = axios.create({
-  baseURL: BASE_URL,
+  baseURL: '/api',
 })
 
 /**

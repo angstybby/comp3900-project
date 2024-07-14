@@ -10,6 +10,9 @@ services:
       - "5555:5555"
     environment:
       DATABASE_URL: mysql://root:password@db:3306/mydb?schema=public
+      JWT_HASH: ${JWT_HASH}
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY}
 
   db:
     image: mysql
