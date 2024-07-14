@@ -8,6 +8,7 @@ import {
     dbGetProjects,
 } from "../models/project.models";
 import { CustomRequest } from "../middleware/auth.middleware";
+import { isProjectOwner } from "../utils/project.utils";
 
 const router = express.Router();
 
@@ -46,18 +47,8 @@ router.get("/applications/:id", async (req: Request, res: Response) => {
     const zid = customReq.token.zid;
     const id = parseInt(req.params.id);
 
-    try {
-        const owner = await dbGetProjectOwnerById(id);
-        if (!owner) {
-            return res.status(404).send("Project not found");
-        }
-
-        if (owner.ProjectOwner.zid != zid) {
-            return res.status(401).send("Unauthorized");
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(500).send("Project doesnt exist");
+    if (await isProjectOwner(zid, id)) {
+        return res.status(401).send("You are not the owner of this project");
     }
 
     try {
@@ -65,11 +56,24 @@ router.get("/applications/:id", async (req: Request, res: Response) => {
         res.status(200).send(result);
     } catch (error) {
         console.log(error);
+        res.status(500).send("Failed fetching project applications");
     }
 });
 
 router.post("/add-skills", async (req: Request, res: Response) => {
     const { projectId, skills } = req.body;
+
+    // need to do checks
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+
+    if (await isProjectOwner(zid, projectId)) {
+        return res.status(401).send("You are not the owner of this project");
+    }
 
     try {
         // Add skill to project
@@ -85,6 +89,18 @@ router.post("/add-skills", async (req: Request, res: Response) => {
 
 router.post("/remove-skills", async (req: Request, res: Response) => {
     const { projectId, skills } = req.body;
+
+    // need to do checks
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+
+    if (await isProjectOwner(zid, projectId)) {
+        return res.status(401).send("You are not the owner of this project");
+    }
 
     try {
         // Remove skill from project
