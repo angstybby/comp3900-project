@@ -3,6 +3,7 @@ generator client {
 }
 
 datasource db {
+  // provider = "postgresql"
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
@@ -20,6 +21,16 @@ model User {
   notifications Notification[]
 }
 
+model Skills {
+  id        Int       @id @default(autoincrement())
+  skillName String
+  createdAt DateTime  @default(now())
+  Profile   Profile[]
+  Course    Course[]
+  Group     Group[]
+  Project   Project[]
+}
+
 enum UserType {
   student
   academic
@@ -31,18 +42,22 @@ model Profile {
   profileOwner   User            @relation(fields: [zid], references: [zid])
   profilePicture String?         @db.LongText
   fullname       String
-  description    String?
+  description    String?         @db.Text
   resume         String?
-  GroupOwner     Group[]
+  Group          Group[]
   ProjectOwner   Project[]
   CourseTaken    CourseTaken[]
+  Skills         Skills[]
   GroupJoined    GroupJoined[]
   GroupInterest  GroupInterest[]
 }
 
 model Course {
   id          String        @id
-  courseName  String        @unique
+  courseName  String
+  skills      Skills[]
+  summary     String?       @db.Text
+  // Skills here should store an array of strings
   CourseTaken CourseTaken[]
 }
 
@@ -56,16 +71,18 @@ model CourseTaken {
 }
 
 model Group {
-  id           Int             @id @default(autoincrement())
-  groupName    String          @unique
-  description  String?
-  groupOwnerId String
-  GroupOwner   Profile         @relation(fields: [groupOwnerId], references: [zid])
-  GroupMembers GroupJoined[]
-  projects     ProjectTaken[]
-  interests    GroupInterest[]
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  id             Int             @id @default(autoincrement())
+  groupName      String          @unique
+  description    String?
+  groupOwnerId   String
+  GroupOwner     Profile         @relation(fields: [groupOwnerId], references: [zid])
+  GroupMembers   GroupJoined[]
+  projects       ProjectTaken[]
+  interests      GroupInterest[]
+  CombinedSkills Skills[]
+  MaxMembers     Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model GroupJoined {
@@ -104,6 +121,7 @@ model Project {
   ProjectOwner   Profile        @relation(fields: [projectOwnerId], references: [zid])
   projectOwnerId String
   projectMembers ProjectTaken[]
+  skills         Skills[]
 }
 
 model ProjectTaken {
