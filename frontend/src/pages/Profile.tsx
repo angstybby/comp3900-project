@@ -1,13 +1,13 @@
 import { FormEvent, ChangeEvent, useState, useEffect } from "react";
 import "flowbite/dist/flowbite.min.css";
-import { axiosInstanceWithAuth } from "../api/Axios";
-import ButtonLoading from "../components/ButtonLoading";
-import 'flowbite/dist/flowbite.min.css'; 
-import ButtonUtility from "../components/ButtonUtility";
-import ButtonSubmit from "../components/ButtonSubmit";
+import { axiosInstanceWithAuth } from "@/api/Axios";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
+import 'flowbite/dist/flowbite.min.css';
+import ButtonUtility from "@/components/Buttons/ButtonUtility";
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
 import { Options } from "browser-image-compression";
 import imageCompression from "browser-image-compression";
-import { useProfile } from "../contexts/ProfileContext";
+import { useProfile } from "@/contexts/ProfileContext";
 
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
@@ -25,12 +25,12 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
 
   /**
-   * Two useEffects used to get the profile data from the context
+   * Two useEffects used to get the profile data from the context and apply it to the edit modal
    */
   useEffect(() => {
     fetchProfileData();
   }, []);
-  
+
   useEffect(() => {
     if (profileData) {
       setEditProfileInfo({
@@ -51,6 +51,9 @@ export default function Profile() {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
+    // if (id === 'description') {
+    //   console.log(value.length);
+    // }
     setEditProfileInfo((prevData) => ({
       ...prevData,
       [id]: value,
@@ -89,22 +92,14 @@ export default function Profile() {
    * @param e 
    * @returns {void}
    */
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0];
-    if (!file) {
-      return;
-    }
+    if (!file) return;
     // Compress the image to 5mb at most
-    const imageOptions: Options = {
-      maxSizeMB: 5
-    }
+    const imageOptions: Options = { maxSizeMB: 5 }
     imageCompression(file, imageOptions)
-    .then( function (compressed){
-      setSelectedFile(compressed);
-    })
-    .catch( function(error) {
-      console.log(error.message);
-    })
+      .then(compressed => { setSelectedFile(compressed) })
+      .catch(error => { console.log(error) })
     return;
   };
 
@@ -114,10 +109,9 @@ export default function Profile() {
    * @param e 
    * @returns {void}
    */
-  const handleSaveProfilePic = async (e: FormEvent) => {
+  const handleSaveProfilePic = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     if (!selectedFile) {
-      // No file has been selected! Return gracefully.
       alert('Please select a file!')
       return;
     }
@@ -125,7 +119,7 @@ export default function Profile() {
     const imageDataURL = await imageCompression.getDataUrlFromFile(selectedFile)
     try {
       setLoading(true);
-      await axiosInstanceWithAuth.put('/profile/update-profile', { 
+      await axiosInstanceWithAuth.put('/profile/update-profile', {
         zid: profileData.zid,
         profilePicture: imageDataURL,
         fullname: profileData.fullname,
@@ -138,7 +132,7 @@ export default function Profile() {
     }
     setLoading(false);
     setShowChangeProfPicModal(false);
-    return;    
+    return;
   }
 
   return (

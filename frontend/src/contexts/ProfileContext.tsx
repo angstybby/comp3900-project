@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from "react";
-import { axiosInstanceWithAuth } from "../api/Axios";
+import { axiosInstanceWithAuth } from "@/api/Axios";
+import { STUB_IMAGE } from "@/utils/constants";
 
 interface ProfileData {
   zid: string;
@@ -17,12 +18,15 @@ interface ProfileContextType {
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
-export const ProfileProvider: React.FC< { children: ReactNode } > = ({ children }) => {
+export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [profileData, setProfileData] = useState<ProfileData>({} as ProfileData);
-
   const fetchProfileData = async () => {
     try {
       const response = await axiosInstanceWithAuth.get("/profile");
+      const data = response.data;
+      if (!data.profilePicture || data.profilePicture === '') {
+        data.profilePicture = STUB_IMAGE;
+      }
       setProfileData(response.data);
     } catch (error) {
       console.log(error);
