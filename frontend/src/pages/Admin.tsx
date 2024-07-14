@@ -27,7 +27,13 @@ export default function Admin() {
   const navigate = useNavigate();
   const [usersData, setUsersData] = useState<UserDetails[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [userTypeFilter, setUserTypeFilter] = useState("");
+  const [currentPage] = useState(1);
+  const [usersPerPage] = useState(10);
   const { isModalOpen, currentZid, openCloseModal } = useDeleteModal();
+
+  // Fetch user data
   const fetchData = async () => {
     setLoading(true);
     const response = await axiosInstanceWithAuth.get("/user/all");
@@ -41,8 +47,20 @@ export default function Admin() {
     if (userType !== 'admin') {
       navigate('/dashboard')
     }
-    fetchData()
+    fetchData();
   }, [userType]);
+
+  // Search and filter users
+  const filteredUsers = usersData.filter(user =>
+    user.profile.fullname.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (userTypeFilter ? user.userType === userTypeFilter : true)
+  );
+
+  // Pagination logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
 
   return (
     <>
@@ -54,12 +72,31 @@ export default function Admin() {
           refetchData={fetchData}
         />
         <p className="text-3xl font-bold mb-5">Showing All Active Users!</p>
+        <div className="mb-5 flex justify-between items-center">
+          <input
+            type="text"
+            placeholder="Search by name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="p-2 border border-gray-300 rounded"
+          />
+          <select
+            value={userTypeFilter}
+            onChange={(e) => setUserTypeFilter(e.target.value)}
+            className="p-2 border border-gray-300 rounded"
+          >
+            <option value="admin">All User Types</option>
+            <option value="academic">Academics</option>
+            <option value="student">Students</option>
+          </select>
+        </div>
         {loading ?
           <div className="flex justify-center"><LoadingCircle /></div>
           :
           <>
-            {usersData.map((user) => (
+            {currentUsers.map((user) => (
               <UserDetails
+                key={user.zid}
                 zid={user.zid}
                 fullname={user.profile.fullname}
                 userType={user.userType}

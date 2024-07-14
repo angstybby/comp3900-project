@@ -17,7 +17,7 @@ model User {
   profile    Profile?
   isAdmin    Boolean  @default(false)
   resetToken String?  @unique
-  notifications Notification []
+  notifications Notification[]
 }
 
 enum UserType {
