@@ -43,7 +43,7 @@ model Profile {
   fullname       String
   description    String?         @db.Text
   resume         String?
-  Group          Group?
+  Group          Group[]
   ProjectOwner   Project[]
   CourseTaken    CourseTaken[]
   Skills         Skills[]
@@ -73,7 +73,7 @@ model Group {
   id             Int             @id @default(autoincrement())
   groupName      String          @unique
   description    String?
-  groupOwnerId   String          @unique
+  groupOwnerId   String         
   GroupOwner     Profile         @relation(fields: [groupOwnerId], references: [zid])
   GroupMembers   GroupJoined[]
   projects       ProjectTaken[]

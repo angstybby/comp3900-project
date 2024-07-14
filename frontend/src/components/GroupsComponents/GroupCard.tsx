@@ -5,30 +5,48 @@ import { useNavigate } from "react-router-dom";
 interface GroupCardProps {
     groupId: number,
     group: {
-        name: string,
+        groupName: string,
         description: string,
         members: number,
-        maxMembers: number
+        MaxMembers: number
+        groupOwnerId: string
     }
     inCarousel: boolean
+    profile: {
+        zid: string;
+        profilePicture: string;
+        fullname: string;
+        description: string;
+        resume: string;
+    }
 }
 
-export default function GroupCard({ groupId, group, inCarousel }: GroupCardProps) {
+export default function GroupCard({ groupId, group, inCarousel, profile }: GroupCardProps) {
+    console.log(groupId, group, inCarousel);
     const navigate = useNavigate();
     const handleClick = () => {
         navigate(`/group/${groupId}`);
     }
+    const isOwner = group.groupOwnerId === profile.zid
+
     const content = (
         <div onClick={handleClick} className="h-32 bg-gray-200 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-80 hover:cursor-pointer">
-            <div className="text-start flex flex-col gap-1">
-                <div className="flex flex-row justify-between items-center">
-                    <h1 className="text-2xl font-light">{group.name}</h1>
-                    <div className="flex flex-row gap-1 items-center">
-                        <UserGroupIcon className="h-5 w-5" />
-                        <span className="font-light">{group.members}/{group.maxMembers}</span>
+            <div className="flex flex-col justify-between h-full">
+                <div className="text-start flex flex-col gap-1">
+                    <div className="flex flex-row justify-between items-center">
+                        <h1 className="text-2xl font-light">{group.groupName}</h1>
+                        <div className="flex flex-row gap-1 items-center">
+                            <UserGroupIcon className="h-5 w-5" />
+                            <span className="font-light">{group.members}/{group.MaxMembers}</span>
+                        </div>
                     </div>
+                    <h2 className="text-sm font-light line-clamp-2">{group.description}</h2>
                 </div>
-                <h2 className="text-sm font-light line-clamp-2">{group.description}</h2>
+                {inCarousel && <div className="text-start">
+                    <div className={`rounded-full ${isOwner ? "bg-pink-300" : "bg-teal-300"} w-fit px-3 py-0.5`}>
+                        <p className="text-sm font-light">{isOwner ? "Owner" : "Member"}</p>
+                    </div>
+                </div>}
             </div>
         </div>
     );

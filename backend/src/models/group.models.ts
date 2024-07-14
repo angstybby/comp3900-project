@@ -7,7 +7,6 @@ export const dbCreateGroup = async (
     description: string,
     groupOwnerId: string,
     maxMembers: number,
-    zIds?: string[],
 ) => {
     try {
         const newGroup = await prisma.group.create({
@@ -15,15 +14,6 @@ export const dbCreateGroup = async (
                 groupName,
                 description,
                 groupOwnerId,
-                GroupMembers: {
-                    create: zIds?.map((zid) => ({
-                        profileOwner: {
-                            connect: {
-                                zid,
-                            },
-                        },
-                    })),
-                },
                 MaxMembers: maxMembers,
             },
         });
@@ -420,6 +410,7 @@ export const dbGetGroupApplications = async (
 
 export const dbGetUserInGroup = async (zId: string) => {
     try {
+        // Fetch the groups the user is a part of
         const groupsPartOf = await prisma.groupJoined.findMany({
             where: {
                 zid: zId,
@@ -429,15 +420,42 @@ export const dbGetUserInGroup = async (zId: string) => {
             },
         });
 
-        const groups = await prisma.group.findMany({
+        // Extract group IDs
+        const groupIds = groupsPartOf.map((group) => group.groupId);
+
+        // Fetch the groups owned by the user
+        const groupOwned = await prisma.group.findMany({
             where: {
-                id: {
-                    in: groupsPartOf.map((group) => group.groupId),
-                },
+                groupOwnerId: zId,
             },
         });
 
-        return groups;
+        // Fetch the groups the user is a part of
+        const groups = await prisma.group.findMany({
+            where: {
+                id: { in: groupIds },
+            },
+        });
+
+        // Combine the two arrays
+        const combinedGroups = [...groups, ...groupOwned];
+
+        // Fetch the member count for each group
+        const groupsWithMemberCount = await Promise.all(
+            combinedGroups.map(async (group) => {
+                let members = await prisma.groupJoined.count({
+                    where: { groupId: group.id },
+                });
+                members += 1; // Add 1 for the group owner
+
+                return {
+                    ...group,
+                    members,
+                };
+            }),
+        );
+
+        return groupsWithMemberCount;
     } catch (error) {
         console.error("Error getting user in group:", error);
         throw error;
