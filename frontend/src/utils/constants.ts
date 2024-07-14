@@ -1,4 +1,6 @@
-export const BASE_URL = 'http://localhost:5005';
+export const BASE_URL = import.meta.env.PROD
+  ? "http://backend:3000"
+  : "http://localhost:5005";
 
 export const LOREM = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptates debitis reiciendis ratione nam officia natus repellat? Maxime sint, quaerat autem eaque corporis, deleniti necessitatibus, animi neque eius ullam placeat debitis.'
 
