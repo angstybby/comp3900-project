@@ -31,7 +31,7 @@ const projectsToString = () => {
 }
 
 const generatePrompt = () => {
-  return `You are a member of a group that has the following skills: ${stubSkills}. You are looking for projects to do. Here are the list of projects that you can work on:\n${projectsToString()}. Recommend a project that you think is suitable based on their current skills. Format them with the project name followed by the requirements in list format without bold fonts. For example, "Project 1: network protocols (HTTP, FTP, SMTP, etc.), network security (firewalls, VPNs, encryption), socket programming, wireless networking, cloud computing (AWS, Azure, Google Cloud)". And only at the very end you give a brief, max 100 words, explanation of why you think this project rankings is suitable for them.`;
+  return `You are a member of a group that has the following skills: ${stubSkills}. You are looking for projects to do. Here are the list of projects that you can work on:\n${projectsToString()}. Recommend a project that you think is suitable based on their current skills. Format them with the project name only separated by commas. For example, "Project 1".`;
 }
 
 const GroupDetails = () => {
@@ -42,7 +42,7 @@ const GroupDetails = () => {
     description: "",
   });
 
-  const [recc, setRecc] = useState<string>("");
+  const [recc, setRecc] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -59,7 +59,7 @@ const GroupDetails = () => {
         prompt: generatePrompt(),
       })
       const textOutput = response.data;
-      const formatted = textOutput.replace(/\*\* /g, "\n\n");
+      const formatted = textOutput.split(",")
       setRecc(formatted);
     }
 
@@ -90,7 +90,9 @@ const GroupDetails = () => {
         </div>
         
         <p className="mt-10 text-2xl font-bold mb-5">{`Recommended Projects`}</p>
-        <p>{recc}</p>
+        {recc.map(skill => (
+          <p key={skill}>{skill}</p>
+        ))}
       </div>    
     </>
   )
