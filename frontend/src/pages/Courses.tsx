@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import LoadingCircle from "@/components/LoadingCircle";
 import CourseList from "@/components/CoursesComponents/CourseList";
+import UploadModal from "@/components/Modals/UploadModal";
 
 interface Course {
   id: string;
@@ -21,9 +22,10 @@ export default function Courses() {
   const [loading, setLoading] = useState(false);
   const [userCourses, setUserCourses] = useState<Course[]>([]);
   const [showAddCourseModal, setShowAddCourseModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+
   const [userType, setUserType] = useState<UserType>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const userTypeFromCookie = Cookies.get('userType') as UserType;
@@ -46,13 +48,16 @@ export default function Courses() {
     fetchUserCourses();
   }, []);
 
-  
-  // TODO: If courses are added then dont show it
   return (
     <div className="h-screen flex justify-center">
       <AddCourseModal
         isVisible={showAddCourseModal}
         close={() => setShowAddCourseModal(false)}
+        refetchData={fetchUserCourses}
+      />
+      <UploadModal
+        isVisible={showUploadModal}
+        close={() => setShowUploadModal(false)}
         refetchData={fetchUserCourses}
       />
       <div className="w-full flex flex-col p-14">
@@ -61,7 +66,7 @@ export default function Courses() {
             <h1 className="text-4xl font-medium pb-8">Courses</h1>
             {userType === 'student' && (
               <div className="flex items-center space-x-4" title="Add Course Button">
-                <ButtonUtility text={"Upload Courses Taken"} onClick={() => navigate('/Upload')} />
+                <ButtonUtility text={"Upload Courses Taken"} onClick={() => setShowUploadModal(true)} />
                 <ButtonUtility text={"Add Courses Taken"} onClick={() => setShowAddCourseModal(true)} />
               </div>
             )}

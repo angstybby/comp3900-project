@@ -10,6 +10,7 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import PdfParse from "pdf-parse";
 import { model, getCompletedCourseContext } from "../utils/ai";
+import { dbAddCourse, dbFindCourseByString, dbFindCourseByStringExcTaken } from "../models/course.models";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -116,8 +117,7 @@ router.post(
             // 4. Print their response
             console.log("--------------------");
             console.log(result.response.text());
-
-            res.status(200).send(text);
+            res.status(200).send(result.response.text());
         } catch (error) {
             console.error(error);
             res.status(500).send("An error occured when scraping the PDF File");
@@ -149,12 +149,23 @@ router.post(
 
             const date = new Date().toISOString();
 
-            // TODO: Get every course from the transcript and put it into the Profile CourseTaken
-            // const courseTaken = await extractCoursesFromTranscript(file.buffer);
+            // Extract the course codes from the AI response
+            const responseText = req.body.scrapped;
+            const courseCodeRegex = /\b[A-Z]{4}[0-9]{4}\b/g;
+            const courseCodes = responseText.match(courseCodeRegex) || [];
+            console.log(courseCodes);
 
-            // courseTaken.forEach(async (course) => {
-            //     await dbAddCourseTaken(customReq.token.zid, course);
-            // });
+            // Add each course to the user's profile
+            for (const course of courseCodes) {
+                console.log(course);
+                // const addcourse = await dbFindCourseByString(course, 0);
+                const addcourse = await dbFindCourseByStringExcTaken(course, customReq.token.zid);
+                if (addcourse.length > 0) {
+                  console.log( addcourse[0].id);
+                  await dbAddCourse(addcourse[0].id, customReq.token.zid);
+                }
+            }
+
             // Upload file to S3
             try {
                 const upload = new Upload({
