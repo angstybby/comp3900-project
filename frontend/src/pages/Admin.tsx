@@ -53,7 +53,7 @@ export default function Admin() {
           zid={currentZid}
           refetchData={fetchData}
         />
-        <p className="text-3xl font-bold mb-5">Showing All Active Users!</p>
+        <p className="text-3xl font-bold mb-5">Showing All Registered Users!</p>
         {loading ?
           <div className="flex justify-center"><LoadingCircle /></div>
           :

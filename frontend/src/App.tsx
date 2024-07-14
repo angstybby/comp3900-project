@@ -12,8 +12,10 @@ import Profile from '@/pages/Profile'
 import CourseReco from '@/pages/CourseReco'
 import Admin from '@/pages/Admin'
 import ResetPassword from '@/pages/ResetPassword'
+import CourseDetails from '@/pages/CourseDetails'
 import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
+import GroupDetails from './pages/GroupDetails'
 
 function App() {
   return (
@@ -27,6 +29,8 @@ function App() {
               <Route path={`/groups`} element={<Groups />} />
               <Route path={`/projects`} element={<Projects />} />
               <Route path={`/profile`} element={<Profile />} />
+              <Route path={`/course/:courseId`} element={<CourseDetails />} />
+              <Route path={`/group/:groupId`} element={<GroupDetails />} />
               <Route path={`/manage-users`} element={<Admin />} />
             </Route>
             <Route path={`/register`} element={<Register />} />

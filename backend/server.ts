@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", auth);
-app.use("/groups", authMiddleWare, group);
+app.use("/group", authMiddleWare, group);
 app.use("/profile", authMiddleWare, profile);
 app.use("/user", authMiddleWare, user);
 app.use("/course", authMiddleWare, course);

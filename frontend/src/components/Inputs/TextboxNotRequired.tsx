@@ -3,7 +3,7 @@ import * as React from 'react';
 export interface InputProps
     extends React.InputHTMLAttributes<HTMLInputElement> { }
 
-const Textbox = React.forwardRef<HTMLInputElement, {
+const TextboxNotReq = React.forwardRef<HTMLInputElement, {
     id: string,
     name: string,
     type: string,
@@ -18,7 +18,6 @@ const Textbox = React.forwardRef<HTMLInputElement, {
             type={type}
             autoComplete={autoComplete}
             ref={ref}
-            required
             placeholder={placeholder}
             className="block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-md sm:leading-6"
             {...rest}
@@ -26,5 +25,5 @@ const Textbox = React.forwardRef<HTMLInputElement, {
     );
 });
 
-export default Textbox;
+export default TextboxNotReq;
 
