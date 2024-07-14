@@ -6,7 +6,7 @@ export const dbAddProject = async (
     uid: string,
     title: string,
     description: string,
-    skills: string[],
+    skills: number[],
 ) => {
     try {
         const project = await prisma.project.create({
@@ -21,14 +21,7 @@ export const dbAddProject = async (
             },
         });
 
-        await prisma.projectSkill.createMany({
-            data: skills.map((skill) => {
-                return {
-                    projectId: project.id,
-                    skill,
-                };
-            }),
-        });
+        await dbAddProjectSkills(project.id, skills);
     } catch (error) {
         console.log(error);
         throw error;
@@ -36,14 +29,7 @@ export const dbAddProject = async (
 };
 
 export const dbDeleteProject = async (projectId: number) => {
-    // clear all project skills
-    await prisma.projectSkill.deleteMany({
-        where: {
-            projectId,
-        },
-    });
-
-    // delete project
+    // delete project and skills connections aswell
     await prisma.project.delete({
         where: {
             id: projectId,
@@ -51,36 +37,47 @@ export const dbDeleteProject = async (projectId: number) => {
     });
 };
 
+// Connects gracefully and will not fail if skill is already connected
 export const dbAddProjectSkills = async (
     projectId: number,
-    skills: string[],
+    skills: number[],
 ) => {
-    return await prisma.projectSkill.createMany({
-        data: skills.map((skill) => {
-            return {
-                projectId,
-                skill,
-            };
-        }),
-    });
-};
-
-export const dbDeleteProjectSkill = async (
-    projectId: number,
-    skill: string,
-) => {
-    return await prisma.projectSkill.delete({
+    await prisma.project.update({
         where: {
-            projectId_skill: {
-                projectId,
-                skill,
+            id: projectId,
+        },
+        data: {
+            skills: {
+                connect: skills.map((skill) => {
+                    return {
+                        id: skill,
+                    };
+                }),
             },
         },
     });
 };
 
-export const dbAddProjectToGroup = async (uid: string) => {
-    return await prisma.projectUser.create({
-        
-    })
-}
+export const dbDeleteProjectSkill = async (
+    projectId: number,
+    skills: number[],
+) => {
+    await prisma.project.update({
+        where: {
+            id: projectId,
+        },
+        data: {
+            skills: {
+                disconnect: skills.map((skill) => {
+                    return {
+                        id: skill,
+                    };
+                }),
+            },
+        },
+    });
+};
+
+// export const dbProjectApplications = async (projectId: number) => {
+    
+// };
