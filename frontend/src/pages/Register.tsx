@@ -9,12 +9,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import ButtonLoading from "../components/ButtonLoading";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { getToken } from "../api/Axios";
+import { axiosNoAuth, getToken } from "../api/Axios";
 import Cookies from "js-cookie";
 import { JwtUser } from "../utils/interfaces";
-import { BASE_URL } from "../utils/constants";
 
 type RegisterProps = z.infer<typeof registerSchema>;
 
@@ -43,7 +41,7 @@ export default function Register() {
   const onSubmit = async (data: RegisterProps) => {
     try {
       setLoading(true);
-      await axios.post(BASE_URL + "/auth/register", {
+      await axiosNoAuth.post("/auth/register/", {
         email: data.email,
         password: data.password,
         fullname: data.name,

@@ -12,9 +12,9 @@ import { useState } from "react";
 import ButtonLoading from "../components/ButtonLoading";
 import { JwtUser } from "../utils/interfaces";
 import { jwtDecode } from "jwt-decode";
+// import { axiosNoAuth, getToken } from "../api/Axios";
 import { getToken } from "../api/Axios";
 import Cookies from "js-cookie";
-import { BASE_URL } from "../utils/constants";
 
 
 type LoginProps = z.infer<typeof loginSchema>;
@@ -41,7 +41,7 @@ export default function Landing() {
   const onSubmit = async (data: LoginProps) => {
     try {
       setLoading(true);
-      await axios.post(BASE_URL + "/auth/login", {
+      await axios.post("/api/auth/login/", {
         email: data.email,
         password: data.password,
       });

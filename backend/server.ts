@@ -9,11 +9,18 @@ import course from "./src/routes/course.routes";
 const app = express();
 const cookieParser = require('cookie-parser')
 
+app.use((req, res, next) => {
+  console.log(`Received request: ${req.method} ${req.url}`);
+  next();
+});
+
 // Define the port to run the server on
-const PORT = process.env.PORT || 5005;
+const PORT = 3000;
+
+console.log(process.env.PORT ? "https://80:80" : "http://localhost:5173")
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: process.env.PORT ? "http://localhost:80" : "http://localhost:5173",
   credentials: true, 
 };
 
