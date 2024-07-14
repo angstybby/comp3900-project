@@ -1,4 +1,6 @@
 import { axiosInstanceWithAuth } from "@/api/Axios";
+import ProjectCard from "@/components/ProjectComponents/ProjectCard";
+import { Carousel, CarouselContent, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 
@@ -87,12 +89,24 @@ const GroupDetails = () => {
           <p className="font-bold mt-5">Group Description:</p>
           <p>{`${details.description}`}</p>
           <p className="font-bold">Group Skills:</p>
+
+          <p className="mt-5">----------------- STUB ------------------</p>
+          <p>Currently, this group has the combined skills of:</p>
+          <p>{stubSkills}</p>
         </div>
         
         <p className="mt-10 text-2xl font-bold mb-5">{`Recommended Projects`}</p>
-        {recc.map(skill => (
-          <p key={skill}>{skill}</p>
-        ))}
+        <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{
+          align: "start"
+        }}>
+          <CarouselContent>
+            {recc.map(project => (
+              <ProjectCard id={project} inCarousel={true} />
+            ))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
       </div>    
     </>
   )
