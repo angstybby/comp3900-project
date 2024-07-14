@@ -15,7 +15,6 @@ export default function ProjectCard({ id, inCarousel }: ProjectCardProps) {
 	}
 
   useEffect(() => {
-    console.log(id)
   }, [])
 
   const content = (
