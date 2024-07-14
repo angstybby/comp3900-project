@@ -46,7 +46,7 @@ export default function ResetPassword() {
     try {
       // Send verification email logic goes here
       setloading(true);
-      await axiosNoAuth.post("/auth/reset-password", { email: data.email });
+      await axiosNoAuth.post("api/auth/reset-password", { email: data.email });
       setShowEmailForm(false);
       setloading(false);
       setShowVerificationForm(true);
