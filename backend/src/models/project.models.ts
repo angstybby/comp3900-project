@@ -58,7 +58,7 @@ export const dbAddProjectSkills = async (
     });
 };
 
-export const dbDeleteProjectSkill = async (
+export const dbDeleteProjectSkills = async (
     projectId: number,
     skills: number[],
 ) => {

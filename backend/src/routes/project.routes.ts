@@ -1,5 +1,12 @@
 import express, { Request, Response } from "express";
-import { dbGetAllProjectApplications, dbGetProject, dbGetProjectOwnerById, dbGetProjects } from "../models/project.models";
+import {
+    dbAddProjectSkills,
+    dbDeleteProjectSkills,
+    dbGetAllProjectApplications,
+    dbGetProject,
+    dbGetProjectOwnerById,
+    dbGetProjects,
+} from "../models/project.models";
 import { CustomRequest } from "../middleware/auth.middleware";
 
 const router = express.Router();
@@ -8,7 +15,7 @@ router.get("/:id", async (req, res) => {
     // Get the project ID from the URL
     const { id } = req.params;
     try {
-        const project = await dbGetProject(parseInt(id))
+        const project = await dbGetProject(parseInt(id));
         res.status(200).send(project);
     } catch (error) {
         console.log(error);
@@ -26,7 +33,7 @@ router.get("/", async (req, res) => {
         console.log(error);
         res.status(500).send("Failed fetching projects");
     }
-})
+});
 
 // Id is the project id
 router.get("/applications/:id", async (req: Request, res: Response) => {
@@ -44,7 +51,7 @@ router.get("/applications/:id", async (req: Request, res: Response) => {
         if (!owner) {
             return res.status(404).send("Project not found");
         }
-    
+
         if (owner.ProjectOwner.zid != zid) {
             return res.status(401).send("Unauthorized");
         }
@@ -61,6 +68,34 @@ router.get("/applications/:id", async (req: Request, res: Response) => {
     }
 });
 
+router.post("/add-skills", async (req: Request, res: Response) => {
+    const { projectId, skills } = req.body;
 
+    try {
+        // Add skill to project
+        const skillsArray = Array.isArray(skills) ? skills : [skills];
+
+        await dbAddProjectSkills(projectId, skillsArray);
+        res.status(200).send("Skills added to project");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Failed adding skill to project");
+    }
+});
+
+router.post("/remove-skills", async (req: Request, res: Response) => {
+    const { projectId, skills } = req.body;
+
+    try {
+        // Remove skill from project
+        const skillsArray = Array.isArray(skills) ? skills : [skills];
+
+        await dbDeleteProjectSkills(projectId, skillsArray);
+        res.status(200).send("Skills removed from project");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Failed removing skill from project");
+    }
+});
 
 export default router;
