@@ -90,6 +90,17 @@ export const dbGetAllProjectApplications = async (projectId: number) => {
     });
 };
 
+export const dbGetProjectOwnerById = async (projectId: number) => {
+    return await prisma.project.findUnique({
+        where: {
+            id: projectId,
+        },
+        select: {
+            ProjectOwner: true,
+        },
+    });
+}
+
 export const dbGetProject = async (projectId: number) => {
     return await prisma.project.findUnique({
         where: {
@@ -108,3 +119,20 @@ export const dbGetProject = async (projectId: number) => {
         },
     });
 };
+
+// Get all projects with a limit of 25 and a skip value
+export const dbGetProjects = async (skip: number) => {
+    return await prisma.project.findMany({
+        skip,
+        take: 25,
+        include: {
+            ProjectOwner: true,
+            skills: {
+                select: {
+                    id: true,
+                    skillName: true,
+                },
+            },
+        },
+    });
+}
