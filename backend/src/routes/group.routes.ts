@@ -36,35 +36,59 @@ router.post("/create", async (req, res) => {
         throw new Error("Token is not valid");
     }
 
-    const { groupName, description, zIds } = req.body;
+    let { groupName, description, zIds, maxMembers } = req.body;
     // Check if the request body contains the required fields
-    if (!groupName || !description || !zIds) {
+    if (!groupName || !description || !zIds || !maxMembers) {
         return res.status(400).send("Missing required fields");
     }
 
     const groupOwnerId = customReq.token.zid;
 
     // Check the zIds if they exist and are not empty
-    zIds.forEach((zid: string) => {
-        if (!validateZid(zid)) {
-            return res.status(400).send("Invalid zid" + zid);
-        }
-        if (zid === groupOwnerId) {
-            return res.status(400).send("Cannot add yourself to the group");
-        }
-        if (!dbFindUserByZid(zid)) {
-            return res.status(400).send("User does not exist");
-        }
-    });
+    if (zIds.length > 0) {
+        console.log(zIds);
+        zIds.forEach(async (zid: string) => {
+            if (!validateZid(zid)) {
+                return res.status(400).send("Invalid zid " + zid);
+            }
+            if (zid === groupOwnerId) {
+                return res.status(400).send("Cannot add yourself to the group");
+            }
+            const user = await dbFindUserByZid(zid);
+            if (!user) {
+                return res.status(400).send("User " + zid + " does not exist");
+            }
+        });
+    }
 
     try {
         const newGroup = await dbCreateGroup(
             groupName,
             description,
             groupOwnerId,
-            zIds,
+            maxMembers,
         );
-        return res.status(200).send(newGroup);
+
+        console.log("Group Created");
+        // Invite the users to the group
+
+        console.log(zIds);
+
+        if (zIds.length > 0) {
+            try {
+                zIds.forEach(async (zid: string) => {
+                    await dbInviteUserToGroup(newGroup.id, groupOwnerId, zid);
+                });
+                return res.status(200).send("Group created successfully");
+            } catch (error) {
+                console.error(error);
+                return res
+                    .status(500)
+                    .send("An error occurred while inviting users to group");
+            }
+        } else {
+            return res.status(200).send("Group created successfully");
+        }
     } catch (error) {
         console.error(error);
         return res.status(500).send("An error occurred while creating group");
@@ -377,7 +401,7 @@ router.get("/details/:groupId", authMiddleWare, async (req, res) => {
     }
 
     const { groupId } = req.params;
-    
+
     const groupIdInt = parseInt(groupId);
 
     try {
@@ -385,7 +409,9 @@ router.get("/details/:groupId", authMiddleWare, async (req, res) => {
         return res.status(200).send(group);
     } catch (error) {
         console.error(error);
-        return res.status(500).send("An error occured while fetching group details");
+        return res
+            .status(500)
+            .send("An error occured while fetching group details");
     }
 });
 
@@ -406,6 +432,6 @@ router.post("/stub", authMiddleWare, async (req, res) => {
         console.error(error);
         return res.status(500).send("Failed to get recommendations");
     }
-})
+});
 
 export default router;
