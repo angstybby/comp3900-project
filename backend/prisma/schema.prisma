@@ -56,7 +56,6 @@ model Course {
   courseName  String
   skills      Skills[]
   summary     String?       @db.Text
-  // Skills here should store an array of strings
   CourseTaken CourseTaken[]
 }
 

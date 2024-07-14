@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import {
     dbAddProject,
     dbAddProjectSkills,
+    dbDeleteProject,
     dbDeleteProjectSkills,
     dbGetAllProjectApplications,
     dbGetProject,
@@ -47,7 +48,30 @@ router.post("/add", async (req, res) => {
         res.status(500).send("Failed adding project");
     }
 });
-router.get("/delete", async (req, res) => {});
+
+router.post("/delete", async (req, res) => {
+    const { projectId } = req.body;
+
+    // Check that hes the owner
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+
+    if (await isProjectOwner(zid, projectId)) {
+        return res.status(401).send("You are not the owner of this project");
+    }
+
+    try {
+        await dbDeleteProject(projectId);
+        res.status(200).send("Project deleted");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Failed deleting project");
+    }
+});
 
 router.get("/:id", async (req, res) => {
     // Get the project ID from the URL
