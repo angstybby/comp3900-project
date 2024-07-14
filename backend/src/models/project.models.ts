@@ -21,7 +21,7 @@ export const dbAddProject = async (
             },
         });
 
-        await dbAddProjectSkills(project.id, skills);
+        return await dbAddProjectSkills(project.id, skills);
     } catch (error) {
         console.log(error);
         throw error;

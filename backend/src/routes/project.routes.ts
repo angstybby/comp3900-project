@@ -1,16 +1,53 @@
 import express, { Request, Response } from "express";
 import {
+    dbAddProject,
     dbAddProjectSkills,
     dbDeleteProjectSkills,
     dbGetAllProjectApplications,
     dbGetProject,
-    dbGetProjectOwnerById,
     dbGetProjects,
 } from "../models/project.models";
 import { CustomRequest } from "../middleware/auth.middleware";
 import { isProjectOwner } from "../utils/project.utils";
+import { getUserType } from "../models/profile.models";
+import { UserType } from "@prisma/client";
 
 const router = express.Router();
+
+router.post("/add", async (req, res) => {
+    // Check that hes the owner
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+
+    // Check if the user is an academic
+    try {
+        const userType = await getUserType(zid);
+        if (!userType) {
+            return res.status(401).send("User not found");
+        }
+        if (userType.userType !== UserType.academic) {
+            return res.status(401).send("You are not an academic");
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send("Failed fetching user type");
+    }
+
+    // Add the project
+    const { title, description, skills } = req.body;
+    try {
+        const project = await dbAddProject(zid, title, description, skills);
+        res.status(200).send(project);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Failed adding project");
+    }
+});
+router.get("/delete", async (req, res) => {});
 
 router.get("/:id", async (req, res) => {
     // Get the project ID from the URL
