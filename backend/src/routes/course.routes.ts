@@ -4,13 +4,19 @@ import {
     dbDeleteCourse,
     dbFindCourseById,
     dbFindCourseByString,
+    dbFindCourseByStringExcTaken,
     dbGetAllCourses,
     dbGetUserCourses,
     dbUpdateCourse,
 } from "../models/course.models";
 import { CustomRequest } from "../middleware/auth.middleware";
 import PdfParse from "pdf-parse";
-import { AIModel, getCourseSkillsContext, summarizeCourseOutlineContext } from "../utils/ai";
+import {
+    model,
+    getCourseSkillsContext,
+    summarizeCourseOutlineContext,
+    generationConfig,
+} from "../utils/ai";
 import multer from "multer";
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -36,6 +42,33 @@ router.post("/search", async (req, res) => {
 });
 
 /**
+ * Search for courses by name excluding courses already taken by the user
+ * @name POST /course/search
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the token is not valid.
+ * @returns {Response} A response object containing the matching courses.
+ */
+router.post("/searchExc", async (req, res) => {
+  const customReq = req as CustomRequest;
+  if (!customReq.token || typeof customReq.token === "string") {
+      throw new Error("Token is not valid");
+  }
+
+  const zid = customReq.token.zid;
+  const { name } = req.body;
+
+  try {
+      const courses = await dbFindCourseByStringExcTaken(name, zid);
+      res.status(200).send(courses);
+  } catch (error) {
+      console.log(error);
+      res.status(500).send("An error occurred while searching for courses");
+  }
+});
+
+
+/**
  * Adds the course to the list of courses taken by the user
  * @name POST /add
  * @param {Request} req - The request object.
@@ -48,13 +81,17 @@ router.post("/add", async (req, res) => {
     if (!customReq.token || typeof customReq.token === "string") {
         throw new Error("Token is not valid");
     }
-
-    const { course } = req.body;
+    // changed it to req.body.id to get course id
+    const course = req.body.id;
     const zid = customReq.token.zid;
 
+    console.log(course);
+    console.log(zid);
+
     try {
-        await dbAddCourse(zid, course);
+        await dbAddCourse(course, zid);
         res.status(200).send("Course added successfully");
+        console.log("Course added");
     } catch (error) {
         console.log(error);
         res.status(500).send("An error occurred while adding course");
@@ -126,7 +163,7 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
         if (!customReq.token || typeof customReq.token === "string") {
             throw new Error("Token is not valid");
         }
-    
+
         const file = req.file;
         // Check if file is present
         if (!file) {
@@ -137,26 +174,31 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
             throw new Error("File is not a pdf");
         }
         const text = await PdfParse(file.buffer);
-        const chat = AIModel.startChat();
+        const chat = model.startChat({
+            generationConfig,
+        });
 
-        const summaryResult = await chat.sendMessage(`${summarizeCourseOutlineContext} Here is the text: ${text.text}`);
+        const summaryResult = await chat.sendMessage(
+            `${summarizeCourseOutlineContext} Here is the text: ${text.text}`,
+        );
         const courseSummary = summaryResult.response.text();
-        
-        const skillsResult = await chat.sendMessage(`${getCourseSkillsContext} Here is the text: ${text.text}`);
+
+        const skillsResult = await chat.sendMessage(
+            `${getCourseSkillsContext} Here is the text: ${text.text}`,
+        );
         const courseSkills = skillsResult.response.text();
-        console.log(courseSkills)
+        console.log(courseSkills);
 
         const response = {
             summary: courseSummary,
             skills: courseSkills,
-        }
-        res.status(200).send(response)
+        };
+        res.status(200).send(response);
     } catch (error) {
         console.log(error);
-        res.status(500).send('Failed updating course skills');
+        res.status(500).send("Failed updating course skills");
     }
-
-})
+});
 
 /**
  * Route for fetching all courses
@@ -175,14 +217,14 @@ router.get("/all", async (req, res) => {
         const offsetStr = req.query.offset as string;
         let offset = 0;
         if (offsetStr !== undefined) {
-          offset = parseInt(offsetStr);
+            offset = parseInt(offsetStr);
         }
         res.status(200).send(await dbGetAllCourses(offset));
     } catch (error) {
         console.log(error);
-        res.status(500).send('Failed fetching courses');
+        res.status(500).send("Failed fetching courses");
     }
-})
+});
 
 /**
  * Route for fetching details of a specific course
@@ -228,6 +270,6 @@ router.post("/update-details", async (req, res) => {
         console.log(error);
         res.status(500).send("An error occurred while updating course details");
     }
-})
+});
 
 export default router;

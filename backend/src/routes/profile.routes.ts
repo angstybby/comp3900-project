@@ -9,7 +9,7 @@ import { Profile } from "@prisma/client";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import PdfParse from "pdf-parse";
-import { AIModel, getCompletedCourseContext } from "../utils/ai";
+import { model, getCompletedCourseContext } from "../utils/ai";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -71,6 +71,7 @@ router.put("/update-profile", async (req, res) => {
         fullname,
         description,
         resume,
+        Skills: { set: [] }, // Just as a placeholder as we will not update skills here
     };
 
     try {
@@ -84,42 +85,49 @@ router.put("/update-profile", async (req, res) => {
     }
 });
 
-router.post("/scrape-pdf", upload.single("pdfUpload"), async (req: Request, res: Response) => {
-    try {
-        const customReq = req as CustomRequest;
-        if (!customReq.token || typeof customReq.token === "string") {
-            throw new Error("Token is not valid");
+router.post(
+    "/scrape-pdf",
+    upload.single("pdfUpload"),
+    async (req: Request, res: Response) => {
+        try {
+            const customReq = req as CustomRequest;
+            if (!customReq.token || typeof customReq.token === "string") {
+                throw new Error("Token is not valid");
+            }
+
+            const file = req.file;
+            // Check if file is present
+            if (!file) {
+                throw new Error("No file uploaded");
+            }
+            // Check if file is a pdf
+            if (file.mimetype !== "application/pdf") {
+                throw new Error("File is not a pdf");
+            }
+
+            // TODO: Finish this! Prompt still needs some work.
+            // 1. Parse the pdf to obtain the text within
+            const text = await PdfParse(file.buffer);
+            // 2. Start a chat with the AI model
+            const chat = model.startChat();
+            // 3. Send the prompt to the AI model
+            const result = await chat.sendMessage(
+                `${getCompletedCourseContext} Here is the text: ${text.text}`,
+            );
+            // 4. Print their response
+            console.log("--------------------");
+            console.log(result.response.text());
+
+            res.status(200).send(text);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("An error occured when scraping the PDF File");
         }
+    },
+);
 
-        const file = req.file;
-        // Check if file is present
-        if (!file) {
-            throw new Error("No file uploaded");
-        }
-        // Check if file is a pdf
-        if (file.mimetype !== "application/pdf") {
-            throw new Error("File is not a pdf");
-        }
-
-        // TODO: Finish this! Prompt still needs some work.
-        // 1. Parse the pdf to obtain the text within
-        const text = await PdfParse(file.buffer);
-        // 2. Start a chat with the AI model
-        const chat = AIModel.startChat();
-        // 3. Send the prompt to the AI model
-        const result = await chat.sendMessage(`${getCompletedCourseContext} Here is the text: ${text.text}`);
-        // 4. Print their response
-        console.log('--------------------')
-        console.log(result.response.text())
-
-        res.status(200).send(text);
-    } catch (error) {
-        console.error(error)
-        res.status(500).send('An error occured when scraping the PDF File')
-    }
-})
-
-router.post("/upload-transcript",
+router.post(
+    "/upload-transcript",
     upload.single("pdfUpload"),
     async (req, res) => {
         try {
