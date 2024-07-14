@@ -1,6 +1,7 @@
 import { UserGroupIcon } from "@heroicons/react/24/outline"
 import { CarouselItem } from "@/components/ui/carousel";
 import { useNavigate } from "react-router-dom";
+import Bubble from "./Bubble";
 
 interface GroupCardProps {
     groupId: number,
@@ -43,9 +44,7 @@ export default function GroupCard({ groupId, group, inCarousel, profile }: Group
                     <h2 className="text-sm font-light line-clamp-2">{group.description}</h2>
                 </div>
                 {inCarousel && <div className="text-start">
-                    <div className={`rounded-full ${isOwner ? "bg-pink-300" : "bg-teal-300"} w-fit px-3 py-0.5`}>
-                        <p className="text-sm font-light">{isOwner ? "Owner" : "Member"}</p>
-                    </div>
+                    <Bubble isOwner={isOwner} />
                 </div>}
             </div>
         </div>
