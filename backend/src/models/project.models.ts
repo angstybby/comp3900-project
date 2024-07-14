@@ -78,6 +78,33 @@ export const dbDeleteProjectSkill = async (
     });
 };
 
-// export const dbProjectApplications = async (projectId: number) => {
-    
-// };
+// Let me (koda) know if you need more from this
+export const dbGetAllProjectApplications = async (projectId: number) => {
+    return await prisma.projectTaken.findMany({
+        where: {
+            projectId,
+        },
+        include: {
+            group: true,
+        },
+    });
+};
+
+export const dbGetProject = async (projectId: number) => {
+    return await prisma.project.findUnique({
+        where: {
+            id: projectId,
+        },
+        include: {
+            ProjectOwner: true,
+            skills: {
+                select: {
+                    id: true,
+                    skillName: true,
+                },
+            },
+            projectMembers: true
+
+        },
+    });
+};
