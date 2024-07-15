@@ -11,6 +11,7 @@ import { axiosInstanceWithAuth } from "@/api/Axios";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import CreateGroupModal from "@/components/Modals/CreateGroupModal";
 import { useProfile } from "@/contexts/ProfileContext";
+import LoadingCircle from "@/components/LoadingCircle";
 
 // Group Data Placeholders
 const groups = [
@@ -66,8 +67,9 @@ interface Group {
 }
 
 export default function Groups() {
-  const [yourGroups, setYourGroups] = useState<Group[]>([])
-  const [open, setOpen] = useState(false)
+  const [yourGroups, setYourGroups] = useState<Group[]>([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { profileData } = useProfile();
 
   const handleOpen = () => {
@@ -79,18 +81,17 @@ export default function Groups() {
   }
 
   const fetchYourGroups = async () => {
-    const response = await axiosInstanceWithAuth.get("/group/groups");
-    console.log(response.data);
-    setYourGroups(response.data);
+    setLoading(true);
+    try {
+      const response = await axiosInstanceWithAuth.get("/group/groups");
+      setYourGroups(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
   }
 
   useEffect(() => {
-    const fetchYourGroups = async () => {
-      const response = await axiosInstanceWithAuth.get("/group/groups");
-      console.log(response.data);
-      setYourGroups(response.data);
-    }
-
     fetchYourGroups();
   }, [])
 
@@ -106,28 +107,31 @@ export default function Groups() {
                 <ButtonUtility text="Create Group" classname="h-10" onClick={handleOpen} />
               </div>
             </div>
-            {yourGroups.length === 0 ? (
+            {yourGroups.length === 0 
+              ? (
               <div className="flex justify-center items-center h-full">
-                <p className="text-lg text-center">You are not in any groups
-                  <br />
-                  <span className="text-sm">Create a group or join one</span>
-                </p>
+                {(loading ? <LoadingCircle /> :
+                  <p className="text-lg text-center">You are not in any groups
+                    <br />
+                    <span className="text-sm">Create a group or join one</span>
+                  </p>
+                )}
 
-              </div>)
+              </div>
 
-              :
-
-              <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{
-                align: "start"
-              }}>
-                <CarouselContent>
-                  {yourGroups.map((group) => (
-                    <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} profile={profileData} />
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
+              ) : (
+                <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{
+                  align: "start"
+                }}>
+                  <CarouselContent>
+                    {yourGroups.map((group) => (
+                      <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} profile={profileData} />
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
+              )
             }
           </div>
           <div className="h-2/3">
