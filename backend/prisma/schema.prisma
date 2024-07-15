@@ -18,6 +18,7 @@ model User {
   profile    Profile?
   isAdmin    Boolean  @default(false)
   resetToken String?  @unique
+  notifications Notification []
 }
 
 model Skills {
@@ -28,7 +29,6 @@ model Skills {
   Course    Course[]
   Group     Group[]
   Project   Project[]
-  notifications Notification []
 }
 
 enum UserType {
