@@ -1,4 +1,4 @@
-import { Chart } from "chart.js/auto";
+import { Chart } from "chart.js";
 import { useEffect, useRef, useState } from "react";
 
 
@@ -39,23 +39,28 @@ export default function SkillsGapAnalysis() {
     useEffect(() => {
         if (chartRef.current && skillsGap.length > 0) {
             const chartInstance = new Chart(chartRef.current, {
-                type: 'bar',
+                type: 'doughnut',
                 data: { 
-                    labels: skillsGap,
-                    datasets: [
-                        {
-                            label: 'Skills Gap Analysis',
-                            data: skillsGap.map(() => 1),
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderWidth: 1,
-                            borderColor: 'rgba(255, 99, 132, 1)'
-                        }
-                    ]
+                    labels: ['Skills Lacking', 'Skills Possessed'],
+                    datasets: [{
+                        label: 'Skills Gap Analysis',
+                        data: [skillsGap.length, projectSkills.length - skillsGap.length],
+                        backgroundColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)'
+                        ],
+                        borderWidth: 1
+                    }]
                 },
                 options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    responsive: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Skills Gap Analysis'
                         }
                     }
                 }
@@ -68,8 +73,10 @@ export default function SkillsGapAnalysis() {
 
     return (
         <div>
-            <h1 className="text-2xl font-light">Your Skill Gap Analysis</h1> 
-            <canvas ref={chartRef} />
+            <h1 className="text-2xl font-light">Your skills analysis for this project</h1> 
+            <div className="mt-8">
+                <canvas ref={chartRef}/>
+            </div>
         </div>
     );
 
