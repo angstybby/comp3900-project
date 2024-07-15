@@ -23,7 +23,7 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     fetchProfileData();
-  }, [fetchProfileData]);
+  }, []);
 
   return (
 
