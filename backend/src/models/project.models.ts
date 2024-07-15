@@ -21,7 +21,11 @@ export const dbAddProject = async (
             },
         });
 
-        return await dbAddProjectSkills(project.id, skills);
+        if (skills.length > 0) {
+            await dbAddProjectSkills(project.id, skills);
+        }
+
+        return project.id;
     } catch (error) {
         console.log(error);
         throw error;
@@ -114,8 +118,6 @@ export const dbGetProject = async (projectId: number) => {
                     skillName: true,
                 },
             },
-            projectMembers: true
-
         },
     });
 };

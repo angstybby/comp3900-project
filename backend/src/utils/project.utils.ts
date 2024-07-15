@@ -7,7 +7,8 @@ export const isProjectOwner = async ( zid: string, projectId: number) => {
             return false;
         }
 
-        if (owner.ProjectOwner.zid != zid) {
+        console.log(owner.ProjectOwner.zid, zid);
+        if (owner.ProjectOwner.zid !== zid) {
             return false;
         }
     } catch (error) {
