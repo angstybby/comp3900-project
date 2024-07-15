@@ -3,11 +3,18 @@ import { Carousel, CarouselContent, CarouselNext, CarouselPrevious } from "@/com
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 import { useNavigate } from 'react-router-dom';
+import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
 
 interface Details {
   id: number,
   groupName: string,
   description: string,
+}
+
+interface Project {
+  id: number;
+  name: string;
+  description: string;
 }
 
 
@@ -81,11 +88,11 @@ const GroupDetails = () => {
           align: "start"
         }}>
           <CarouselContent>
-          {recc.map((projects) => (
+            {recc.map((project) => (
               <ProjectCard
-                key={projects.id}
-                project={projects}
-                onClick={() => navigate(`/project/${projects.id}`)}
+                key={project.id}
+                project={project}
+                onClick={() => navigate(`/project/${project.id}`)}
               />
             ))}
           </CarouselContent>
