@@ -16,6 +16,7 @@ import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
 import { model } from "../utils/ai";
+import { PrismaClient } from "@prisma/client";
 
 const router = express.Router();
 
@@ -36,35 +37,59 @@ router.post("/create", async (req, res) => {
         throw new Error("Token is not valid");
     }
 
-    const { groupName, description, zIds } = req.body;
+    let { groupName, description, zIds, maxMembers } = req.body;
     // Check if the request body contains the required fields
-    if (!groupName || !description || !zIds) {
+    if (!groupName || !description || !zIds || !maxMembers) {
         return res.status(400).send("Missing required fields");
     }
 
     const groupOwnerId = customReq.token.zid;
 
     // Check the zIds if they exist and are not empty
-    zIds.forEach((zid: string) => {
-        if (!validateZid(zid)) {
-            return res.status(400).send("Invalid zid" + zid);
-        }
-        if (zid === groupOwnerId) {
-            return res.status(400).send("Cannot add yourself to the group");
-        }
-        if (!dbFindUserByZid(zid)) {
-            return res.status(400).send("User does not exist");
-        }
-    });
+    if (zIds.length > 0) {
+        console.log(zIds);
+        zIds.forEach(async (zid: string) => {
+            if (!validateZid(zid)) {
+                return res.status(400).send("Invalid zid " + zid);
+            }
+            if (zid === groupOwnerId) {
+                return res.status(400).send("Cannot add yourself to the group");
+            }
+            const user = await dbFindUserByZid(zid);
+            if (!user) {
+                return res.status(400).send("User " + zid + " does not exist");
+            }
+        });
+    }
 
     try {
         const newGroup = await dbCreateGroup(
             groupName,
             description,
             groupOwnerId,
-            zIds,
+            maxMembers,
         );
-        return res.status(200).send(newGroup);
+
+        console.log("Group Created");
+        // Invite the users to the group
+
+        console.log(zIds);
+
+        if (zIds.length > 0) {
+            try {
+                zIds.forEach(async (zid: string) => {
+                    await dbInviteUserToGroup(newGroup.id, groupOwnerId, zid);
+                });
+                return res.status(200).send("Group created successfully");
+            } catch (error) {
+                console.error(error);
+                return res
+                    .status(500)
+                    .send("An error occurred while inviting users to group");
+            }
+        } else {
+            return res.status(200).send("Group created successfully");
+        }
     } catch (error) {
         console.error(error);
         return res.status(500).send("An error occurred while creating group");
@@ -377,7 +402,7 @@ router.get("/details/:groupId", authMiddleWare, async (req, res) => {
     }
 
     const { groupId } = req.params;
-    
+
     const groupIdInt = parseInt(groupId);
 
     try {
@@ -385,27 +410,78 @@ router.get("/details/:groupId", authMiddleWare, async (req, res) => {
         return res.status(200).send(group);
     } catch (error) {
         console.error(error);
-        return res.status(500).send("An error occured while fetching group details");
+        return res
+            .status(500)
+            .send("An error occured while fetching group details");
     }
 });
 
 ///////////////////////////// STUB!!! DELETE LATER /////////////////////////////
-router.post("/stub", authMiddleWare, async (req, res) => {
+router.post("/get-reccs", authMiddleWare, async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
         return res.status(401).send("Unauthorized");
     }
 
     const prompt = req.body.prompt;
+    const allProjects = await stubDbGetAllProjectsWithSkills();
+    let stringProjects = ''
+    for (const project of allProjects) {
+        stringProjects += `Details for Project: ${project.id}\n`;
+        stringProjects += `Title: ${project.title}\n`;
+        stringProjects += `Description: ${project.description}\n`;
+        stringProjects += `Skills: ${project.skills}\n\n`;
+    }
+    
+    const promptForAi = `This group current has these skills: ${prompt}. And here are the current existing projects: ${stringProjects}. Based on this set of projects, recommend the three most suitable projects for this group. Format the response as a comma-separated list of ProjectId: <id>`;
 
     try {
         const chat = model.startChat();
-        const result = await chat.sendMessage(`${prompt}`);
+        const result = await chat.sendMessage(`${promptForAi}`);
         return res.status(200).send(result.response.text());
+        // return res.status(200).send(allProjects);
     } catch (error) {
         console.error(error);
         return res.status(500).send("Failed to get recommendations");
     }
-})
+});
+
+const prisma = new PrismaClient();
+
+interface CombinedProject { 
+    id: number; 
+    title: string; 
+    description: string | null; 
+    projectOwnerId: string; 
+    skills?: string[] 
+}
+
+const stubDbGetAllProjectsWithSkills = async () => {
+    const returnProjects: CombinedProject[] = [];
+    const projects = await prisma.project.findMany({
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            projectOwnerId: true,
+        }
+    });
+    for (const project of projects) {
+        const tempProject:CombinedProject  = project;
+        const skills = await prisma.skills.findMany({
+            where: {
+                Project: {
+                    some: {
+                        id: project.id
+                    }
+                }
+            }
+        });
+        const skillNames = skills.map((skill) => skill.skillName);
+        tempProject["skills"] = skillNames;
+        returnProjects.push(tempProject);
+    }
+    return returnProjects;
+}
 
 export default router;
