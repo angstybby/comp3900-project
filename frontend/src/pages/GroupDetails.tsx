@@ -1,5 +1,5 @@
 import { axiosInstanceWithAuth } from "@/api/Axios";
-import ProjectCard from "@/components/ProjectComponents/ProjectCard";
+import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
 import { Carousel, CarouselContent, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
