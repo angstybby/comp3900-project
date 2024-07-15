@@ -57,7 +57,6 @@ model Course {
   courseName  String
   skills      Skills[]
   summary     String?       @db.Text
-  // Skills here should store an array of strings
   CourseTaken CourseTaken[]
 }
 
@@ -71,18 +70,20 @@ model CourseTaken {
 }
 
 model Group {
-  id             Int             @id @default(autoincrement())
-  groupName      String          @unique
-  description    String?
-  groupOwnerId   String
-  GroupOwner     Profile         @relation(fields: [groupOwnerId], references: [zid])
-  GroupMembers   GroupJoined[]
-  projects       ProjectTaken[]
-  interests      GroupInterest[]
-  CombinedSkills Skills[]
-  MaxMembers     Int
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id              Int               @id @default(autoincrement())
+  groupName       String            @unique
+  description     String?
+  groupOwnerId    String
+  GroupOwner      Profile           @relation(fields: [groupOwnerId], references: [zid])
+  GroupMembers    GroupJoined[]
+  // projects        ProjectTaken[]
+  interests       GroupInterest[]
+  CombinedSkills  Skills[]
+  MaxMembers      Int
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  ProjectInterest ProjectInterest[]
+  Project         Project[]
 }
 
 model GroupJoined {
@@ -113,26 +114,39 @@ enum InterestStatus {
 }
 
 model Project {
-  id             Int            @id @default(autoincrement())
-  title          String         @unique
-  description    String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  ProjectOwner   Profile        @relation(fields: [projectOwnerId], references: [zid])
-  projectOwnerId String
-  projectMembers ProjectTaken[]
-  skills         Skills[]
+  id              Int               @id @default(autoincrement())
+  title           String            @unique
+  description     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  ProjectOwner    Profile           @relation(fields: [projectOwnerId], references: [zid])
+  projectOwnerId  String
+  groupId         Int?
+  assignedGroup   Group?            @relation(fields: [groupId], references: [id])
+  skills          Skills[]
+  ProjectInterest ProjectInterest[]
 }
 
-model ProjectTaken {
+// model ProjectTaken {
+//   projectId Int
+//   project   Project          @relation(fields: [projectId], references: [id])
+//   groupId   Int
+//   group     Group            @relation(fields: [groupId], references: [id])
+//   status    GroupEntryStatus @default(PENDING)
+
+//   @@id([projectId, groupId])
+//   @@index([status])
+// }
+
+model ProjectInterest {
   projectId Int
-  project   Project          @relation(fields: [projectId], references: [id])
+  project   Project        @relation(fields: [projectId], references: [id])
   groupId   Int
-  group     Group            @relation(fields: [groupId], references: [id])
-  status    GroupEntryStatus @default(PENDING)
+  group     Group          @relation(fields: [groupId], references: [id])
+  status    InterestStatus @default(PENDING)
+  createdAt DateTime       @default(now())
 
   @@id([projectId, groupId])
-  @@index([status])
 }
 
 enum GroupEntryStatus {

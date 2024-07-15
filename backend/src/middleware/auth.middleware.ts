@@ -10,13 +10,14 @@ export const authMiddleWare = async (req: Request, res: Response, next: NextFunc
         const token = req.header("Authorization")?.replace("Bearer ", "");
 
         if (!token) {
-            throw new Error();
+            throw new Error("Token not provided");
         }
 
         if (!process.env.JWT_HASH) {
             res.status(500).send("Internal server error JWT_HASH not set");
             return;
         }
+
         const decoded = verify(token, process.env.JWT_HASH);
         (req as CustomRequest).token = decoded;
 

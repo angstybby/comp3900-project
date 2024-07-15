@@ -6,6 +6,7 @@ import {
     dbGetGroup,
     dbGetGroupApplications,
     dbGetUserInGroup,
+    dbGroupExpressInterstProject,
     dbInviteUserToGroup,
     dbKickUserFromGroup,
     dbLeaveGroup,
@@ -16,6 +17,8 @@ import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
 import { model } from "../utils/ai";
+import { PrismaClient } from "@prisma/client";
+import { dbGetProject } from "../models/project.models";
 
 const router = express.Router();
 
@@ -415,23 +418,107 @@ router.get("/details/:groupId", authMiddleWare, async (req, res) => {
     }
 });
 
+/**
+ * @route POST /group/apply-project
+ * @desc Apply a group to a project
+ * @access Private
+ * @returns {string} - Success message
+ * @returns {Error} - If the request body is missing required fields
+ * @throws {400} - If the request body is missing required fields
+ * @throws {500} - If an error occurs while expressing interest
+ */
+router.post("/apply-project", async (req, res) => {
+    const { groupId, projectId } = req.body;
+
+    // check user is owner
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+
+    try {
+        const result = await dbGroupExpressInterstProject(
+            groupId,
+            zid,
+            projectId,
+        );
+        return res.status(200).send(result);
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .send("An error occurred while expressing interest");
+    }
+});
+
 ///////////////////////////// STUB!!! DELETE LATER /////////////////////////////
-router.post("/stub", authMiddleWare, async (req, res) => {
+router.post("/get-reccs", authMiddleWare, async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
         return res.status(401).send("Unauthorized");
     }
 
     const prompt = req.body.prompt;
+    const allProjects = await stubDbGetAllProjectsWithSkills();
+    let stringProjects = "";
+    for (const project of allProjects) {
+        stringProjects += `Details for Project: ${project.id}\n`;
+        stringProjects += `Title: ${project.title}\n`;
+        stringProjects += `Description: ${project.description}\n`;
+        stringProjects += `Skills: ${project.skills}\n\n`;
+    }
+
+    const promptForAi = `This group current has these skills: ${prompt}. And here are the current existing projects: ${stringProjects}. Based on this set of projects, recommend the three most suitable projects for this group. Format the response as a comma-separated list of ProjectId: <id>`;
 
     try {
         const chat = model.startChat();
-        const result = await chat.sendMessage(`${prompt}`);
+        const result = await chat.sendMessage(`${promptForAi}`);
         return res.status(200).send(result.response.text());
+        // return res.status(200).send(allProjects);
     } catch (error) {
         console.error(error);
         return res.status(500).send("Failed to get recommendations");
     }
 });
+
+const prisma = new PrismaClient();
+
+interface CombinedProject {
+    id: number;
+    title: string;
+    description: string | null;
+    projectOwnerId: string;
+    skills?: string[];
+}
+
+const stubDbGetAllProjectsWithSkills = async () => {
+    const returnProjects: CombinedProject[] = [];
+    const projects = await prisma.project.findMany({
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            projectOwnerId: true,
+        },
+    });
+    for (const project of projects) {
+        const tempProject: CombinedProject = project;
+        const skills = await prisma.skills.findMany({
+            where: {
+                Project: {
+                    some: {
+                        id: project.id,
+                    },
+                },
+            },
+        });
+        const skillNames = skills.map((skill) => skill.skillName);
+        tempProject["skills"] = skillNames;
+        returnProjects.push(tempProject);
+    }
+    return returnProjects;
+};
 
 export default router;

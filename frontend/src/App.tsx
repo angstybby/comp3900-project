@@ -14,9 +14,12 @@ import Notification from '@/pages/Notification'
 import Admin from '@/pages/Admin'
 import ResetPassword from '@/pages/ResetPassword'
 import CourseDetails from '@/pages/CourseDetails'
+import ProjectDetails from './pages/ProjectDetails'
 import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
 import GroupDetails from './pages/GroupDetails'
+
+
 
 function App() {
   return (
@@ -32,6 +35,7 @@ function App() {
               <Route path={`/profile`} element={<Profile />} />
               <Route path={`/notifications`} element={<Notification />} />
               <Route path={`/course/:courseId`} element={<CourseDetails />} />
+              <Route path={`/project/:projectId`} element={<ProjectDetails />} />
               <Route path={`/group/:groupId`} element={<GroupDetails />} />
               <Route path={`/manage-users`} element={<Admin />} />
             </Route>

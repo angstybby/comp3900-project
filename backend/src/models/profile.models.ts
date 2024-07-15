@@ -53,3 +53,14 @@ export const dbUpdateProfile = async (profile: Profile): Promise<Profile> => {
         throw new Error("An database error occurred");
     }
 };
+
+export const getUserType = async (zid: string) => {
+    return await prisma.user.findFirst({
+        where: {
+            zid: zid,
+        },
+        select: {
+            userType: true,
+        }
+    })
+}
