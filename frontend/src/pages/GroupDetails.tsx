@@ -8,6 +8,10 @@ interface Details {
   id: number,
   groupName: string,
   description: string,
+  groupOwnerId: string,
+  members: number,
+  MaxMembers: number
+  groupOwnerName: string
 }
 
 const stubSkills = "Python, Java, C, C++, C#, JavaScript";
@@ -22,6 +26,10 @@ const GroupDetails = () => {
     id: 0,
     groupName: "",
     description: "",
+    groupOwnerId: "",
+    members: 0,
+    MaxMembers: 0,
+    groupOwnerName: ""
   });
 
   const [recc, setRecc] = useState<string[]>([]);
@@ -33,8 +41,10 @@ const GroupDetails = () => {
           groupId: groupId,
         }
       })
+      console.log(response.data);
       setDetails(response.data);
     }
+<<<<<<< Updated upstream
 
     const getReccs = async () => {
       const response = await axiosInstanceWithAuth.post("/group/get-reccs", {
@@ -46,25 +56,28 @@ const GroupDetails = () => {
     fetchDetails();
     getReccs();
   },[groupId])
+=======
+    // const getReccs = async () => {
+    //   const response = await axiosInstanceWithAuth.post("/group/stub", {
+    //     prompt: generatePrompt(),
+    //   })
+    //   const textOutput = response.data;
+    //   const formatted = textOutput.replace(/\*\* /g, "\n\n");
+    //   setRecc(formatted);
+    // }
+
+    fetchDetails();
+    console.log(details);
+    // getReccs();
+  }, [])
+>>>>>>> Stashed changes
 
   return (
     <>
-      <div className="px-14 py-5">
-        <p className="mt-8 text-2xl font-bold mb-5">{`GroupDetails for ${groupId}`}</p>
+      <div className="p-14">
+        <p className="text-4xl font-normal">Group Details for <span className="font-bold">{details.groupName}</span></p>
         <div className="mb-5">
-          <p className="mb-2">
-            {`GroupId: `}
-            <span className="font-bold">
-            {`${groupId}`}
-            </span>
-          </p>
-          <p>
-            {`Group Name : `}
-            <span className="font-bold">
-              {`${details.groupName}`}
-            </span>
-          </p>
-          <p className="font-bold mt-5">Group Description:</p>
+          <p className="font-normal mt-5">Group Owner: <span className="font-bold">{details.groupOwnerName} ({details.groupOwnerId})</span></p>
           <p>{`${details.description}`}</p>
           <p className="font-bold">Group Skills:</p>
 
@@ -72,6 +85,7 @@ const GroupDetails = () => {
           <p>Currently, this group has the combined skills of:</p>
           <p>{stubSkills}</p>
         </div>
+<<<<<<< Updated upstream
         
         <p className="mt-10 text-2xl font-bold mb-5">{`Recommended Projects`}</p>
         <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{
@@ -86,6 +100,12 @@ const GroupDetails = () => {
           <CarouselNext />
         </Carousel>
       </div>    
+=======
+
+        {/* <p className="mt-10 text-2xl font-bold mb-5">{`Recommended Projects`}</p>
+        <p>{recc}</p> */}
+      </div>
+>>>>>>> Stashed changes
     </>
   )
 }

@@ -464,16 +464,38 @@ export const dbGetUserInGroup = async (zId: string) => {
 
 export const dbGetGroup = async (groupId: number) => {
     try {
-        return await prisma.group.findFirst({
+        const group = await prisma.group.findFirst({
             where: {
                 id: groupId,
             },
+        });
+
+        if (!group) {
+            throw new Error("Group does not exist");
+        }
+
+        // get the group owner details
+        const groupOwnerName = await prisma.profile.findFirst({
+            where: {
+                zid: group.groupOwnerId,
+            },
             select: {
-                id: true,
-                groupName: true,
-                description: true,
+                fullname: true,
             },
         });
+
+        // Fetch the member count for the group
+        let members = await prisma.groupJoined.count({
+            where: { groupId },
+        });
+
+        members += 1; // Add 1 for the group owner
+
+        return {
+            ...group,
+            members,
+            groupOwnerName: groupOwnerName?.fullname,
+        };
     } catch (error) {
         console.error("Error getting group:", error);
         throw error;
