@@ -8,10 +8,12 @@ import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
 import { Options } from "browser-image-compression";
 import imageCompression from "browser-image-compression";
 import { useProfile } from "@/contexts/ProfileContext";
+import ShareButton from "@/components/Buttons/ShareButton";
 
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const stubLink = "https://youtube.com";
   const [editProfileInfo, setEditProfileInfo] = useState({
     zid: "",
     profilePicture: "",
@@ -164,9 +166,11 @@ export default function Profile() {
         <h3 className="text-sm text-gray-500 mt-2">{profileData.zid}</h3>
       </div>
 
-      <div className="mt-8 w-80 mx-auto" title="Edit Profile Button">
+      <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
         <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
+        <ShareButton link={stubLink} />
       </div>
+
 
       {/* Edit profile details modal */}
       {showEditProfileModal && (

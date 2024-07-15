@@ -2,6 +2,7 @@ import { axiosInstanceWithAuth } from "@/api/Axios";
 import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
+import { useNavigate } from 'react-router-dom';
 
 interface Details {
   id: number,
@@ -12,6 +13,7 @@ interface Details {
   MaxMembers: number
   groupOwnerName: string
 }
+
 
 const stubSkills = "Python, Java, C, C++, C#, JavaScript";
 
@@ -65,7 +67,9 @@ const GroupDetails = () => {
     // getReccs();
   }, [groupId])
 
+  const navigate = useNavigate();
   return (
+
     <>
       <div className="p-14">
         <p className="text-4xl font-normal">Group Details for <span className="font-bold">{details.groupName}</span></p>

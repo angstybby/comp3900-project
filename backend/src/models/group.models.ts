@@ -250,7 +250,7 @@ export const dbGroupExpressInterstProject = async (
             throw new Error("Project does not exist");
         }
 
-        const existingProjectInterest = await prisma.projectTaken.findUnique({
+        const existingProjectInterest = await prisma.projectInterest.findUnique({
             where: {
                 projectId_groupId: { projectId, groupId },
             },
@@ -262,7 +262,7 @@ export const dbGroupExpressInterstProject = async (
             );
         }
 
-        const newInterest = await prisma.projectTaken.create({
+        const newInterest = await prisma.projectInterest.create({
             data: {
                 projectId,
                 groupId,

@@ -23,11 +23,13 @@ const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
 /**
- * Search for a course by their course code or title
- * @name POST /search
- * @param {Request} req - The request object.
- * @param {Response} res - The response object.
- * @returns {Response} A response object containing the courses matching the search string.
+ * @route POST /course/search
+ * @desc Search for a course
+ * @access Public
+ * @returns {Array} Array of courses
+ * @returns {String} Error message
+ * @throws {400} If no search string is provided
+ * @throws {500} If an error occurs while searching for course
  */
 router.post("/search", async (req, res) => {
     const { name } = req.body;
@@ -45,7 +47,7 @@ router.post("/search", async (req, res) => {
 });
 
 /**
- * Search for courses by name excluding courses already taken by the user
+ *  * Search for courses by name excluding courses already taken by the user
  * @name POST /course/search
  * @param {Request} req - The request object.
  * @param {Response} res - The response object.
@@ -69,14 +71,14 @@ router.post("/searchExc", async (req, res) => {
         res.status(500).send("An error occurred while searching for courses");
     }
 });
-
 /**
- * Adds the course to the list of courses taken by the user
- * @name POST /add
- * @param {Request} req - The request object.
- * @param {Response} res - The response object.
- * @throws {Error} If the token is not valid.
- * @returns {Response} A response object indicating the success or failure of the course addition.
+ * @route POST /course/add
+ * @desc Add a course to user
+ * @access Private
+ * @returns {String} Success message
+ * @returns {String} Error message
+ * @throws {400} If no course is provided
+ * @throws {500} If an error occurs while adding course
  */
 router.post("/add", async (req, res) => {
     const customReq = req as CustomRequest;
@@ -98,12 +100,13 @@ router.post("/add", async (req, res) => {
 });
 
 /**
- * Removes the course from the list of courses taken by the user
- * @name DELETE /add
- * @param {Request} req - The request object.
- * @param {Response} res - The response object.
- * @throws {Error} If the token is not valid.
- * @returns {Response} A response object indicating the success or failure of the course addition.
+ * @route DELETE /course/delete
+ * @desc Delete a course from user
+ * @access Private
+ * @returns {String} Success message
+ * @returns {String} Error message
+ * @throws {400} If no course is provided
+ * @throws {500} If an error occurs while deleting course
  */
 router.delete("/delete", async (req, res) => {
     const customReq = req as CustomRequest;
