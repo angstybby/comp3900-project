@@ -3,6 +3,7 @@ generator client {
 }
 
 datasource db {
+  // provider = "postgresql"
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
@@ -10,12 +11,23 @@ datasource db {
 model User {
   zid        String   @id
   email      String   @unique
+  userType   UserType
   password   String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   profile    Profile?
   isAdmin    Boolean  @default(false)
-  resetToken String? @unique
+  resetToken String?  @unique
+}
+
+model Skills {
+  id        Int       @id @default(autoincrement())
+  skillName String
+  createdAt DateTime  @default(now())
+  Profile   Profile[]
+  Course    Course[]
+  Group     Group[]
+  Project   Project[]
   notifications Notification []
 }
 
@@ -26,14 +38,107 @@ enum UserType {
 }
 
 model Profile {
-  zid          String @id
-  profileOwner User   @relation(fields: [zid], references: [zid])
-
-  profilePicture String?
-  userType       UserType?
+  zid            String          @id
+  profileOwner   User            @relation(fields: [zid], references: [zid])
+  profilePicture String?         @db.LongText
   fullname       String
-  description    String?
+  description    String?         @db.Text
   resume         String?
+  Group          Group[]
+  ProjectOwner   Project[]
+  CourseTaken    CourseTaken[]
+  Skills         Skills[]
+  GroupJoined    GroupJoined[]
+  GroupInterest  GroupInterest[]
+}
+
+model Course {
+  id          String        @id
+  courseName  String
+  skills      Skills[]
+  summary     String?       @db.Text
+  // Skills here should store an array of strings
+  CourseTaken CourseTaken[]
+}
+
+model CourseTaken {
+  zid          String
+  profileOwner Profile @relation(fields: [zid], references: [zid])
+  courseId     String
+  course       Course  @relation(fields: [courseId], references: [id])
+
+  @@id([zid, courseId])
+}
+
+model Group {
+  id             Int             @id @default(autoincrement())
+  groupName      String          @unique
+  description    String?
+  groupOwnerId   String
+  GroupOwner     Profile         @relation(fields: [groupOwnerId], references: [zid])
+  GroupMembers   GroupJoined[]
+  projects       ProjectTaken[]
+  interests      GroupInterest[]
+  CombinedSkills Skills[]
+  MaxMembers     Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model GroupJoined {
+  zid          String
+  profileOwner Profile @relation(fields: [zid], references: [zid])
+  groupId      Int
+  group        Group   @relation(fields: [groupId], references: [id])
+
+  @@id([zid, groupId])
+}
+
+model GroupInterest {
+  id           Int            @id @default(autoincrement())
+  groupId      Int
+  group        Group          @relation(fields: [groupId], references: [id])
+  zid          String
+  profileOwner Profile        @relation(fields: [zid], references: [zid])
+  status       InterestStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
+
+  @@unique([groupId, zid])
+}
+
+enum InterestStatus {
+  PENDING
+  ACCEPTED
+  DENIED
+}
+
+model Project {
+  id             Int            @id @default(autoincrement())
+  title          String         @unique
+  description    String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  ProjectOwner   Profile        @relation(fields: [projectOwnerId], references: [zid])
+  projectOwnerId String
+  projectMembers ProjectTaken[]
+  skills         Skills[]
+}
+
+model ProjectTaken {
+  projectId Int
+  project   Project          @relation(fields: [projectId], references: [id])
+  groupId   Int
+  group     Group            @relation(fields: [groupId], references: [id])
+  status    GroupEntryStatus @default(PENDING)
+
+  @@id([projectId, groupId])
+  @@index([status])
+}
+
+enum GroupEntryStatus {
+  PENDING
+  ACCEPTED
+  DENIED
 }
 
 model Notification {

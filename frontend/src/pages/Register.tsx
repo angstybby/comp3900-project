@@ -1,22 +1,26 @@
 // Local Imports
-import Textbox from "../components/Textbox";
-import ButtonSubmit from "../components/ButtonSubmit";
-import { registerSchema } from "../utils/auth.schema";
+import Textbox from "@/components/Inputs/Textbox";
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
+import { registerSchema } from "@/utils/auth.schema";
 
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { axiosNoAuth } from "../api/Axios";
 import { useState } from "react";
-import ButtonLoading from "../components/ButtonLoading";
-import axios from "axios";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
+import { jwtDecode } from "jwt-decode";
+import { axiosNoAuth, getToken } from "@/api/Axios";
+import Cookies from "js-cookie";
+import { JwtUser } from "@/utils/interfaces";
 
 type RegisterProps = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("")
+  const [showError, setShowError] = useState(false)
 
   const {
     register,
@@ -30,21 +34,32 @@ export default function Register() {
       email: "",
       password: "",
       confirmPassword: "",
+      userType: "student",
     },
   });
 
   const onSubmit = async (data: RegisterProps) => {
     try {
       setLoading(true);
-      await axios.post("http://localhost:5005/auth/register", {
+      await axiosNoAuth.post("/auth/register/", {
         email: data.email,
         password: data.password,
         fullname: data.name,
         zid: data.zId,
+        userType: data.userType,
       });
+      const decoded: JwtUser = jwtDecode(getToken());
+      Cookies.set('userType', decoded.userType);
       navigate("/upload");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.log(error)
+      if (error.response.status === 409) {
+        setError(error.response.data)
+        setShowError(true);
+      } else {
+        setError("An error occurred");
+        setShowError(true);
+      }
     }
     setLoading(false);
   };
@@ -99,6 +114,32 @@ export default function Register() {
                 {errors.zId && (
                   <p className="text-red-600 text-sm">{errors.zId.message}</p>
                 )}
+              </div>
+            </div>
+            <div className="mt-3">
+              <label
+                htmlFor="userType"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
+                User Type
+              </label>
+              <div className="mt-3">
+                <input
+                  id="student"
+                  type="radio"
+                  value="student"
+                  {...register("userType")}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                <label htmlFor="student" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Student</label>
+              </div>
+              <div className="mt-3">
+                <input
+                  id="academic"
+                  type="radio"
+                  value="academic"
+                  {...register("userType")}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                <label htmlFor="academic" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Academic</label>
               </div>
             </div>
             <div>
@@ -174,6 +215,7 @@ export default function Register() {
               ) : (
                 <ButtonSubmit text="Register Now!" />
               )}
+              {showError && <p className="text-red-600 text-sm">{error}</p>}
             </div>
           </form>
 

@@ -6,6 +6,7 @@ import {
     dbAddUser,
     dbFindJwtUserByZid,
     dbFindUserByEmail,
+    dbFindUserByZid,
     dbSetNewPassword,
     dbSetResetToken,
 } from "../models/auth.models";
@@ -22,10 +23,10 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
     console.log("Registering user");
     // Gets the email and password from the request body
-    const { email, password, fullname, zid } = req.body;
+    const { email, password, fullname, zid, userType } = req.body;
 
     // Check if the email or password is missing
-    if (!email || !password || !fullname || !zid) {
+    if (!email || !password || !fullname || !zid || !userType) {
         return res.status(400).send("Some details are missing");
     }
 
@@ -51,22 +52,28 @@ router.post("/register", async (req, res) => {
     }
 
     // Check if the email is already in use
-    dbFindUserByEmail(email).then((user) => {
-        if (user) {
-            return res.status(400).send("Email is already in use");
-        }
-    });
+    const emailExists = await dbFindUserByEmail(email);
+    if (emailExists) {
+        return res.status(409).send("Email is already in use");
+    }
+
+    // Check if the zid is already in use
+    const zidExists = await dbFindUserByZid(zid);
+    if (zidExists) {
+        return res.status(409).send("zID is already in use");
+    }
 
     // Hash the password
     const hashedPassword = sha256(password);
 
     // Adds the user to the database
-    await dbAddUser(zid, email, hashedPassword).catch((error) => {
+    try {
+        await dbAddUser(zid, email, hashedPassword, userType);
+        await dbAddProfile(zid, fullname);
+    } catch (error) {
+        console.log(error);
         return res.status(500).send(error);
-    });
-    await dbAddProfile(zid, fullname).catch((error) => {
-        return res.status(500).send(error);
-    });
+    }
 
     // Makes the token and sends it to the user
     const jwtUser: JwtUser = await dbFindJwtUserByZid(zid);

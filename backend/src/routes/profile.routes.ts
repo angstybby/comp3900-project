@@ -1,10 +1,26 @@
 import express from "express";
+import multer from "multer";
+
 import { CustomRequest } from "../middleware/auth.middleware";
 import { Request, Response } from "express";
 import { dbGetProfile, dbUpdateProfile } from "../models/profile.models";
 import { Profile } from "@prisma/client";
 
+import { S3Client } from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
+import PdfParse from "pdf-parse";
+import { model, getCompletedCourseContext } from "../utils/ai";
+
+const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
+
+const s3Client = new S3Client({
+    region: "ap-southeast-2",
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY as string,
+        secretAccessKey: process.env.AWS_SECRET_KEY as string,
+    },
+});
 
 router.get("/", async (req: Request, res: Response) => {
     try {
@@ -27,9 +43,8 @@ router.get("/:zid", async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).send("Error retrieving profile");
     }
-})
+});
 
-// Works
 router.put("/update-profile", async (req, res) => {
     // Check token is valid
     const customReq = req as CustomRequest;
@@ -38,18 +53,21 @@ router.put("/update-profile", async (req, res) => {
     }
 
     // Check all the fields are present or correct
-    let { zid, profilePicture, userType, fullname, description, resume } = req.body;
+    let { zid, profilePicture, fullname, description, resume } = req.body;
 
     // Checks if zid matches
     if (customReq.token.zid !== zid) {
         throw new Error("Zid is not valid");
     }
 
+    if (profilePicture.length > 5 * 1024 * 1024) {
+        return res.status(413).send("Image payload too large");
+    }
+
     // Construct the profile object
     const profile: Profile = {
         zid,
         profilePicture,
-        userType,
         fullname,
         description,
         resume,
@@ -58,23 +76,107 @@ router.put("/update-profile", async (req, res) => {
     try {
         // Update the user's profile in the database
         await dbUpdateProfile(profile);
-
         // Return a success message
-        res.status(200).send("Profile updated successfully");
+        res.status(200).send("Profile details updated successfully");
     } catch (error) {
         console.error(error);
         res.status(500).send("An error occurred while updating the profile");
     }
 });
 
-// router.post("/upload-resume", async (req, res) => {
-//     // Take the resume and ensure it is a pdf or some format
+router.post(
+    "/scrape-pdf",
+    upload.single("pdfUpload"),
+    async (req: Request, res: Response) => {
+        try {
+            const customReq = req as CustomRequest;
+            if (!customReq.token || typeof customReq.token === "string") {
+                throw new Error("Token is not valid");
+            }
 
-//     // Upload it to some other database
+            const file = req.file;
+            // Check if file is present
+            if (!file) {
+                throw new Error("No file uploaded");
+            }
+            // Check if file is a pdf
+            if (file.mimetype !== "application/pdf") {
+                throw new Error("File is not a pdf");
+            }
 
-//     // Then save the link to the resume in the user's profile in the db
+            // TODO: Finish this! Prompt still needs some work.
+            // 1. Parse the pdf to obtain the text within
+            const text = await PdfParse(file.buffer);
+            // 2. Start a chat with the AI model
+            const chat = model.startChat();
+            // 3. Send the prompt to the AI model
+            const result = await chat.sendMessage(
+                `${getCompletedCourseContext} Here is the text: ${text.text}`,
+            );
+            // 4. Print their response
+            console.log("--------------------");
+            console.log(result.response.text());
 
-//     // Return a success message
-// });
+            res.status(200).send(text);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("An error occured when scraping the PDF File");
+        }
+    },
+);
+
+router.post(
+    "/upload-transcript",
+    upload.single("pdfUpload"),
+    async (req, res) => {
+        try {
+            const customReq = req as CustomRequest;
+            if (!customReq.token || typeof customReq.token === "string") {
+                throw new Error("Token is not valid");
+            }
+
+            const file = req.file;
+
+            // Check if file is present
+            if (!file) {
+                throw new Error("No file uploaded");
+            }
+
+            // Check if file is a pdf
+            if (file.mimetype !== "application/pdf") {
+                throw new Error("File is not a pdf");
+            }
+
+            const date = new Date().toISOString();
+
+            // TODO: Get every course from the transcript and put it into the Profile CourseTaken
+            // const courseTaken = await extractCoursesFromTranscript(file.buffer);
+
+            // courseTaken.forEach(async (course) => {
+            //     await dbAddCourseTaken(customReq.token.zid, course);
+            // });
+            // Upload file to S3
+            try {
+                const upload = new Upload({
+                    client: s3Client,
+                    params: {
+                        Bucket: "skillissue-resume",
+                        Key: `${customReq.token.zid}/resume-${date}.pdf`,
+                        Body: file.buffer,
+                    },
+                });
+
+                await upload.done();
+                res.status(200).json({ message: "File uploaded successfully" });
+            } catch (s3error) {
+                console.error(s3error);
+                res.status(500).send("Error uploading file to S3");
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("An error occurred while uploading file");
+        }
+    },
+);
 
 export default router;

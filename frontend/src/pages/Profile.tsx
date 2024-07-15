@@ -1,89 +1,74 @@
 import { FormEvent, ChangeEvent, useState, useEffect } from "react";
 import "flowbite/dist/flowbite.min.css";
-import { axiosInstanceWithAuth } from "../api/Axios";
-import ButtonLoading from "../components/ButtonLoading";
-import 'flowbite/dist/flowbite.min.css'; 
+import { axiosInstanceWithAuth } from "@/api/Axios";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
+import 'flowbite/dist/flowbite.min.css';
+import ButtonUtility from "@/components/Buttons/ButtonUtility";
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
+import { Options } from "browser-image-compression";
+import imageCompression from "browser-image-compression";
+import { useProfile } from "@/contexts/ProfileContext";
 
 export default function Profile() {
-  // const profileTemp = {
-  //     name: 'Edrick Koda',
-  //     userType: 'Student',
-  //     bio: 'insert bio here or some other details',
-  //     email: 'z12345@student.unsw.edu',
-  //     profilePic: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/2048px-Windows_10_Default_Profile_Picture.svg.png'
-  // };
-
-  // const [profile, setProfile] = useState(profileTemp);
-  // fields: zid, profilePicture, userType, fullname, description, resume
-  // const accessToken = localStorage.getItem(accessToken);
-  const [profile, setProfile] = useState({
-    zid: "",
-    profilePicture: "",
-    // userType: '',
-    fullname: "",
-    description: "",
-    resume: "",
-  });
+  const { profileData, fetchProfileData, updateProfileContext } = useProfile();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [editProfileInfo, setEditProfileInfo] = useState({
     zid: "",
     profilePicture: "",
-    userType: "",
     fullname: "",
     description: "",
     resume: "",
   });
+
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
+  /**
+   * Two useEffects used to get the profile data from the context and apply it to the edit modal
+   */
   useEffect(() => {
-    fetchProfile();
+    fetchProfileData();
   }, []);
 
-  const fetchProfile = async () => {
-    try {
-      const response = await axiosInstanceWithAuth.get("/profile");
-      const profileData = response.data;
-      setProfile(profileData);
-      setEditProfileInfo(profileData);
-    } catch (error) {
-      console.error("Error fetching profile", error);
+  useEffect(() => {
+    if (profileData) {
+      setEditProfileInfo({
+        zid: profileData.zid || '',
+        profilePicture: profileData.profilePicture || '',
+        fullname: profileData.fullname || '',
+        description: profileData.description || '',
+        resume: profileData.resume || '',
+      })
     }
-  };
+  }, [profileData])
 
-  const handleOpenEditProfileModal = () => {
-    setShowEditProfileModal(true);
-  };
-
-  const handleCloseEditProfileModal = () => {
-    setShowEditProfileModal(false);
-  };
-
-  const handleOpenChangeProfPicModal = () => {
-    setShowChangeProfPicModal(true);
-  };
-
-  const handleCloseChangeProfPicModal = () => {
-    setShowChangeProfPicModal(false);
-  };
-
+  /**
+   * Handles the changing and editing of profile details
+   * @param e 
+   */
   const handleEditProfileChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
+    // if (id === 'description') {
+    //   console.log(value.length);
+    // }
     setEditProfileInfo((prevData) => ({
       ...prevData,
       [id]: value,
     }));
   };
 
+  /**
+   * Handles the saving profile details
+   * @param e 
+   */
   const handleSaveEditProfile = async (e: FormEvent) => {
     e.preventDefault();
     try {
-    setLoading(true);
-      const response = await axiosInstanceWithAuth.put(
+      setLoading(true);
+      await axiosInstanceWithAuth.put(
         "/profile/update-profile",
         editProfileInfo,
         {
@@ -92,54 +77,78 @@ export default function Profile() {
           },
         },
       );
-      setProfile(response.data);
-      fetchProfile();
-      console.log("Profile updated", editProfileInfo);
+      updateProfileContext();
     } catch (error) {
-      // setShowEditProfileModal(false);
       console.error("Error updating profile", error);
     }
     setLoading(false);
     setShowEditProfileModal(false);
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  /**
+   * Code for handling selected file change. NOTE THAT THIS DOES NOT SUBMIT THE CHANGE
+   * Function for handling the submit is handleSaveProfilePic
+   * 
+   * @param e 
+   * @returns {void}
+   */
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-    }
+    if (!file) return;
+    // Compress the image to 5mb at most
+    const imageOptions: Options = { maxSizeMB: 5 }
+    imageCompression(file, imageOptions)
+      .then(compressed => { setSelectedFile(compressed) })
+      .catch(error => { console.log(error) })
+    return;
   };
 
-  const handleSaveProfilePic = (e: FormEvent) => {
+  /**
+   * Function to submit the new profile pic and save the change. 
+   * 
+   * @param e 
+   * @returns {void}
+   */
+  const handleSaveProfilePic = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfile((prevProfile) => ({
-          ...prevProfile,
-          profilePic: reader.result as string,
-        }));
-      };
-      reader.readAsDataURL(selectedFile);
+    if (!selectedFile) {
+      alert('Please select a file!')
+      return;
     }
+    // Change the selected image to string data (base64)
+    const imageDataURL = await imageCompression.getDataUrlFromFile(selectedFile)
+    try {
+      setLoading(true);
+      await axiosInstanceWithAuth.put('/profile/update-profile', {
+        zid: profileData.zid,
+        profilePicture: imageDataURL,
+        fullname: profileData.fullname,
+        description: profileData.description,
+        resume: profileData.resume
+      });
+      updateProfileContext();
+    } catch (error) {
+      console.log(error)
+    }
+    setLoading(false);
     setShowChangeProfPicModal(false);
-  };
+    return;
+  }
 
   return (
     <div className="h-screen flex items-center justify-start flex-col">
       <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
-
       <div className="flex flex-col items-center justify-center mt-10 relative group">
         <div className="relative w-32 h-32">
           <img
-            src={profile.profilePicture}
+            src={profileData.profilePicture}
             alt="Profile Picture"
             className="w-full h-full rounded-full cursor-pointer"
-            onClick={handleOpenChangeProfPicModal}
+            onClick={() => setShowChangeProfPicModal(true)}
           />
           <div
             className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-80 bg-black bg-opacity-50 rounded-full transition-opacity duration-300"
-            onClick={handleOpenChangeProfPicModal}
+            onClick={() => setShowChangeProfPicModal(true)}
           >
             <svg
               className="w-8 h-8 text-white"
@@ -150,22 +159,16 @@ export default function Profile() {
             </svg>
           </div>
         </div>
-        <h2 className="text-2xl font-semibold mt-4">{profile.fullname}</h2>
-        {/* <h2 className="text-xl mt-2">{profile.userType}</h2> */}
-        <p className="text-xl text-gray-600 mt-2">{profile.description}</p>
-        <h3 className="text-sm text-gray-500 mt-2">{profile.zid}</h3>
+        <h2 className="text-2xl font-semibold mt-4">{profileData.fullname}</h2>
+        <p className="text-xl text-gray-600 mt-2">{profileData.description}</p>
+        <h3 className="text-sm text-gray-500 mt-2">{profileData.zid}</h3>
       </div>
 
       <div className="mt-8 w-80 mx-auto" title="Edit Profile Button">
-        <button
-          onClick={handleOpenEditProfileModal}
-          className="flex w-full justify-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Edit Profile
-        </button>
+        <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
       </div>
 
-      {/* edit profile details modal */}
+      {/* Edit profile details modal */}
       {showEditProfileModal && (
         <div
           id="edit-profile-modal"
@@ -176,10 +179,11 @@ export default function Profile() {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Edit Profile
               </h3>
+              {/* Button to Exit the Modal */}
               <button
                 type="button"
                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={handleCloseEditProfileModal}
+                onClick={() => setShowEditProfileModal(false)}
               >
                 <svg
                   className="w-5 h-5"
@@ -246,12 +250,7 @@ export default function Profile() {
                 {loading ? (
                   <ButtonLoading />
                 ) : (
-                  <button
-                    type="submit"
-                    className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                  >
-                    Save
-                  </button>
+                  <ButtonSubmit text={"Save"} />
                 )}
               </form>
             </div>
@@ -259,7 +258,7 @@ export default function Profile() {
         </div>
       )}
 
-      {/* change profile picture modal */}
+      {/* Change profile picture modal */}
       {showChangeProfPicModal && (
         <div
           id="change-profile-pic-modal"
@@ -273,7 +272,7 @@ export default function Profile() {
               <button
                 type="button"
                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={handleCloseChangeProfPicModal}
+                onClick={() => setShowChangeProfPicModal(false)}
               >
                 <svg
                   className="w-5 h-5"
@@ -293,7 +292,7 @@ export default function Profile() {
             </div>
             <div className="p-4 space-y-4">
               <form onSubmit={handleSaveProfilePic}>
-                <div>
+                <div className="mb-3">
                   <label
                     htmlFor="profilePic"
                     className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
@@ -308,12 +307,7 @@ export default function Profile() {
                     onChange={handleFileChange}
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  Save
-                </button>
+                {loading ? <ButtonLoading /> : <ButtonSubmit text={"Save"} />}
               </form>
             </div>
           </div>

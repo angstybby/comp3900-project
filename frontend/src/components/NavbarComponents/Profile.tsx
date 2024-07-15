@@ -1,54 +1,60 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
-import ProfilePic from '../../assets/Mazesoba.jpg'
 import Cookies from 'js-cookie'
+import { useProfile } from '@/contexts/ProfileContext'
 import { useEffect, useState } from 'react'
-import { axiosInstanceWithAuth } from '../../api/Axios'
+import LoadingCircle from '@/components/LoadingCircle'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
 export default function Profile() {
+  const { profileData } = useProfile();
 
   const logout = () => {
-    Cookies.remove('token', { path: '' })
+    const allCookieFields = Cookies.get();
+    Object.keys(allCookieFields).forEach((cookieName) => {
+      Cookies.remove(cookieName)
+    })
   }
 
-  const [profile, setProfile] = useState({
-    zid: '',
-    profilePicture: '',
-    userType: '',
-    fullname: '',
-    description: '',
-    resume: ''
-  });
-
+  const [fetched, setFetched] = useState(false);
+  const [userType, setUserType] = useState('');
   useEffect(() => {
-    fetchProfile();
-  }, []); // TODO: Replace with provider to avoid multiple fetches
-
-  const fetchProfile = async () => {
-    try {
-      const response = await axiosInstanceWithAuth.get('/profile');
-      const profileData = response.data;
-      setProfile(profileData);
-    } catch (error) {
-      console.error('Error fetching profile', error);
+    if (profileData.fullname !== undefined) {
+      setFetched(true);
     }
-  };
+    const type = Cookies.get('userType');
+    if (type === 'student') {
+      setUserType('Student');
+    } else if (type === 'academic') {
+      setUserType('Academic');
+    } else if (type === 'admin') {
+      setUserType('Admin');
+    }
+  }, [profileData])
 
   return (
     <Menu as="div" className="relative inline-block w-full text-left mt-auto bg-white hover:bg-gray-50">
       <div>
-        <MenuButton className="flex w-full justify-start items-center gap-x-5 rounded-md px-7 py-5 text-sm text-gray-900">
-          <img className="w-11 h-11 rounded-full" src={ProfilePic} alt="Rounded avatar" />
-          <div className='flex flex-col justify-start items-start tracking-widest'>
-            <p className='font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-36'>{`${profile.fullname}`}</p>
-            {profile.userType ?
-              <p>{`${profile.userType}`}</p> : <p>Student</p>
-            }
+        {fetched
+          ?
+          <MenuButton className="flex w-full justify-start items-center gap-x-5 rounded-md px-7 py-5 text-sm text-gray-900">
+            <img className="w-11 h-11 rounded-full" src={profileData.profilePicture} alt="Rounded avatar" />
+            <div className='flex flex-col justify-start items-start tracking-widest'>
+              <p className='font-semibold whitespace-nowrap overflow-hidden text-ellipsis max-w-36'>
+                {profileData.fullname}
+              </p>
+              {Cookies.get('userType') ?
+                <p>{userType}</p> : <p>{''}</p>
+              }
+            </div>
+          </MenuButton>
+          :
+          <div className="justify-center flex mb-5 mt-5 align-middle">
+            <LoadingCircle />
           </div>
-        </MenuButton>
+        }
       </div>
       <Transition
         enter="transition ease-out duration-100"
@@ -58,7 +64,7 @@ export default function Profile() {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems anchor="top" className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <MenuItems anchor="top" className="absolute right-0 z-40 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
           <MenuItem>
               {({ focus }) => (

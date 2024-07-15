@@ -1,15 +1,15 @@
-import ButtonSubmit from "../components/ButtonSubmit";
-import Textbox from "../components/Textbox";
-import { forgetPasswordSchema, resetPasswordSchema } from "../utils/auth.schema";
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
+import Textbox from "@/components/Inputs/Textbox";
+import { forgetPasswordSchema, resetPasswordSchema } from "@/utils/auth.schema";
 
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { axiosNoAuth } from "../api/Axios";
+import { axiosNoAuth } from "@/api/Axios";
 import axios from "axios";
 import { useState } from "react";
-import ButtonLoading from "../components/ButtonLoading";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
 
 
 type ForgetPasswordProps = z.infer<typeof forgetPasswordSchema>;
@@ -46,7 +46,7 @@ export default function ResetPassword() {
     try {
       // Send verification email logic goes here
       setloading(true);
-      await axiosNoAuth.post("/auth/reset-password", { email: data.email });
+      await axiosNoAuth.post("api/auth/reset-password", { email: data.email });
       setShowEmailForm(false);
       setloading(false);
       setShowVerificationForm(true);

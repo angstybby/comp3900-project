@@ -1,24 +1,29 @@
 // Local Imports
-import ButtonSubmit from "../components/ButtonSubmit";
-import Textbox from "../components/Textbox";
-import { loginSchema } from "../utils/auth.schema";
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
+import Textbox from "@/components/Inputs/Textbox";
+import { loginSchema } from "@/utils/auth.schema";
 
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { axiosNoAuth } from "../api/Axios";
 import axios from "axios";
 import { useState } from "react";
-import ButtonLoading from "../components/ButtonLoading";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
+import { JwtUser } from "@/utils/interfaces";
+import { jwtDecode } from "jwt-decode";
+// import { axiosNoAuth, getToken } from "../api/Axios";
+import { axiosNoAuth, getToken } from "../api/Axios";
+import Cookies from "js-cookie";
+
 
 type LoginProps = z.infer<typeof loginSchema>;
 
 axios.defaults.withCredentials = true;
 
 export default function Landing() {
-  const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
+  const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const {
@@ -36,10 +41,12 @@ export default function Landing() {
   const onSubmit = async (data: LoginProps) => {
     try {
       setLoading(true);
-      await axios.post("http://localhost:5005/auth/login", {
+      await axiosNoAuth.post("/auth/login/", {
         email: data.email,
         password: data.password,
       });
+      const decoded: JwtUser = jwtDecode(getToken());
+      Cookies.set('userType', decoded.userType);
       navigate("/dashboard");
     } catch (error) {
       console.log(error);

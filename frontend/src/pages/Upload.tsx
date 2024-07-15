@@ -1,16 +1,64 @@
-import ButtonPrimary from "../components/ButtonPrimary";
-import TextArea from "../components/TextArea";
-import { useState, ChangeEvent } from 'react';
+import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
+import TextArea from "@/components/Inputs/TextArea";
+import { useState, ChangeEvent, FormEvent } from 'react';
+import { axiosInstanceWithAuth } from "@/api/Axios";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
+import { useNavigate } from "react-router-dom";
 
 
 export default function Upload() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
+      const formData = new FormData();
+      formData.append('pdfUpload', file);
+      setLoading(true);
+      try {
+        const response = await axiosInstanceWithAuth.post('profile/scrape-pdf', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        console.log(response.data.text)
+      } catch (error) {
+        console.error('Error uploading file', error);
+      }
+      setLoading(false);
     }
+  }
+
+  const handleUpload = async (event: FormEvent) => {
+    event.preventDefault();
+
+    const formData = new FormData();
+    if (selectedFile === null) {
+      throw new Error('No file selected');
+    }
+    formData.append('pdfUpload', selectedFile);
+
+    setLoading(true);
+    try {
+      const response = await axiosInstanceWithAuth.post('/profile/upload-transcript', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      if (response.status === 200) {
+        console.log('File uploaded successfully');
+        navigate('/courseRecommendations');
+      } else {
+        console.error('Error uploading file');
+
+      }
+    } catch (error) {
+      console.error('Error uploading file', error);
+    }
+    setLoading(false);
   }
 
   return (
@@ -24,13 +72,13 @@ export default function Upload() {
           </h2>
 
           <div className="mt-8">
-            <form className="max-w-l mx-auto space-y-4" action="#" method="POST">
+            <form className="max-w-l mx-auto space-y-4" onSubmit={handleUpload}>
               <div>
                 <label htmlFor="coursesDone" className="block text-lg font-medium leading-6 text-gray-900">
                   Courses Done
                 </label>
                 <div className="mt-2">
-                    <TextArea id="coursesDone" name="coursesDone" autoComplete="coursesDone" placeholder="Example: COMP1511"/>
+                  <TextArea id="coursesDone" name="coursesDone" autoComplete="coursesDone" placeholder="Example: COMP1511" />
                 </div>
               </div>
               <div>
@@ -44,37 +92,37 @@ export default function Upload() {
                   Upload PDF:
                 </label>
                 <div className="mt-2">
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('pdfUpload')?.click()}
-                  className="w-full py-2 px-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 "
-                >
-                  <svg className="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
-                  </svg>
-                </button>
-                <input
-                  id="pdfUpload"
-                  name="pdfUpload"
-                  type="file"
-                  accept=".pdf"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('pdfUpload')?.click()}
+                    className="w-full py-2 px-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+                  >
+                    <svg className="w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z" />
+                    </svg>
+                  </button>
+                  <input
+                    id="pdfUpload"
+                    name="pdfUpload"
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
                 </div>
               </div>
               <div className="mt-6 text-left">
                 <p>Selected file: {selectedFile?.name}</p>
               </div>
+              <div className="mt-15 flex justify-end">
+                <div className="w-1/6">
+                  {loading ? <ButtonLoading /> : <ButtonSubmit text="Next" />}
+                </div>
+              </div>
             </form>
           </div>
-          <div className="mt-15 flex justify-end">
-              <div className="w-1/6">
-                <ButtonPrimary text="Next" url="/courseRecommendations"/>
-              </div>
-          </div>
-          </div>
-      </div>
+        </div >
+      </div >
     </>
-    );
-  }
+  );
+}
