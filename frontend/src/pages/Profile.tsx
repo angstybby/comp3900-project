@@ -8,7 +8,8 @@ import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
 import { Options } from "browser-image-compression";
 import imageCompression from "browser-image-compression";
 import { useProfile } from "@/contexts/ProfileContext";
-import ShareButton from "@/components/Buttons/ShareButton";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
@@ -109,6 +110,20 @@ export default function Profile() {
 
   const profileLink = `${window.location.origin}/profile/${profileData.zid}`;
 
+  const copyLinkToClipboard = () => {
+    navigator.clipboard.writeText(profileLink).then(() => {
+      toast.success("Link copied to clipboard!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    });
+  };
+
   return (
     <div className="h-screen flex items-center justify-start flex-col">
       <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
@@ -140,8 +155,12 @@ export default function Profile() {
 
       <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
         <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
-        <ShareButton link={profileLink} />
+        <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Share
+        </button>
       </div>
+
+      <ToastContainer />
 
       {/* Edit profile details modal */}
       {showEditProfileModal && (
