@@ -42,7 +42,7 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
   const handleSkillsChange = (value: string) => {
     setSkills(value);
   };
-  
+
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -51,7 +51,7 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
       const formData = new FormData()
       formData.append('pdfUpload', file);
       try {
-        const response = await axiosInstanceWithAuth.post('/course/parse-outline', 
+        const response = await axiosInstanceWithAuth.post('/course/parse-outline',
           formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -105,7 +105,7 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
     close();
     refetchData();
   }
-  
+
   return (
     <>
       <Dialog
@@ -136,23 +136,23 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
                 <p className='font-thin text-sm opacity-70 mt-1'>Create your own summary and skills or simply upload the course outline</p>
               </DialogTitle>
               <p className="my-2 font-bold">Course Summary</p>
-              <TextArea 
-                placeholder={'Enter course summary here...'} 
+              <TextArea
+                placeholder={'Enter course summary here...'}
                 value={summary}
                 valueChange={handleSummaryChange}
-                id={'courseSummary'} 
-                name={'courseSummary'} 
-                autoComplete={'off'} 
+                id={'courseSummary'}
+                name={'courseSummary'}
+                autoComplete={'off'}
                 disabled={loading}
               />
               <p className="my-2 font-bold">Course Skills</p>
-              <TextArea 
-                placeholder={'Enter skills here separated by a comma...'} 
+              <TextArea
+                placeholder={'Enter skills here separated by a comma...'}
                 value={skills}
                 valueChange={handleSkillsChange}
-                id={'courseSkills'} 
-                name={'courseSkills'} 
-                autoComplete={'off'} 
+                id={'courseSkills'}
+                name={'courseSkills'}
+                autoComplete={'off'}
                 disabled={loading}
               />
 
@@ -186,7 +186,7 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
                   <p>Selected file: {selectedFile?.name}</p>
                 </div>
                 <div className="mt-15 flex justify-end">
-                  { errorRef.current && (
+                  {errorRef.current && (
                     <p className='mr-3 self-center font-thin text-sm text-red-500'>{errorMessage}</p>
                   )}
                   <div className="w-1/6">

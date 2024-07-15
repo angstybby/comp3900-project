@@ -9,6 +9,7 @@ import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import EditGroupModal from "@/components/Modals/EditGroupModal";
 import InviteUserModal from "@/components/Modals/InviteUserModal";
 import GroupOwnerOptions from "@/components/GroupsComponents/GroupOwnerOptions";
+import { set } from "zod";
 
 interface Details {
   id: number,
@@ -22,17 +23,12 @@ interface Details {
 }
 
 
-const stubSkills = "Python, Java, C, C++, C#, JavaScript";
-
 const stubProject = {
   id: 1,
   name: "Stub Project",
   description: "This is a stub project",
 }
 
-const getStubSkills = () => {
-  return stubSkills;
-}
 
 const GroupDetails = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -51,6 +47,7 @@ const GroupDetails = () => {
   const [recc, setRecc] = useState<string[]>(["1", "2", "3", "4", "5"]);
   const [editModal, setEditModal] = useState(false);
   const [inviteUserModal, setInviteUserModal] = useState(false);
+  const [userInGroup, setUserInGroup] = useState(false);
 
   const isOwner = details.groupOwnerId === profileData.zid;
   const handleClickProject = () => {
@@ -99,9 +96,16 @@ const GroupDetails = () => {
       })
 
 
+
       response.data.CombinedSkills = skills;
       console.log(response.data);
       setDetails(response.data);
+    }
+
+    const checkUserInGroup = async () => {
+      const response = await axiosInstanceWithAuth.get(`/group/user-in-group/${groupId}`);
+      console.log(response.data);
+      setUserInGroup(response.data);
     }
 
     // const getReccs = async () => {
@@ -112,6 +116,7 @@ const GroupDetails = () => {
     // }
 
     fetchDetails();
+    checkUserInGroup();
     // getReccs();
   }, [groupId])
 
@@ -136,7 +141,9 @@ const GroupDetails = () => {
                   <GroupOwnerOptions openEditModal={() => setEditModal(true)} openInviteUserModal={() => setInviteUserModal(true)} />
                 </>
               ) : (
-                <ButtonUtility classname="p-10 text-lg bg-orange-700" text="Leave Group" onClick={leaveGroup} />
+                <>
+                  {userInGroup ? (<ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />) : (<ButtonUtility classname="p-10 text-lg bg-green-700 hover:bg-green-800" text="Apply to Join" onClick={leaveGroup} />)}
+                </>
               )}
 
 

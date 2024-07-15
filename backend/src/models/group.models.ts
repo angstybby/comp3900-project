@@ -735,3 +735,18 @@ export const dbGetUsersNotInGroup = async (groupId: number) => {
         throw error;
     }
 };
+
+export const dbIsUserJoinedGroup = async (groupId: number, zId: string) => {
+    try {
+        const groupMember = await prisma.groupJoined.findUnique({
+            where: {
+                zid_groupId: { zid: zId, groupId },
+            },
+        });
+
+        return !!groupMember;
+    } catch (error) {
+        console.error("Error checking if user joined group:", error);
+        throw error;
+    }
+};

@@ -138,7 +138,7 @@ const AddCourseModal: React.FC<AddCourseModalProps> = ({ isVisible, close, refet
                     <div key={course.id} className="flex justify-between items-center p-2 border-b border-black">
                       <span>{course.courseName} ({course.id})</span>
                       <div onClick={() => handleRemoveCourse(course.id)}>
-                        <ButtonWarning text={"Remove"}/>
+                        <ButtonWarning text={"Remove"} />
                       </div>
                     </div>
                   ))}

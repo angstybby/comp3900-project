@@ -9,6 +9,7 @@ import {
     dbGetUsersNotInGroup,
     dbGroupExpressInterstProject,
     dbInviteUserToGroup,
+    dbIsUserJoinedGroup,
     dbKickUserFromGroup,
     dbLeaveGroup,
     dbUpdateGroup,
@@ -460,7 +461,14 @@ router.post("/apply-project", async (req, res) => {
     }
 });
 
-// Make a route to get users who are not in the specific group
+/**
+ * @route GET /group/not-in-group/:groupId
+ * @desc Get all the users not in a group
+ * @access Private
+ * @returns {User[]} - Array of users not in the group
+ * @returns {Error} - If an error occurs while fetching users not in group
+ * @throws {500} - If an error occurs while fetching users not in group
+ */
 router.get("/not-in-group/:groupId", authMiddleWare, async (req, res) => {
     const { groupId } = req.params;
 
@@ -474,6 +482,30 @@ router.get("/not-in-group/:groupId", authMiddleWare, async (req, res) => {
         return res
             .status(500)
             .send("An error occured while fetching users not in group");
+    }
+});
+
+router.get("/user-in-group/:groupId", authMiddleWare, async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        return res.status(401).send("Unauthorized");
+    }
+
+    const { groupId } = req.params;
+
+    const groupIdInt = parseInt(groupId);
+
+    try {
+        const users = await dbIsUserJoinedGroup(
+            groupIdInt,
+            customReq.token.zid,
+        );
+        return res.status(200).send(users);
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .send("An error occured while fetching users in group");
     }
 });
 
