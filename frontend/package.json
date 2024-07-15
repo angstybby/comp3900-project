@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/lib-storage": "^3.609.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@aws-sdk/lib-storage": "^3.609.0",
     "@fontsource/roboto": "^5.0.13",
     "@headlessui/react": "^2.0.4",
     "@heroicons/react": "^2.1.4",
@@ -23,6 +23,7 @@
     "apexcharts": "^3.50.0",
     "axios": "^1.7.2",
     "browser-image-compression": "^2.0.2",
+    "chart.js": "^4.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.1.6",
@@ -32,22 +33,14 @@
     "lucide-react": "^0.400.0",
     "path": "^0.12.7",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.52.0",
     "react-multi-carousel": "^2.8.5",
     "react-router-dom": "^6.23.1",
-    "styled-components": "^6.1.11",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.23.8",
-    "@mui/icons-material": "^5.15.20",
-    "@mui/material": "^5.15.20",
-    "@reduxjs/toolkit": "^2.2.5",
-    "@trycourier/courier": "^6.2.1",
-    "@trycourier/react-inbox": "^6.0.0",
-    "@trycourier/react-provider": "^6.0.0",
-    "react-redux": "^9.1.2",
-    "react-toastify": "^10.0.5"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

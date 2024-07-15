@@ -10,9 +10,9 @@ import Groups from '@/pages/Groups'
 import Projects from '@/pages/Projects'
 import Profile from '@/pages/Profile'
 import CourseReco from '@/pages/CourseReco'
+import Notification from '@/pages/Notification'
 import Admin from '@/pages/Admin'
 import ResetPassword from '@/pages/ResetPassword'
-import Notification from './pages/Notification'
 import CourseDetails from '@/pages/CourseDetails'
 import ProjectDetails from './pages/ProjectDetails'
 import { ProfileProvider } from '@/contexts/ProfileContext'
@@ -33,6 +33,7 @@ function App() {
               <Route path={`/groups`} element={<Groups />} />
               <Route path={`/projects`} element={<Projects />} />
               <Route path={`/profile`} element={<Profile />} />
+              <Route path={`/notifications`} element={<Notification />} />
               <Route path={`/course/:courseId`} element={<CourseDetails />} />
               <Route path={`/project/:projectId`} element={<ProjectDetails />} />
               <Route path={`/group/:groupId`} element={<GroupDetails />} />

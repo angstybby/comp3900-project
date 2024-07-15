@@ -6,6 +6,8 @@ import profile from "./src/routes/profile.routes";
 import user from "./src/routes/user.routes";
 import course from "./src/routes/course.routes";
 import group from "./src/routes/group.routes";
+import skills from "./src/routes/skills.routes";
+import projects from "./src/routes/project.routes";
 
 // Create an Express application
 const app = express();
@@ -33,6 +35,8 @@ app.use("/api/group", authMiddleWare, group);
 app.use("/api/profile", authMiddleWare, profile);
 app.use("/api/user", authMiddleWare, user);
 app.use("/api/course", authMiddleWare, course);
+app.use("/api/skills", authMiddleWare, skills);
+app.use("/api/projects", authMiddleWare, projects);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
