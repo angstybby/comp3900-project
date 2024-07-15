@@ -75,13 +75,14 @@ model Group {
   groupOwnerId    String
   GroupOwner      Profile           @relation(fields: [groupOwnerId], references: [zid])
   GroupMembers    GroupJoined[]
-  projects        ProjectTaken[]
+  // projects        ProjectTaken[]
   interests       GroupInterest[]
   CombinedSkills  Skills[]
   MaxMembers      Int
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   ProjectInterest ProjectInterest[]
+  Project         Project[]
 }
 
 model GroupJoined {
@@ -119,31 +120,32 @@ model Project {
   updatedAt       DateTime          @updatedAt
   ProjectOwner    Profile           @relation(fields: [projectOwnerId], references: [zid])
   projectOwnerId  String
+  groupId         Int?
+  assignedGroup   Group?            @relation(fields: [groupId], references: [id])
   skills          Skills[]
   ProjectInterest ProjectInterest[]
-  ProjectTaken    ProjectTaken[]
 }
 
-model ProjectTaken {
-  projectId Int
-  project   Project          @relation(fields: [projectId], references: [id])
-  groupId   Int
-  group     Group            @relation(fields: [groupId], references: [id])
-  status    GroupEntryStatus @default(PENDING)
+// model ProjectTaken {
+//   projectId Int
+//   project   Project          @relation(fields: [projectId], references: [id])
+//   groupId   Int
+//   group     Group            @relation(fields: [groupId], references: [id])
+//   status    GroupEntryStatus @default(PENDING)
 
-  @@id([projectId, groupId])
-  @@index([status])
-}
+//   @@id([projectId, groupId])
+//   @@index([status])
+// }
 
 model ProjectInterest {
   projectId Int
   project   Project        @relation(fields: [projectId], references: [id])
-  GroupId   Int
-  group     Group          @relation(fields: [GroupId], references: [id])
+  groupId   Int
+  group     Group          @relation(fields: [groupId], references: [id])
   status    InterestStatus @default(PENDING)
   createdAt DateTime       @default(now())
 
-  @@id([projectId, GroupId])
+  @@id([projectId, groupId])
 }
 
 enum GroupEntryStatus {

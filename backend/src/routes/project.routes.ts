@@ -4,9 +4,12 @@ import {
     dbAddProjectSkills,
     dbDeleteProject,
     dbDeleteProjectSkills,
+    dbGetProjectByTitle,
     dbGetAllProjectApplications,
     dbGetProject,
     dbGetProjects,
+    dbAcceptGroupToProject,
+    dbRejectGroupToProject,
 } from "../models/project.models";
 import { CustomRequest } from "../middleware/auth.middleware";
 import { isProjectOwner } from "../utils/project.utils";
@@ -56,6 +59,10 @@ router.post("/add", async (req, res) => {
         return res.status(400).send("Missing fields");
     }
 
+    if (!(await dbGetProjectByTitle(title))) {
+        return res.status(400).send("Project with this title already exists");
+    }
+
     if (!Array.isArray(skills)) {
         return res.status(400).send("Skills must be an array");
     }
@@ -94,6 +101,10 @@ router.post("/delete", async (req, res) => {
     }
 
     const zid = customReq.token.zid;
+
+    if (!(await dbGetProject(zid))) {
+        return res.status(400).send("Project doesnt exist");
+    }
 
     if (!(await isProjectOwner(zid, projectId))) {
         return res.status(401).send("You are not the owner of this project");
@@ -263,6 +274,82 @@ router.post("/remove-skills", async (req: Request, res: Response) => {
     } catch (error) {
         console.log(error);
         res.status(500).send("Failed removing skill from project");
+    }
+});
+
+/**
+ * @route POST /projects/accept
+ * @desc Accepts a group to a project. User needs to be the owner of the project
+ * @access Private
+ * @returns {String} Success message
+ * @returns {String} Error message
+ * @throws {400} If missing fields
+ * @throws {401} If premissions invalid
+ * @throws {500} If an error occurs while accepting group to project
+ */
+router.post("/accept", async (req: Request, res: Response) => {
+    const { projectId, groupId } = req.body;
+    if (!projectId || !groupId) {
+        return res.status(400).send("Missing fields");
+    }
+
+    // need to do checks
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const ownerZid = customReq.token.zid;
+
+    if (!(await isProjectOwner(ownerZid, projectId))) {
+        return res.status(401).send("You are not the owner of this project");
+    }
+
+    try {
+        // Accept group
+        await dbAcceptGroupToProject(projectId, groupId);
+        res.status(200).send("Group accepted");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Server Error");
+    }
+});
+
+/**
+ * @route POST /projects/reject
+ * @desc Rejects a group from a project. User needs to be the owner of the project
+ * @access Private
+ * @returns {String} Success message
+ * @returns {String} Error message
+ * @throws {400} If missing fields
+ * @throws {401} If premissions invalid
+ * @throws {500} If an error occurs
+ */
+router.post("/reject", async (req: Request, res: Response) => {
+    const { projectId, groupId } = req.body;
+    if (!projectId || !groupId) {
+        return res.status(400).send("Missing fields");
+    }
+
+    // need to do checks
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const ownerZid = customReq.token.zid;
+
+    if (!(await isProjectOwner(ownerZid, projectId))) {
+        return res.status(401).send("You are not the owner of this project");
+    }
+
+    try {
+        // Accept group
+        await dbRejectGroupToProject(projectId, groupId);
+        res.status(200).send("Group rejected");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Server Error");
     }
 });
 

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { InterestStatus, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -84,7 +84,7 @@ export const dbDeleteProjectSkills = async (
 
 // Let me (koda) know if you need more from this
 export const dbGetAllProjectApplications = async (projectId: number) => {
-    return await prisma.projectTaken.findMany({
+    return await prisma.projectInterest.findMany({
         where: {
             projectId,
         },
@@ -103,7 +103,7 @@ export const dbGetProjectOwnerById = async (projectId: number) => {
             ProjectOwner: true,
         },
     });
-}
+};
 
 export const dbGetProject = async (projectId: number) => {
     return await prisma.project.findUnique({
@@ -137,4 +137,74 @@ export const dbGetProjects = async (skip: number) => {
             },
         },
     });
-}
+};
+
+export const dbAcceptGroupToProject = async (
+    groupId: number,
+    projectId: number,
+) => {
+    // update the group application status
+    await prisma.projectInterest.update({
+        where: {
+            projectId_groupId: {
+                projectId,
+                groupId,
+            },
+        },
+        data: {
+            status: InterestStatus.ACCEPTED,
+        },
+    });
+
+    // update the project to have the group
+    await prisma.project.update({
+        where: {
+            id: projectId,
+        },
+        data: {
+            assignedGroup: {
+                connect: {
+                    id: groupId,
+                },
+            },
+        },
+    });
+
+    // update all other applications
+    await prisma.projectInterest.updateMany({
+        where: {
+            projectId,
+            groupId: {
+                not: groupId,
+            },
+        },
+        data: {
+            status: InterestStatus.REJECTED,
+        },
+    });
+};
+
+export const dbRejectGroupToProject = async (
+    groupId: number,
+    projectId: number,
+) => {
+    await prisma.projectInterest.update({
+        where: {
+            projectId_groupId: {
+                projectId,
+                groupId,
+            },
+        },
+        data: {
+            status: InterestStatus.REJECTED,
+        },
+    });
+};
+
+export const dbGetProjectByTitle = async (projectId: number) => {
+    return await prisma.project.findUnique({
+        where: {
+            id: projectId,
+        },
+    });
+};
