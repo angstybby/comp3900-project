@@ -146,7 +146,35 @@ export const dbAddCourse = async (courseId: string, zid: string) => {
             },
         });
 
+        // Add the skills to all of the user's joined groups
+        const groups = await prisma.group.findMany({
+            where: {
+                GroupMembers: {
+                    some: {
+                        zid,
+                    },
+                },
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        groups.forEach(async (group) => {
+            await prisma.group.update({
+                where: {
+                    id: group.id,
+                },
+                data: {
+                    CombinedSkills: {
+                        connect: SkillFound,
+                    },
+                },
+            });
+        });
+
         console.log(`Course ${courseId} added for user ${zid}`);
+        return;
     } catch (error) {
         console.error("Error in dbAddCourse:", error);
         throw error;
@@ -180,7 +208,6 @@ export const dbDeleteCourse = async (courseId: string, zid: string) => {
 
     const courseSkills = course?.skills.map((skill) => skill.skillName) || [];
 
-    // Step 3: Get all other courses taken by the user
     const otherCourses = await prisma.courseTaken.findMany({
         where: {
             zid: zid,
@@ -237,8 +264,83 @@ export const dbDeleteCourse = async (courseId: string, zid: string) => {
         });
     }
 
+    // Step 8: Get all groups the user is part of
+    const groups = await prisma.group.findMany({
+        where: {
+            GroupMembers: {
+                some: {
+                    zid,
+                },
+            },
+        },
+        select: {
+            id: true,
+        },
+    });
+
+    for (const group of groups) {
+        // Step 9: Remove the unique skills from the group
+        const groupMembers = await prisma.group.findUnique({
+            where: {
+                id: group.id,
+            },
+            select: {
+                GroupMembers: {
+                    select: {
+                        zid: true,
+                        profileOwner: {
+                            select: {
+                                Skills: {
+                                    select: {
+                                        skillName: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        const groupMemberSkills = new Set<string>();
+        groupMembers?.GroupMembers.forEach((member) => {
+            if (member.zid !== zid) {
+                member.profileOwner.Skills.forEach((skill) => {
+                    groupMemberSkills.add(skill.skillName);
+                });
+            }
+        });
+
+        const uniqueSkills = skillsToRemove.filter(
+            (skill) => !groupMemberSkills.has(skill),
+        );
+
+        if (uniqueSkills.length > 0) {
+            const skillsToDisconnect = await prisma.skills.findMany({
+                where: {
+                    skillName: {
+                        in: uniqueSkills,
+                    },
+                },
+            });
+
+            await prisma.group.update({
+                where: {
+                    id: group.id,
+                },
+                data: {
+                    CombinedSkills: {
+                        disconnect: skillsToDisconnect.map((skill) => ({
+                            id: skill.id,
+                        })),
+                    },
+                },
+            });
+        }
+    }
+
     console.log(
-        `Course ${courseId} removed for user ${zid} and skills ${skillsToRemove} disconnected from the profile`,
+        `Course ${courseId} removed for user ${zid} and skills ${skillsToRemove} disconnected from the profile and groups`,
     );
 
     return;
@@ -302,4 +404,6 @@ export const dbUpdateCourse = async (
             },
         });
     }
+
+    //TODO: Update all groups that have this course
 };

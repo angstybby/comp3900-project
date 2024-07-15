@@ -17,6 +17,35 @@ export const dbCreateGroup = async (
                 MaxMembers: maxMembers,
             },
         });
+
+        // Add owner to group members
+        await prisma.groupJoined.create({
+            data: {
+                groupId: newGroup.id,
+                zid: groupOwnerId,
+            },
+        });
+
+        // Add owner skills to the group
+        const userSkills = await prisma.profile.findFirst({
+            where: {
+                zid: groupOwnerId,
+            },
+            select: {
+                Skills: true,
+            },
+        });
+
+        await prisma.group.update({
+            where: {
+                id: newGroup.id,
+            },
+            data: {
+                CombinedSkills: {
+                    connect: userSkills?.Skills,
+                },
+            },
+        });
         return newGroup;
     } catch (error) {
         console.error("Error creating group:", error);
@@ -55,14 +84,36 @@ export const dbInviteUserToGroup = async (
         }
 
         // Invite the user to the group
-        const invitedUser = await prisma.groupJoined.create({
+        await prisma.groupJoined.create({
             data: {
                 groupId,
                 zid: zId,
             },
         });
 
-        return invitedUser;
+        // Add the user skills to the group
+
+        const userSkills = await prisma.profile.findFirst({
+            where: {
+                zid: zId,
+            },
+            select: {
+                Skills: true,
+            },
+        });
+
+        await prisma.group.update({
+            where: {
+                id: groupId,
+            },
+            data: {
+                CombinedSkills: {
+                    connect: userSkills?.Skills,
+                },
+            },
+        });
+
+        return;
     } catch (error) {
         console.error("Error inviting user to group:", error);
         throw error;
@@ -133,6 +184,64 @@ export const dbLeaveGroup = async (groupId: number, zId: string) => {
             },
         });
 
+        // Remove the unique skills of the user from the group
+        const userSkills = await prisma.profile.findFirst({
+            where: {
+                zid: zId,
+            },
+            select: {
+                Skills: true,
+            },
+        });
+
+        // Check other users skills
+        const otherUsers = await prisma.groupJoined.findMany({
+            where: {
+                groupId,
+                zid: {
+                    not: zId,
+                },
+            },
+            select: {
+                zid: true,
+            },
+        });
+
+        const otherUsersSkills = await prisma.profile.findMany({
+            where: {
+                zid: {
+                    in: otherUsers.map((user) => user.zid),
+                },
+            },
+            select: {
+                Skills: true,
+            },
+        });
+
+        console.log(otherUsersSkills);
+
+        const otherUsersCombinedSkills = otherUsersSkills.flatMap(
+            (user) => user.Skills,
+        );
+
+        const uniqueSkills = userSkills?.Skills.filter(
+            (skill) =>
+                !otherUsersCombinedSkills.find(
+                    (otherSkill) => otherSkill.id === skill.id,
+                ),
+        );
+
+        await prisma.group.update({
+            where: {
+                id: groupId,
+            },
+            data: {
+                CombinedSkills: {
+                    disconnect: uniqueSkills,
+                },
+            },
+        });
+
         return;
     } catch (error) {
         console.error("Error leaving group:", error);
@@ -145,6 +254,7 @@ export const dbUpdateGroup = async (
     groupName: string,
     groupOwnerId: string,
     description: string,
+    maxMembers: number,
 ) => {
     try {
         const group = await prisma.group.findUnique({
@@ -164,6 +274,7 @@ export const dbUpdateGroup = async (
             data: {
                 groupName,
                 description,
+                MaxMembers: maxMembers,
             },
         });
         return updatedGroup;
@@ -204,6 +315,64 @@ export const dbKickUserFromGroup = async (
         await prisma.groupJoined.delete({
             where: {
                 zid_groupId: { zid: zId, groupId },
+            },
+        });
+
+        // Remove the unique skills of the user from the group
+        const userSkills = await prisma.profile.findFirst({
+            where: {
+                zid: zId,
+            },
+            select: {
+                Skills: true,
+            },
+        });
+
+        // Check other users skills
+        const otherUsers = await prisma.groupJoined.findMany({
+            where: {
+                groupId,
+                zid: {
+                    not: zId,
+                },
+            },
+            select: {
+                zid: true,
+            },
+        });
+
+        const otherUsersSkills = await prisma.profile.findMany({
+            where: {
+                zid: {
+                    in: otherUsers.map((user) => user.zid),
+                },
+            },
+            select: {
+                Skills: true,
+            },
+        });
+
+        console.log(otherUsersSkills);
+
+        const otherUsersCombinedSkills = otherUsersSkills.flatMap(
+            (user) => user.Skills,
+        );
+
+        const uniqueSkills = userSkills?.Skills.filter(
+            (skill) =>
+                !otherUsersCombinedSkills.find(
+                    (otherSkill) => otherSkill.id === skill.id,
+                ),
+        );
+
+        await prisma.group.update({
+            where: {
+                id: groupId,
+            },
+            data: {
+                CombinedSkills: {
+                    disconnect: uniqueSkills,
+                },
             },
         });
 
@@ -250,11 +419,13 @@ export const dbGroupExpressInterstProject = async (
             throw new Error("Project does not exist");
         }
 
-        const existingProjectInterest = await prisma.projectInterest.findUnique({
-            where: {
-                projectId_groupId: { projectId, groupId },
+        const existingProjectInterest = await prisma.projectInterest.findUnique(
+            {
+                where: {
+                    projectId_groupId: { projectId, groupId },
+                },
             },
-        });
+        );
 
         if (existingProjectInterest) {
             throw new Error(
@@ -314,6 +485,26 @@ export const dbAcceptUserToGroup = async (
             data: {
                 groupId,
                 zid: zId,
+            },
+        });
+
+        const userSkills = await prisma.profile.findFirst({
+            where: {
+                zid: zId,
+            },
+            select: {
+                Skills: true,
+            },
+        });
+
+        await prisma.group.update({
+            where: {
+                id: groupId,
+            },
+            data: {
+                CombinedSkills: {
+                    connect: userSkills?.Skills,
+                },
             },
         });
 
@@ -423,13 +614,6 @@ export const dbGetUserInGroup = async (zId: string) => {
         // Extract group IDs
         const groupIds = groupsPartOf.map((group) => group.groupId);
 
-        // Fetch the groups owned by the user
-        const groupOwned = await prisma.group.findMany({
-            where: {
-                groupOwnerId: zId,
-            },
-        });
-
         // Fetch the groups the user is a part of
         const groups = await prisma.group.findMany({
             where: {
@@ -438,7 +622,7 @@ export const dbGetUserInGroup = async (zId: string) => {
         });
 
         // Combine the two arrays
-        const combinedGroups = [...groups, ...groupOwned];
+        const combinedGroups = [...groups];
 
         // Fetch the member count for each group
         const groupsWithMemberCount = await Promise.all(
@@ -446,7 +630,6 @@ export const dbGetUserInGroup = async (zId: string) => {
                 let members = await prisma.groupJoined.count({
                     where: { groupId: group.id },
                 });
-                members += 1; // Add 1 for the group owner
 
                 return {
                     ...group,
@@ -467,6 +650,18 @@ export const dbGetGroup = async (groupId: number) => {
         const group = await prisma.group.findFirst({
             where: {
                 id: groupId,
+            },
+            select: {
+                id: true,
+                groupName: true,
+                description: true,
+                groupOwnerId: true,
+                MaxMembers: true,
+                CombinedSkills: {
+                    select: {
+                        skillName: true,
+                    },
+                },
             },
         });
 
@@ -489,8 +684,6 @@ export const dbGetGroup = async (groupId: number) => {
             where: { groupId },
         });
 
-        members += 1; // Add 1 for the group owner
-
         return {
             ...group,
             members,
@@ -498,6 +691,47 @@ export const dbGetGroup = async (groupId: number) => {
         };
     } catch (error) {
         console.error("Error getting group:", error);
+        throw error;
+    }
+};
+
+export const dbGetUsersNotInGroup = async (groupId: number) => {
+    try {
+        const group = await prisma.group.findUnique({
+            where: {
+                id: groupId,
+            },
+        });
+
+        if (!group) {
+            throw new Error("Group does not exist");
+        }
+
+        const groupMembers = await prisma.groupJoined.findMany({
+            where: {
+                groupId,
+            },
+            select: {
+                zid: true,
+            },
+        });
+
+        const groupMemberIds = groupMembers.map((member) => member.zid);
+
+        const usersNotInGroup = await prisma.profile.findMany({
+            where: {
+                zid: {
+                    notIn: groupMemberIds,
+                },
+            },
+            select: {
+                zid: true,
+            },
+        });
+
+        return usersNotInGroup;
+    } catch (error) {
+        console.error("Error getting users not in group:", error);
         throw error;
     }
 };

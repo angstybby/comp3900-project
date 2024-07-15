@@ -6,6 +6,7 @@ import {
     dbGetGroup,
     dbGetGroupApplications,
     dbGetUserInGroup,
+    dbGetUsersNotInGroup,
     dbGroupExpressInterstProject,
     dbInviteUserToGroup,
     dbKickUserFromGroup,
@@ -190,7 +191,7 @@ router.post("/leave", async (req, res) => {
     const zid = customReq.token.zid;
 
     try {
-        await dbLeaveGroup(groupId, zid);
+        await dbLeaveGroup(parseInt(groupId), zid);
         return res.status(200).send("User left group successfully");
     } catch (error) {
         console.error(error);
@@ -216,15 +217,21 @@ router.put("/update", async (req, res) => {
         throw new Error("Token is not valid");
     }
 
-    const { groupId, groupName, description } = req.body;
-    if (!groupId || !groupName || !description) {
+    const { groupId, groupName, description, maxMembers } = req.body;
+    if (!groupId || !groupName || !description || !maxMembers) {
         return res.status(400).send("Missing required fields");
     }
 
     const zid = customReq.token.zid;
 
     try {
-        await dbUpdateGroup(groupId, groupName, zid, description);
+        await dbUpdateGroup(
+            groupId,
+            groupName,
+            zid,
+            description,
+            parseInt(maxMembers),
+        );
         return res.status(200).send("Group updated successfully");
     } catch (error) {
         console.error(error);
@@ -450,6 +457,23 @@ router.post("/apply-project", async (req, res) => {
         return res
             .status(500)
             .send("An error occurred while expressing interest");
+    }
+});
+
+// Make a route to get users who are not in the specific group
+router.get("/not-in-group/:groupId", authMiddleWare, async (req, res) => {
+    const { groupId } = req.params;
+
+    const groupIdInt = parseInt(groupId);
+
+    try {
+        const users = await dbGetUsersNotInGroup(groupIdInt);
+        return res.status(200).send(users);
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .send("An error occured while fetching users not in group");
     }
 });
 
