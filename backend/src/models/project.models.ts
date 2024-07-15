@@ -179,7 +179,7 @@ export const dbAcceptGroupToProject = async (
             },
         },
         data: {
-            status: InterestStatus.REJECTED,
+            status: InterestStatus.DENIED,
         },
     });
 };
@@ -196,7 +196,7 @@ export const dbRejectGroupToProject = async (
             },
         },
         data: {
-            status: InterestStatus.REJECTED,
+            status: InterestStatus.DENIED,
         },
     });
 };
