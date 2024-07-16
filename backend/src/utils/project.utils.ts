@@ -1,6 +1,6 @@
 import { dbGetProjectOwnerById } from "../models/project.models";
 
-export const isProjectOwner = async ( zid: string, projectId: number) => {
+export const isProjectOwner = async (zid: string, projectId: number) => {
     try {
         const owner = await dbGetProjectOwnerById(projectId);
         if (!owner) {
@@ -17,3 +17,17 @@ export const isProjectOwner = async ( zid: string, projectId: number) => {
     }
     return true;
 };
+
+export interface Project {
+    id: number;
+    title: string;
+    description: string | null;
+}
+
+export interface CombinedProject {
+    id: number;
+    title: string;
+    description: string | null;
+    projectOwnerId: string;
+    skills?: string[];
+}
