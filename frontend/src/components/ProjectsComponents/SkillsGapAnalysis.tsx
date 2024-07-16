@@ -1,14 +1,109 @@
+import { Chart } from "chart.js";
+import { useEffect, useRef, useState } from "react";
+
+
 export default function SkillsGapAnalysis() {
-  return (
-      <div className="h-32 bg-gray-200 p-5 py-3 text-center rounded-lg">
-        <div className="text-start flex flex-col gap-1">
-            <div className="flex flex-row justify-between items-center">
-                <h1 className="text-2xl font-light">Your Skill Gap Analysis</h1>
+
+    const [projectSkills, setProjectSkills] = useState<string[]>([]);
+    const [studentSkills, setStudentSkills] = useState<string[]>([]);
+    const [skillsGap, setSkillsGap] = useState<string[]>([]);
+    const chartRef = useRef<HTMLCanvasElement | null>(null);
+
+    //stubs
+    const projectSkillsStub = [
+        'JavaScript',
+        'React',
+        'Node.js',
+        'SQL'
+    ];
+
+    const studentSkillsStub = [
+        'JavaScript',
+        'HTML',
+        'CSS'
+    ];
+
+    useEffect(() => {
+        setProjectSkills(projectSkillsStub);
+        setStudentSkills(studentSkillsStub);
+    }, []);
+
+    useEffect(() => {
+        const gap = projectSkills.filter(
+            (skill) => !studentSkills.includes(skill)
+        );
+        setSkillsGap(gap);
+    }, [projectSkills, studentSkills]);
+
+
+    useEffect(() => {
+        if (chartRef.current && skillsGap.length > 0) {
+            const chartInstance = new Chart(chartRef.current, {
+                type: 'doughnut',
+                data: { 
+                    labels: ['Skills Lacking', 'Skills Possessed'],
+                    datasets: [{
+                        label: 'Skills Gap Analysis',
+                        data: [skillsGap.length, projectSkills.length - skillsGap.length],
+                        backgroundColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Skills Gap Analysis'
+                        }
+                    }
+                }
+            });
+            return () => {
+                chartInstance.destroy();
+            };
+        }
+    }, [skillsGap]);
+
+    return (
+        <div>
+            <h1 className="text-xl font-semibold pt-4">Your skills analysis for this project</h1> 
+            <div className="mt-8 flex">
+                <canvas ref={chartRef}/>
             </div>
-            <h2 className="text-sm font-light line-clamp-2">graphs and stuff here</h2>
-            {/* <div className="py-6" id="donut-chart"></div> */}
+            <div className="flex mt-8">
+                <div className="mr-4">
+                    <h2 className="font-semibold">Skills Required:</h2>
+                    <ul>
+                        {projectSkills.map(skill => (
+                            <li key={skill}>{skill}</li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="mr-4">
+                    <h2 className="font-semibold">Skills Possesed:</h2>
+                    <ul>
+                        {studentSkills.map(skill => (
+                            <li key={skill}>{skill}</li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="mr-4">
+                    <h2 className="font-semibold">Skills Lacking:</h2>
+                    <ul>
+                        {skillsGap.map(skill => (
+                            <li key={skill}>{skill}</li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
         </div>
-      </div>
-  );
+    );
 
 }
