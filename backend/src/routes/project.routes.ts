@@ -10,6 +10,7 @@ import {
     dbGetProjects,
     dbAcceptGroupToProject,
     dbRejectGroupToProject,
+    dbGetProjectByName,
 } from "../models/project.models";
 import { CustomRequest } from "../middleware/auth.middleware";
 import { isProjectOwner } from "../utils/project.utils";

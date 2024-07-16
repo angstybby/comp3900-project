@@ -1,39 +1,22 @@
 import { axiosInstanceWithAuth } from "@/api/Axios";
-import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
-import { UserGroupIcon } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"
-import { useNavigate } from 'react-router-dom';
+
+import { useCallback, useEffect, useState } from "react";
+
+import { useParams, useNavigate } from "react-router-dom"
+
 import { useProfile } from "@/contexts/ProfileContext";
+
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import EditGroupModal from "@/components/Modals/EditGroupModal";
 import InviteUserModal from "@/components/Modals/InviteUserModal";
 import GroupOwnerOptions from "@/components/GroupsComponents/GroupOwnerOptions";
-import { set } from "zod";
+import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
 
-interface Details {
-  id: number,
-  groupName: string,
-  description: string,
-  groupOwnerId: string,
-  members: number,
-  MaxMembers: number
-  groupOwnerName: string
-  CombinedSkills: string[]
-}
+import { UserGroupIcon } from "@heroicons/react/24/outline";
 
-
-const stubProject = {
-  id: 1,
-  name: "Stub Project",
-  description: "This is a stub project",
-}
-
+import { Project, Details } from "@/utils/interfaces";
 
 const GroupDetails = () => {
-  const { groupId } = useParams<{ groupId: string }>();
-  const { profileData } = useProfile();
-
   const [details, setDetails] = useState<Details>({
     id: 0,
     groupName: "",
@@ -44,90 +27,63 @@ const GroupDetails = () => {
     groupOwnerName: "",
     CombinedSkills: []
   });
-  const [recc, setRecc] = useState<string[]>(["1", "2", "3", "4", "5"]);
+  const [recc, setRecc] = useState<Project[]>([]);
   const [editModal, setEditModal] = useState(false);
   const [inviteUserModal, setInviteUserModal] = useState(false);
   const [userInGroup, setUserInGroup] = useState(false);
 
+  const { groupId } = useParams<{ groupId: string }>();
+  const { profileData } = useProfile();
+  const navigate = useNavigate();
+
   const isOwner = details.groupOwnerId === profileData.zid;
-  const handleClickProject = () => {
-    // navigate(`/project/${project.id}`);
-  }
 
-  const fetchDetails = async () => {
-    const response = await axiosInstanceWithAuth.get(`/group/details/${groupId}`, {
-      data: {
-        groupId: groupId,
-      }
-    })
+  const fetchDetails = useCallback(async () => {
+    try {
+      const response = await axiosInstanceWithAuth.get(`/group/details/${groupId}`);
+      const skills = response.data.CombinedSkills.map((skill: { skillName: string }) => skill.skillName);
+      response.data.CombinedSkills = skills;
+      setDetails(response.data);
 
-    const skills = response.data.CombinedSkills.map((skill: {
-      skillName: string
-    }) => {
-      return skill.skillName;
-    })
+      // Get recommendations
+      const response2 = await axiosInstanceWithAuth.post('/group/get-reccs', { prompt: skills.join(',') });
+      setRecc(response2.data);
+    } catch (error) {
+      console.error("Error fetching group details:", error);
+    }
+  }, [groupId]);
 
-
-    response.data.CombinedSkills = skills;
-    console.log(response.data);
-    setDetails(response.data);
-  }
-
-  const leaveGroup = async () => {
-    const response = await axiosInstanceWithAuth.post("/group/leave", {
-      groupId: groupId,
-    })
-    console.log(response.data);
-    navigate("/groups");
-  }
-
-  const expressInterest = async () => {
-    const response = await axiosInstanceWithAuth.post("/group/express-interest", {
-      groupId: groupId,
-    })
-    console.log(response.data);
-  }
+  const checkUserInGroup = useCallback(async () => {
+    try {
+      const response = await axiosInstanceWithAuth.get(`/group/user-in-group/${groupId}`);
+      setUserInGroup(response.data);
+    } catch (error) {
+      console.error("Error checking user in group:", error);
+    }
+  }, [groupId]);
 
   useEffect(() => {
-    const fetchDetails = async () => {
-      const response = await axiosInstanceWithAuth.get(`/group/details/${groupId}`, {
-        data: {
-          groupId: groupId,
-        }
-      })
-
-      const skills = response.data.CombinedSkills.map((skill: {
-        skillName: string
-      }) => {
-        return skill.skillName;
-      })
-
-
-
-      response.data.CombinedSkills = skills;
-      console.log(response.data);
-      setDetails(response.data);
-    }
-
-    const checkUserInGroup = async () => {
-      const response = await axiosInstanceWithAuth.get(`/group/user-in-group/${groupId}`);
-      console.log(response.data);
-      setUserInGroup(response.data);
-    }
-
-    // const getReccs = async () => {
-    //   const response = await axiosInstanceWithAuth.post("/group/get-reccs", {
-    //     prompt: getStubSkills(),
-    //   })
-    //   console.log(response.data);
-    // }
-
     fetchDetails();
     checkUserInGroup();
-    // getReccs();
-  }, [groupId])
+  }, [fetchDetails, checkUserInGroup]);
 
-  const navigate = useNavigate();
+  const leaveGroup = async () => {
+    try {
+      await axiosInstanceWithAuth.post("/group/leave", { groupId });
+      navigate("/groups");
+    } catch (error) {
+      console.error("Error leaving group:", error);
+    }
+  };
+
+  const expressInterest = async () => {
+    try {
+      await axiosInstanceWithAuth.post("/group/express-interest", { groupId });
+    } catch (error) {
+      console.error("Error expressing interest:", error);
+    }
+  };
+
   return (
     <>
       <EditGroupModal open={editModal} close={() => setEditModal(false)} refetchData={fetchDetails} initValues={details} />
@@ -149,7 +105,10 @@ const GroupDetails = () => {
                 </>
               ) : (
                 <>
-                  {userInGroup ? (<ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />) : (<ButtonUtility classname="p-10 text-lg bg-green-700 hover:bg-green-800" text="Apply to Join" onClick={leaveGroup} />)}
+                  {userInGroup ?
+                    (<ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />)
+                    :
+                    (<ButtonUtility classname="p-10 text-lg bg-green-700 hover:bg-green-800" text="Apply to Join" onClick={expressInterest} />)}
                 </>
               )}
 
@@ -166,16 +125,11 @@ const GroupDetails = () => {
         </div>
 
         <p className="mt-10 text-2xl font-bold mb-5">{`Recommended Projects`}</p>
-        {/* {recc.map(project => (
-          <ProjectCard project={i} inCarousel={false} />
-        ))} */}
+
         <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5">
-          <ProjectCard project={stubProject} onClick={handleClickProject} />
-          <ProjectCard project={stubProject} onClick={handleClickProject} />
-          <ProjectCard project={stubProject} onClick={handleClickProject} />
-          <ProjectCard project={stubProject} onClick={handleClickProject} />
-          <ProjectCard project={stubProject} onClick={handleClickProject} />
-          <ProjectCard project={stubProject} onClick={handleClickProject} />
+          {recc.map(project => (
+            <ProjectCard project={project} />
+          ))}
         </div>
       </div>
     </>

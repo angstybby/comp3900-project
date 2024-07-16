@@ -1,4 +1,5 @@
 import { InterestStatus, PrismaClient } from "@prisma/client";
+import { CombinedProject } from "../utils/project.utils";
 
 const prisma = new PrismaClient();
 
@@ -207,4 +208,45 @@ export const dbGetProjectByTitle = async (projectId: number) => {
             id: projectId,
         },
     });
+};
+
+export const dbGetProjectByName = async (name: string) => {
+    return await prisma.project.findUnique({
+        where: {
+            title: name,
+        },
+        select: {
+            id: true,
+            title: true,
+            description: true,
+        },
+    });
+};
+
+export const dbGetAllProjectsWithSkills = async () => {
+    const returnProjects: CombinedProject[] = [];
+    const projects = await prisma.project.findMany({
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            projectOwnerId: true,
+        },
+    });
+    for (const project of projects) {
+        const tempProject: CombinedProject = project;
+        const skills = await prisma.skills.findMany({
+            where: {
+                Project: {
+                    some: {
+                        id: project.id,
+                    },
+                },
+            },
+        });
+        const skillNames = skills.map((skill) => skill.skillName);
+        tempProject["skills"] = skillNames;
+        returnProjects.push(tempProject);
+    }
+    return returnProjects;
 };
