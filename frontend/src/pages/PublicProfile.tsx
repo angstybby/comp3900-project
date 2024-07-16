@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { axiosInstanceWithAuth } from '@/api/Axios';
+import placeholderImage from '/random-image.webp'; // Ensure you have a placeholder image in your assets
 
 export default function PublicProfile() {
   const { zId } = useParams();
@@ -25,14 +26,14 @@ export default function PublicProfile() {
   }, [zId]);
 
   return (
-    <div className="h-screen flex items-center justify-start flex-col">
-      <h1 className="text-3xl font-semibold text-center mt-10">Profile</h1>
+    <div className="h-screen flex items-center justify-center flex-col">
+      <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
       <div className="flex flex-col items-center justify-center mt-10 relative group">
-        <div className="relative w-32 h-32">
+        <div className="relative w-32 h-32 overflow-hidden rounded-full bg-gray-200">
           <img
-            src={profileData.profilePicture}
+            src={profileData.profilePicture || placeholderImage}
             alt="Profile Picture"
-            className="w-full h-full rounded-full"
+            className="w-full h-full object-cover"
           />
         </div>
         <h2 className="text-2xl font-semibold mt-4">{profileData.fullname}</h2>
