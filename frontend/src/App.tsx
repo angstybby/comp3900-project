@@ -18,6 +18,7 @@ import ProjectDetails from './pages/ProjectDetails'
 import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
 import GroupDetails from './pages/GroupDetails'
+import PublicProfile from '@/pages/PublicProfile';
 
 
 
@@ -33,6 +34,7 @@ function App() {
               <Route path={`/groups`} element={<Groups />} />
               <Route path={`/projects`} element={<Projects />} />
               <Route path={`/profile`} element={<Profile />} />
+              <Route path={`/profile/:zId`} element={<PublicProfile />} />
               <Route path={`/notifications`} element={<Notification />} />
               <Route path={`/course/:courseId`} element={<CourseDetails />} />
               <Route path={`/project/:projectId`} element={<ProjectDetails />} />
