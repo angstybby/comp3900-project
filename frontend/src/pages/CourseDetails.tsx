@@ -6,10 +6,14 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 
+
+interface Skills {
+  skillName: string;
+}
 interface CourseDetails {
   id: string;
   courseName: string;
-  skills: string[];
+  skills: Skills[];
   summary: string;
 }
 
@@ -34,6 +38,7 @@ const CourseDetails = () => {
         summary: response.data.summary,
       }
       setCourseDetails(details);
+      console.log('Course details:', details);
     } catch (error) {
       console.error('Failed to fetch course details:', error);
     }
@@ -48,9 +53,9 @@ const CourseDetails = () => {
 
   return (
     <>
-      <EditCourseDetailsModal 
-        open={open} 
-        close={openCloseModal} 
+      <EditCourseDetailsModal
+        open={open}
+        close={openCloseModal}
         courseId={courseId}
         refetchData={fetchDetails}
         initialValues={{
@@ -77,19 +82,19 @@ const CourseDetails = () => {
           <p className="mb-5">{courseDetails.summary ? courseDetails.summary : 'No summary for this course.'}</p>
           <p className="font-bold">Course Skills:</p>
           <div>
-            {courseDetails.skills.length > 0 && courseDetails.skills[0] !== '' ? 
-            (
-              courseDetails.skills.filter(skill => skill).map((skill, index) => (
-                <p key={index} className="">{`\u2022 ${skill}`}</p>
-              ))
-            )
-            : 
-            'No skills found for this course'}
-          </div> 
+            {courseDetails.skills.length > 0 ?
+              (
+                courseDetails.skills.filter(skill => skill).map((skill, index) => (
+                  <p key={index} className="">{`\u2022 ${skill.skillName}`}</p>
+                ))
+              )
+              :
+              'No skills found for this course'}
+          </div>
         </div>
-        
-        {userType === 'student' ? <CourseDetailsActions courseId={courseDetails.id}/> : <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />}
-      </div>    
+
+        {userType === 'student' ? <CourseDetailsActions courseId={courseDetails.id} /> : <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />}
+      </div>
     </>
   )
 }

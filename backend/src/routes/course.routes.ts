@@ -37,7 +37,7 @@ router.post("/search", async (req, res) => {
     if (!name) {
         return res.status(400).send("No search string provided");
     }
-	const offsetStr = req.query.offset as string;
+    const offsetStr = req.query.offset as string;
     let offset = 0;
     if (offsetStr !== undefined) {
         offset = parseInt(offsetStr);
@@ -55,21 +55,21 @@ router.post("/search", async (req, res) => {
  * @returns {Response} A response object containing the matching courses.
  */
 router.post("/searchExc", async (req, res) => {
-	const customReq = req as CustomRequest;
-	if (!customReq.token || typeof customReq.token === "string") {
-		throw new Error("Token is not valid");
-	}
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
 
-	const zid = customReq.token.zid;
-	const { name } = req.body;
+    const zid = customReq.token.zid;
+    const { name } = req.body;
 
-	try {
-		const courses = await dbFindCourseByStringExcTaken(name, zid);
-		res.status(200).send(courses);
-	} catch (error) {
-		console.log(error);
-		res.status(500).send("An error occurred while searching for courses");
-	}
+    try {
+        const courses = await dbFindCourseByStringExcTaken(name, zid);
+        res.status(200).send(courses);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error occurred while searching for courses");
+    }
 });
 /**
  * @route POST /course/add
@@ -85,7 +85,7 @@ router.post("/add", async (req, res) => {
     if (!customReq.token || typeof customReq.token === "string") {
         throw new Error("Token is not valid");
     }
-    
+
     const course = req.body.id;
     const zid = customReq.token.zid;
 
@@ -195,6 +195,7 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
             summary: courseSummary,
             skills: courseSkills,
         };
+
         res.status(200).send(response);
     } catch (error) {
         console.log(error);
