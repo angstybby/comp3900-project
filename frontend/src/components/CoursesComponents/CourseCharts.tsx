@@ -41,7 +41,7 @@ const CourseCharts: React.FC = () => {
   };
 
   return (
-    <div className="mt-8 flex">
+    <div className="flex">
       <Radar data={radarData}></Radar>
     </div>
   )

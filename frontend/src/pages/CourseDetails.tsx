@@ -95,8 +95,11 @@ const CourseDetails = () => {
               :
               'No skills found for this course'}
           </div>
+          
         </div>
-
+        <div>
+          <CourseCharts/>
+        </div>
         {userType === 'student' ? <CourseDetailsActions courseId={courseDetails.id} /> : <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />}
       </div>
     </>
