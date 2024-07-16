@@ -110,20 +110,20 @@ export default function Profile() {
 
   const profileLink = `${window.location.origin}/profile/${profileData.zid}`;
 
-  const copyLinkToClipboard = () => {
-    navigator.clipboard.writeText(profileLink).then(() => {
-      toast.success("Link copied to clipboard!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+const copyLinkToClipboard = () => {
+  navigator.clipboard.writeText(profileLink).then(() => {
+    toast.success("Link copied to clipboard!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
     });
-  };
-
+  });
+};
+  
   return (
     <div className="h-screen flex items-center justify-start flex-col">
       <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
