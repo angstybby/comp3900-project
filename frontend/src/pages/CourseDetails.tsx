@@ -2,6 +2,7 @@ import { axiosInstanceWithAuth } from "@/api/Axios";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import CourseDetailsActions from "@/components/CoursesComponents/CourseDetailsActions";
 import EditCourseDetailsModal from "@/components/Modals/EditCourseDetailsModal";
+import CourseCharts from "@/components/CoursesComponents/CourseCharts";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
@@ -11,6 +12,7 @@ interface CourseDetails {
   courseName: string;
   skills: string[];
   summary: string;
+  popularity: number; //need to implement for fetching
 }
 
 const CourseDetails = () => {
@@ -22,6 +24,7 @@ const CourseDetails = () => {
     courseName: "",
     skills: [],
     summary: "",
+    popularity: 10, //STUB
   });
 
   const fetchDetails = async () => {
@@ -32,6 +35,7 @@ const CourseDetails = () => {
         courseName: response.data.courseName,
         skills: response.data.skills ? response.data.skills : [],
         summary: response.data.summary,
+        popularity: 10, //STUB
       }
       setCourseDetails(details);
     } catch (error) {
@@ -87,8 +91,11 @@ const CourseDetails = () => {
             'No skills found for this course'}
           </div> 
         </div>
-        
+        <div className="">
+          <CourseCharts />
+        </div>
         {userType === 'student' ? <CourseDetailsActions courseId={courseDetails.id}/> : <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />}
+        
       </div>    
     </>
   )
