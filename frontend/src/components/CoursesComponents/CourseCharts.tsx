@@ -27,7 +27,6 @@ const CourseCharts: React.FC = () => {
         label: 'Skill Level',
         data: skillLevels,
         backgroundColor: 'rgb(54, 162, 235)',
-        borderColor: 'black'
       },
       {
         label: 'Skill Importance',
