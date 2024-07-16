@@ -66,8 +66,9 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
       });
       refetchData();
       close();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error inviting users:', error);
+      setError(error.response.data.message);
     } finally {
       setLoading(false);
     }

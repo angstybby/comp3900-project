@@ -81,6 +81,13 @@ const GroupDetails = () => {
     navigate("/groups");
   }
 
+  const expressInterest = async () => {
+    const response = await axiosInstanceWithAuth.post("/group/express-interest", {
+      groupId: groupId,
+    })
+    console.log(response.data);
+  }
+
   useEffect(() => {
     const fetchDetails = async () => {
       const response = await axiosInstanceWithAuth.get(`/group/details/${groupId}`, {
