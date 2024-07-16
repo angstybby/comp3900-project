@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { dbSearchSkillByName } from "../models/skills.models";
+import { dbGenerateGapAnalysis, dbSearchSkillByName } from "../models/skills.models";
 
 const router = express.Router();
 
@@ -21,6 +21,18 @@ router.post("/search", async (req, res) => {
     } catch (error) {
         console.error("Error in /skill:", error);
         res.status(500).send("An error occurred while getting skills");
+    }
+});
+
+router.post("/gap-analysis", async (req, res) => {
+    const { groupId, projectId } = req.body;
+
+    try {
+        const result = await dbGenerateGapAnalysis(groupId, projectId);
+        res.status(200).send(result);
+    } catch (error) {
+        console.error("Error in /skill/gap-analysis:", error);
+        res.status(500).send("An error occurred while generating gap analysis");
     }
 });
 
