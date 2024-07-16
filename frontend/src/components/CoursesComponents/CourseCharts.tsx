@@ -13,7 +13,7 @@ ChartJS.register(
 )
 const CourseCharts: React.FC = () => {
   
-  const skillLabels = ['Javascript', 'Software design', 'Software testing', 'Object-Oriented', 'Another skill'];
+  const skillLabels = ['Javascript', 'Software design', 'Software testing', 'Object-Oriented', 'Most important Skill'];
   const skillLevels = ['3', '2', '5', '4', '3'];
   const skillImportance = ['1', '2', '4', '3', '5'];
   // const popularity = 50;
@@ -34,15 +34,16 @@ const CourseCharts: React.FC = () => {
         data: skillImportance,
         borderColor: 'rgb(255, 99, 132)',
       },
-    //   options: {
-    //     responsive: false,
-    //     elements: {
-    //        line: {
-    //           borderWidth: 3
-    //        }
-    //     }
-    //  },
+      
     ],
+    options: {
+      responsive: false,
+      elements: {
+         line: {
+            borderWidth: 3
+         }
+      }
+   },
   };
 
   return (
