@@ -1,6 +1,5 @@
 import "react-multi-carousel/lib/styles.css";
 import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
-import { useNavigate } from 'react-router-dom';
 
 // stubs
 const projects = [
@@ -33,7 +32,6 @@ const projects = [
 
 
 export default function Project() {
-  const navigate = useNavigate();
   return (
     <div className="h-screen flex justify-center">
       <div className="w-full flex flex-col p-14">
