@@ -1,5 +1,4 @@
-import CourseDetails from '@/pages/CourseDetails';
-import { Radar, Bar, Doughnut } from 'react-chartjs-2';
+import { Radar } from 'react-chartjs-2';
 import { Chart as ChartJS, Tooltip, Legend, RadialLinearScale, LineElement, PointElement, Filler } from 'chart.js';
 
 
@@ -12,7 +11,8 @@ ChartJS.register(
   Filler
 )
 const CourseCharts: React.FC = () => {
-  
+
+  //still stubs
   const skillLabels = ['Javascript', 'Software design', 'Software testing', 'Object-Oriented', 'Most important Skill'];
   const skillLevels = ['3', '2', '5', '4', '3'];
   const skillImportance = ['1', '2', '4', '3', '5'];
@@ -26,7 +26,7 @@ const CourseCharts: React.FC = () => {
       {
         label: 'Skill Level',
         data: skillLevels,
-        backgroundColor: 'rgb(54, 162, 235)',
+        backgroundColor: 'rgba(54, 162, 235, 0.5)',
       },
       {
         label: 'Skill Importance',
@@ -37,11 +37,6 @@ const CourseCharts: React.FC = () => {
     ],
     options: {
       responsive: false,
-      elements: {
-         line: {
-            borderWidth: 3
-         }
-      }
    },
   };
 
