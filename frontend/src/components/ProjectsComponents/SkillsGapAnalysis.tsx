@@ -73,9 +73,35 @@ export default function SkillsGapAnalysis() {
 
     return (
         <div>
-            <h1 className="text-2xl font-light">Your skills analysis for this project</h1> 
-            <div className="mt-8">
+            <h1 className="text-xl font-semibold pt-4">Your skills analysis for this project</h1> 
+            <div className="mt-8 flex">
                 <canvas ref={chartRef}/>
+            </div>
+            <div className="flex mt-8">
+                <div className="mr-4">
+                    <h2 className="font-semibold">Skills Required:</h2>
+                    <ul>
+                        {projectSkills.map(skill => (
+                            <li key={skill}>{skill}</li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="mr-4">
+                    <h2 className="font-semibold">Skills Possesed:</h2>
+                    <ul>
+                        {studentSkills.map(skill => (
+                            <li key={skill}>{skill}</li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="mr-4">
+                    <h2 className="font-semibold">Skills Lacking:</h2>
+                    <ul>
+                        {skillsGap.map(skill => (
+                            <li key={skill}>{skill}</li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );
