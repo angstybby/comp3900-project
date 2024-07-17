@@ -202,14 +202,6 @@ export const dbRejectGroupToProject = async (
     });
 };
 
-export const dbGetProjectByTitle = async (projectId: number) => {
-    return await prisma.project.findUnique({
-        where: {
-            id: projectId,
-        },
-    });
-};
-
 export const dbGetProjectByName = async (name: string) => {
     return await prisma.project.findUnique({
         where: {

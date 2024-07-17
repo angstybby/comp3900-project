@@ -50,7 +50,11 @@ export default function Register() {
       });
       const decoded: JwtUser = jwtDecode(getToken());
       Cookies.set('userType', decoded.userType);
-      navigate("/upload");
+      if (decoded.userType === 'student') {
+        navigate("/upload");
+      } else {
+        navigate("/dashboard")
+      }
     } catch (error: any) {
       console.log(error)
       if (error.response.status === 409) {

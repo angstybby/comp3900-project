@@ -21,3 +21,5 @@ export interface Details {
   groupOwnerName: string;
   CombinedSkills: string[];
 }
+
+export type UserType = "admin" | "student" | "academic" | null;

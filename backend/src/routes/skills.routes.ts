@@ -1,10 +1,24 @@
 import express, { Request, Response } from "express";
-import { dbGenerateGapAnalysis, dbSearchSkillByName } from "../models/skills.models";
+import {
+    dbGenerateGapAnalysis,
+    dbGetSkills,
+    dbSearchSkillByName,
+} from "../models/skills.models";
 
 const router = express.Router();
 
+router.get("/", async (req: Request, res: Response) => {
+    try {
+        const result = await dbGetSkills();
+        res.status(200).send(result);
+    } catch (error) {
+        console.error("Error in /skill:", error);
+        res.status(500).send("An error occurred while getting skills");
+    }
+});
+
 /**
- * @route GET /skill
+ * @route GET /skill/search
  * @desc Get the first 10 skills matching the search query
  * @access Private
  * @returns {Array} Array of skills

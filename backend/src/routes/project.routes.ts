@@ -4,7 +4,6 @@ import {
     dbAddProjectSkills,
     dbDeleteProject,
     dbDeleteProjectSkills,
-    dbGetProjectByTitle,
     dbGetAllProjectApplications,
     dbGetProject,
     dbGetProjects,
@@ -60,13 +59,15 @@ router.post("/add", async (req, res) => {
         return res.status(400).send("Missing fields");
     }
 
-    if (!(await dbGetProjectByTitle(title))) {
+    if ((await dbGetProjectByName(title)) !== null) {
         return res.status(400).send("Project with this title already exists");
     }
 
     if (!Array.isArray(skills)) {
         return res.status(400).send("Skills must be an array");
     }
+
+    console.log(skills);
 
     try {
         const projectId = await dbAddProject(zid, title, description, skills);
