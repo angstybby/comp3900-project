@@ -19,6 +19,7 @@ import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
 import GroupDetails from './pages/GroupDetails'
 import PublicProfile from '@/pages/PublicProfile';
+import ProjectApplications from './pages/ProjectApplications'
 
 
 
@@ -38,6 +39,7 @@ function App() {
               <Route path={`/notifications`} element={<Notification />} />
               <Route path={`/course/:courseId`} element={<CourseDetails />} />
               <Route path={`/project/:projectId`} element={<ProjectDetails />} />
+              <Route path={`/project/:projectId/applications`} element={<ProjectApplications />} />
               <Route path={`/group/:groupId`} element={<GroupDetails />} />
               <Route path={`/manage-users`} element={<Admin />} />
             </Route>

@@ -52,7 +52,7 @@ router.post("/add", async (req, res) => {
             return res.status(401).send("You are not an academic");
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).send("Failed fetching user type");
     }
 
@@ -70,14 +70,12 @@ router.post("/add", async (req, res) => {
         return res.status(400).send("Skills must be an array");
     }
 
-    console.log(skills);
-
     try {
         const projectId = await dbAddProject(zid, title, description, skills);
         const project = await dbGetProject(projectId);
         res.status(200).send(project);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(400).send("Failed adding project");
     }
 });
@@ -119,8 +117,67 @@ router.post("/delete", async (req, res) => {
         await dbDeleteProject(projectId);
         res.status(200).send("Project deleted");
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).send("Failed deleting project");
+    }
+});
+
+/**
+ * @route GET /projects/all
+ * @desc Fetches all projects. If user is a student, return projects of groups they are in.
+ *       If user is an academic, return projects they own. If user is an admin, return all projects
+ * @access Private
+ * @returns {Object} Projects
+ * @throws {400} If skip is not a number
+ * @throws {401} If user type is invalid
+ * @throws {500} If an error occurs while fetching projects
+ */
+router.get("/all", async (req: Request, res: Response) => {
+    // If student, return projects of groups they are in
+    // If academic, return projects they own
+    // If admin, return all projects
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+    try {
+        const skip = parseInt(req.query.skip as string);
+
+        if (!skip && skip !== 0) {
+            return res.status(400).send("Invalid skip value");
+        }
+
+        const userType = await getUserType(zid);
+        if (!userType) {
+            return res.status(401).send("User not found");
+        }
+
+        if (userType.userType === UserType.student) {
+            // Get projects of groups they are in
+            const projects = await dbGetUserJoinedProjects(zid, skip);
+
+            // Filter out groups with no projects and flatten the project array
+            const projectReturn = projects
+                .map((group) => group.group.Project)
+                .filter((projectArray) => projectArray.length > 0)
+                .flat();
+
+            return res.status(200).send(projectReturn);
+        } else if (userType.userType === UserType.academic) {
+            // Get projects they own
+            const projects = await dbGetProjectsOwnedByUser(zid, skip);
+            return res.status(200).send(projects);
+        } else if (userType.userType === UserType.admin) {
+            const projects = await dbGetProjects(skip);
+            return res.status(200).send(projects);
+        } else {
+            return res.status(401).send("Invalid user type");
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Failed fetching projects");
     }
 });
 
@@ -143,7 +200,7 @@ router.get("/:id", async (req, res) => {
         const project = await dbGetProject(id);
         res.status(200).send(project);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).send("Failed fetching project");
     }
 });
@@ -167,7 +224,7 @@ router.get("/", async (req, res) => {
     try {
         res.status(200).send(await dbGetProjects(skip));
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).send("Failed fetching projects");
     }
 });
@@ -199,7 +256,7 @@ router.get("/applications/:id", async (req: Request, res: Response) => {
         const result = await dbGetAllProjectApplications(id);
         res.status(200).send(result);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).send("Failed fetching project applications");
     }
 });
@@ -240,7 +297,7 @@ router.post("/add-skills", async (req: Request, res: Response) => {
         await dbAddProjectSkills(projectId, skillsArray);
         res.status(200).send("Skills added to project");
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).send("Failed adding skill to project");
     }
 });
@@ -277,7 +334,7 @@ router.post("/remove-skills", async (req: Request, res: Response) => {
         await dbDeleteProjectSkills(projectId, skillsArray);
         res.status(200).send("Skills removed from project");
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).send("Failed removing skill from project");
     }
 });
@@ -315,7 +372,7 @@ router.post("/accept", async (req: Request, res: Response) => {
         await dbAcceptGroupToProject(projectId, groupId);
         res.status(200).send("Group accepted");
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).send("Server Error");
     }
 });
@@ -353,69 +410,8 @@ router.post("/reject", async (req: Request, res: Response) => {
         await dbRejectGroupToProject(projectId, groupId);
         res.status(200).send("Group rejected");
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).send("Server Error");
-    }
-});
-
-/**
- * @route GET /projects/all
- * @desc Fetches all projects. If user is a student, return projects of groups they are in.
- *       If user is an academic, return projects they own. If user is an admin, return all projects
- * @access Private
- * @returns {Object} Projects
- * @throws {400} If skip is not a number
- * @throws {401} If user type is invalid
- * @throws {500} If an error occurs while fetching projects
- */
-router.get("/all", async (req: Request, res: Response) => {
-    // If student, return projects of groups they are in
-    // If academic, return projects they own
-    // If admin, return all projects
-
-    const customReq = req as CustomRequest;
-    if (!customReq.token || typeof customReq.token === "string") {
-        throw new Error("Token is not valid");
-    }
-
-    const zid = customReq.token.zid;
-
-    try {
-        const skip = parseInt(req.query.skip as string);
-
-        if (!skip && skip !== 0) {
-            return res.status(400).send("Invalid skip value");
-        }
-
-        const userType = await getUserType(zid);
-        if (!userType) {
-            return res.status(401).send("User not found");
-        }
-
-        if (userType.userType === UserType.student) {
-            // Get projects of groups they are in
-            const projects = await dbGetUserJoinedProjects(zid, skip);
-
-            // Filter out groups with no projects and flatten the project array
-            const projectReturn = projects
-                .map((group) => group.group.Project)
-                .filter((projectArray) => projectArray.length > 0)
-                .flat();
-
-            return res.status(200).send(projectReturn);
-        } else if (userType.userType === UserType.academic) {
-            // Get projects they own
-            const projects = await dbGetProjectsOwnedByUser(zid, skip);
-            return res.status(200).send(projects);
-        } else if (userType.userType === UserType.admin) {
-            const projects = await dbGetProjects(skip);
-            return res.status(200).send(projects);
-        } else {
-            return res.status(401).send("Invalid user type");
-        }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send("Failed fetching projects");
     }
 });
 
@@ -442,7 +438,7 @@ router.put("/update", async (req: Request, res: Response) => {
         await dbUpdateProject(projectId, title, description, skills);
         res.status(200).send("Project updated");
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).send("Failed updating project");
     }
 });

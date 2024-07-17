@@ -19,6 +19,7 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
                     name: searchTerm.trim()
                 });
             }
+            console.log(response.data);
             response.data.forEach((project: any) => {
                 project.id = parseInt(project.id);
             });
@@ -33,9 +34,9 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
         try {
             let response = { data: [] };
             if (!searchTerm) {
-                response = await axiosInstanceWithAuth.get(`/projects/all?offset=${startIndex}`);
+                response = await axiosInstanceWithAuth.get(`/projects/all?skip=${startIndex}`);
             } else {
-                response = await axiosInstanceWithAuth.post(`/projects/search?offset=${startIndex}`, {
+                response = await axiosInstanceWithAuth.post(`/projects/search?skip=${startIndex}`, {
                     name: searchTerm.trim(),
                 });
             }

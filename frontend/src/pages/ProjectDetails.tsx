@@ -6,6 +6,7 @@ import { axiosInstanceWithAuth } from "@/api/Axios";
 import { Project } from "@/utils/interfaces";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import EditProjectModal from "@/components/Modals/EditProjectModal";
+import ButtonPrimary from "@/components/Buttons/ButtonPrimary";
 
 const ProjectDetails = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -45,7 +46,6 @@ const ProjectDetails = () => {
     const fetchProjectDetails = async () => {
       try {
         const response = await axiosInstanceWithAuth.get(`/projects/${projectId}`);
-        console.log(response.data);
         setProject(response.data);
       } catch (error) {
         console.error('Failed to fetch project:', error);
@@ -64,21 +64,13 @@ const ProjectDetails = () => {
           {isProjectOwner && (
             <div className="flex flex-row gap-5">
               <ButtonUtility text="Edit Project" onClick={() => setEditProjectModalOpen(true)} />
-              <ButtonUtility classname="bg-orange-600 hover:bg-orange-800" text="Group Applications" onClick={() => { }} />
+              <ButtonPrimary classname="bg-orange-600 hover:bg-orange-800" text="Group Applications" url={`/project/${project.id}/applications`} />
             </div>
           )}
         </div>
         <div className="mt-8">
           <h2 className="text-2xl font-medium">Description</h2>
           <p className="mt-4 text-lg">{project?.description}</p>
-        </div>
-        <div className="mt-8">
-          <h2 className="text-2xl font-medium">Skills</h2>
-          <div className="flex flex-row gap-5 mt-4">
-            {project?.skills.map(skill => (
-              <div key={skill.id} className="bg-gray-200 p-2 rounded-lg">{skill.skillName}</div>
-            ))}
-          </div>
         </div>
         <div className="mt-8">
           <h2 className="text-2xl font-medium">Skills Gap Analysis</h2>
