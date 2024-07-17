@@ -15,7 +15,6 @@ import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 
 import { Project, Details } from "@/utils/interfaces";
-import { set } from "zod";
 import LoadingCircle from "@/components/LoadingCircle";
 
 const GroupDetails = () => {

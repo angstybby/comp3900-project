@@ -140,6 +140,56 @@ export const dbGetProjects = async (skip: number) => {
     });
 };
 
+// Get all projects a user is a part of based on groups and have a limit of 25 and a skip value
+export const dbGetUserJoinedProjects = async (
+    zid: string,
+    skip: number = 0,
+) => {
+    return await prisma.groupJoined.findMany({
+        where: {
+            zid: zid,
+        },
+        select: {
+            group: {
+                select: {
+                    Project: {
+                        include: {
+                            ProjectOwner: true,
+                            skills: {
+                                select: {
+                                    id: true,
+                                    skillName: true,
+                                },
+                            },
+                        },
+                        skip: skip,
+                        take: 25,
+                    },
+                },
+            },
+        },
+    });
+};
+
+export const dbGetProjectsOwnedByUser = async (zid: string, skip: number) => {
+    return await prisma.project.findMany({
+        skip,
+        take: 25,
+        where: {
+            projectOwnerId: zid,
+        },
+        include: {
+            ProjectOwner: true,
+            skills: {
+                select: {
+                    id: true,
+                    skillName: true,
+                },
+            },
+        },
+    });
+};
+
 export const dbAcceptGroupToProject = async (
     groupId: number,
     projectId: number,

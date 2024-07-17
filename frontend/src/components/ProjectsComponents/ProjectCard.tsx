@@ -13,7 +13,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         navigate(`/project/${project.id}`);
     }
     return (
-        <div className="h-32 bg-gray-200 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-80 hover:cursor-pointer"
+        <div className="h-40 bg-gray-100 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-full hover:cursor-pointer transition duration-150 shadow-lg"
             onClick={onClick}
         >
             <div className="text-start flex flex-col gap-1">
