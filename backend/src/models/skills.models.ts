@@ -17,3 +17,41 @@ export const dbSearchSkillByName = async (skillName: string) => {
     });
 };
 
+export const dbGenerateGapAnalysis = async (
+    groupId: number,
+    projectId: number,
+) => {
+    const group = await prisma.group.findUnique({
+        where: {
+            id: groupId,
+        },
+        include: {
+            CombinedSkills: true,
+        },
+    });
+
+    if (!group) {
+        throw new Error("Group not found");
+    }
+
+    const groupSkills = group.CombinedSkills.map((skill) => skill);
+
+    const project = await prisma.project.findUnique({
+        where: {
+            id: projectId,
+        },
+        include: {
+            skills: true,
+        },
+    });
+
+    if (!project) {
+        throw new Error("Project not found");
+    }
+    const projectSkills = project.skills.map((skill) => skill);
+
+    const matchingSkills = projectSkills.filter((skill) => groupSkills.includes(skill));
+    const unmatchedSkills = projectSkills.filter((skill) => !groupSkills.includes(skill));
+
+    return {matchingSkills, unmatchedSkills};
+};

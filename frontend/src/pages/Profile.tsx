@@ -8,12 +8,12 @@ import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
 import { Options } from "browser-image-compression";
 import imageCompression from "browser-image-compression";
 import { useProfile } from "@/contexts/ProfileContext";
-import ShareButton from "@/components/Buttons/ShareButton";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const stubLink = "https://youtube.com";
   const [editProfileInfo, setEditProfileInfo] = useState({
     zid: "",
     profilePicture: "",
@@ -26,9 +26,6 @@ export default function Profile() {
   const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  /**
-   * Two useEffects used to get the profile data from the context and apply it to the edit modal
-   */
   useEffect(() => {
     fetchProfileData();
   }, []);
@@ -41,31 +38,20 @@ export default function Profile() {
         fullname: profileData.fullname || '',
         description: profileData.description || '',
         resume: profileData.resume || '',
-      })
+      });
     }
-  }, [profileData])
+  }, [profileData]);
 
-  /**
-   * Handles the changing and editing of profile details
-   * @param e 
-   */
   const handleEditProfileChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { id, value } = e.target;
-    // if (id === 'description') {
-    //   console.log(value.length);
-    // }
     setEditProfileInfo((prevData) => ({
       ...prevData,
       [id]: value,
     }));
   };
 
-  /**
-   * Handles the saving profile details
-   * @param e 
-   */
   const handleSaveEditProfile = async (e: FormEvent) => {
     e.preventDefault();
     try {
@@ -87,38 +73,23 @@ export default function Profile() {
     setShowEditProfileModal(false);
   };
 
-  /**
-   * Code for handling selected file change. NOTE THAT THIS DOES NOT SUBMIT THE CHANGE
-   * Function for handling the submit is handleSaveProfilePic
-   * 
-   * @param e 
-   * @returns {void}
-   */
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Compress the image to 5mb at most
-    const imageOptions: Options = { maxSizeMB: 5 }
+    const imageOptions: Options = { maxSizeMB: 5 };
     imageCompression(file, imageOptions)
-      .then(compressed => { setSelectedFile(compressed) })
-      .catch(error => { console.log(error) })
+      .then(compressed => { setSelectedFile(compressed); })
+      .catch(error => { console.log(error); });
     return;
   };
 
-  /**
-   * Function to submit the new profile pic and save the change. 
-   * 
-   * @param e 
-   * @returns {void}
-   */
   const handleSaveProfilePic = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
     if (!selectedFile) {
-      alert('Please select a file!')
+      alert('Please select a file!');
       return;
     }
-    // Change the selected image to string data (base64)
-    const imageDataURL = await imageCompression.getDataUrlFromFile(selectedFile)
+    const imageDataURL = await imageCompression.getDataUrlFromFile(selectedFile);
     try {
       setLoading(true);
       await axiosInstanceWithAuth.put('/profile/update-profile', {
@@ -126,17 +97,33 @@ export default function Profile() {
         profilePicture: imageDataURL,
         fullname: profileData.fullname,
         description: profileData.description,
-        resume: profileData.resume
+        resume: profileData.resume,
       });
       updateProfileContext();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
     setLoading(false);
     setShowChangeProfPicModal(false);
     return;
   }
 
+  const profileLink = `${window.location.origin}/profile/${profileData.zid}`;
+
+const copyLinkToClipboard = () => {
+  navigator.clipboard.writeText(profileLink).then(() => {
+    toast.success("Link copied to clipboard!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  });
+};
+  
   return (
     <div className="h-screen flex items-center justify-start flex-col">
       <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
@@ -168,9 +155,12 @@ export default function Profile() {
 
       <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
         <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
-        <ShareButton link={stubLink} />
+        <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Share
+        </button>
       </div>
 
+      <ToastContainer />
 
       {/* Edit profile details modal */}
       {showEditProfileModal && (
@@ -183,7 +173,6 @@ export default function Profile() {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Edit Profile
               </h3>
-              {/* Button to Exit the Modal */}
               <button
                 type="button"
                 className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"

@@ -34,15 +34,15 @@ const CourseCharts: React.FC = () => {
         data: skillImportance,
         borderColor: 'rgb(255, 99, 132)',
       },
-      
+
     ],
     options: {
       responsive: false,
-   },
+    },
   };
 
   return (
-    <div className="mt-8 flex">
+    <div className="flex">
       <Radar data={radarData}></Radar>
     </div>
   )

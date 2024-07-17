@@ -35,8 +35,8 @@ export default function Project() {
   return (
     <div className="h-screen flex justify-center">
       <div className="w-full flex flex-col p-14">
-        <div className="h-2/3">
-          <h1 className="text-4xl font-medium pb-8">Projects</h1>
+        <div className="h-1/2">
+          <h1 className="text-4xl font-medium pb-8">Your Projects</h1>
           <div className="w-[90%] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
               <ProjectCard key={project.id} project={project} />

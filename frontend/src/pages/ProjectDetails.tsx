@@ -34,7 +34,7 @@ const ProjectDetails = () => {
         <p className="mt-4 text-lg">{project.description}</p>
       </div>
       <div className="mt-8">
-        <h2 className="text-2xl font-medium">Skills Gap</h2>
+        <h2 className="text-2xl font-medium">Skills Gap Analysis</h2>
         <SkillsGapAnalysis/>
       </div>
     </div>
