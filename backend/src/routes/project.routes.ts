@@ -12,65 +12,14 @@ import {
     dbGetProjectByName,
     dbGetUserJoinedProjects,
     dbGetProjectsOwnedByUser,
+    dbUpdateProject,
 } from "../models/project.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { isProjectOwner } from "../utils/project.utils";
 import { getUserType } from "../models/profile.models";
 import { UserType } from "@prisma/client";
-import { dbGetUserInGroup } from "../models/group.models";
 
 const router = express.Router();
-
-router.get("/all", async (req: Request, res: Response) => {
-    // If student, return projects of groups they are in
-    // If academic, return projects they own
-    // If admin, return all projects
-
-    const customReq = req as CustomRequest;
-    if (!customReq.token || typeof customReq.token === "string") {
-        throw new Error("Token is not valid");
-    }
-
-    const zid = customReq.token.zid;
-
-    try {
-        const skip = parseInt(req.query.skip as string);
-
-        if (!skip && skip !== 0) {
-            return res.status(400).send("Invalid skip value");
-        }
-
-        const userType = await getUserType(zid);
-        if (!userType) {
-            return res.status(401).send("User not found");
-        }
-
-        if (userType.userType === UserType.student) {
-            // Get projects of groups they are in
-            const projects = await dbGetUserJoinedProjects(zid, skip);
-
-            // Filter out groups with no projects and flatten the project array
-            const projectReturn = projects
-                .map((group) => group.group.Project)
-                .filter((projectArray) => projectArray.length > 0)
-                .flat();
-
-            return res.status(200).send(projectReturn);
-        } else if (userType.userType === UserType.academic) {
-            // Get projects they own
-            const projects = await dbGetProjectsOwnedByUser(zid, skip);
-            return res.status(200).send(projects);
-        } else if (userType.userType === UserType.admin) {
-            const projects = await dbGetProjects(skip);
-            return res.status(200).send(projects);
-        } else {
-            return res.status(401).send("Invalid user type");
-        }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send("Failed fetching projects");
-    }
-});
 
 /**
  * @route POST /projects/add
@@ -406,6 +355,95 @@ router.post("/reject", async (req: Request, res: Response) => {
     } catch (error) {
         console.log(error);
         res.status(500).send("Server Error");
+    }
+});
+
+/**
+ * @route GET /projects/all
+ * @desc Fetches all projects. If user is a student, return projects of groups they are in.
+ *       If user is an academic, return projects they own. If user is an admin, return all projects
+ * @access Private
+ * @returns {Object} Projects
+ * @throws {400} If skip is not a number
+ * @throws {401} If user type is invalid
+ * @throws {500} If an error occurs while fetching projects
+ */
+router.get("/all", async (req: Request, res: Response) => {
+    // If student, return projects of groups they are in
+    // If academic, return projects they own
+    // If admin, return all projects
+
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+
+    try {
+        const skip = parseInt(req.query.skip as string);
+
+        if (!skip && skip !== 0) {
+            return res.status(400).send("Invalid skip value");
+        }
+
+        const userType = await getUserType(zid);
+        if (!userType) {
+            return res.status(401).send("User not found");
+        }
+
+        if (userType.userType === UserType.student) {
+            // Get projects of groups they are in
+            const projects = await dbGetUserJoinedProjects(zid, skip);
+
+            // Filter out groups with no projects and flatten the project array
+            const projectReturn = projects
+                .map((group) => group.group.Project)
+                .filter((projectArray) => projectArray.length > 0)
+                .flat();
+
+            return res.status(200).send(projectReturn);
+        } else if (userType.userType === UserType.academic) {
+            // Get projects they own
+            const projects = await dbGetProjectsOwnedByUser(zid, skip);
+            return res.status(200).send(projects);
+        } else if (userType.userType === UserType.admin) {
+            const projects = await dbGetProjects(skip);
+            return res.status(200).send(projects);
+        } else {
+            return res.status(401).send("Invalid user type");
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send("Failed fetching projects");
+    }
+});
+
+router.put("/update", async (req: Request, res: Response) => {
+    const { projectId, title, description, skills } = req.body;
+    if (!projectId || !title || !description || !skills) {
+        return res.status(400).send("Missing fields");
+    }
+
+    // need to do checks
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+
+    if (!(await isProjectOwner(zid, projectId))) {
+        return res.status(401).send("You are not the owner of this project");
+    }
+
+    try {
+        // Update project
+        await dbUpdateProject(projectId, title, description, skills);
+        res.status(200).send("Project updated");
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Failed updating project");
     }
 });
 

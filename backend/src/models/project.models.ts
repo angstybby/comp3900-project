@@ -292,3 +292,39 @@ export const dbGetAllProjectsWithSkills = async () => {
     }
     return returnProjects;
 };
+
+export const dbUpdateProject = async (
+    projectId: number,
+    title: string,
+    description: string,
+    skills: number[],
+) => {
+    await prisma.project.update({
+        where: {
+            id: projectId,
+        },
+        data: {
+            title: title,
+            description: description,
+        },
+    });
+
+    const currentSkills = await prisma.project.findUnique({
+        where: { id: projectId },
+        select: { skills: { select: { id: true } } },
+    });
+
+    const currentSkillIds =
+        currentSkills?.skills.map((skill) => skill.id) || [];
+
+    // Determine which skills to add and which to remove
+    const skillsToAdd = skills.filter(
+        (skillId) => !currentSkillIds.includes(skillId),
+    );
+    const skillsToRemove = currentSkillIds.filter(
+        (skillId) => !skills.includes(skillId),
+    );
+
+    await dbAddProjectSkills(projectId, skillsToAdd);
+    await dbDeleteProjectSkills(projectId, skillsToRemove);
+};

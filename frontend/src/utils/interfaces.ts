@@ -8,7 +8,14 @@ export interface JwtUser {
 export interface Project {
   id: number;
   title: string;
-  description: string | null;
+  description: string;
+  ProjectOwner: {
+    zid: string;
+  };
+  skills: {
+    id: number;
+    skillName: string;
+  }[];
 }
 
 export interface Details {
