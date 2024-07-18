@@ -662,6 +662,7 @@ export const dbGetGroup = async (groupId: number) => {
                         skillName: true,
                     },
                 },
+                Project: true,
             },
         });
 

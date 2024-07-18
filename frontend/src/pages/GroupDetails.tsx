@@ -2,7 +2,7 @@ import { axiosInstanceWithAuth } from "@/api/Axios";
 
 import { useCallback, useEffect, useState } from "react";
 
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 
 import { useProfile } from "@/contexts/ProfileContext";
 
@@ -26,7 +26,8 @@ const GroupDetails = () => {
     members: 0,
     MaxMembers: 0,
     groupOwnerName: "",
-    CombinedSkills: []
+    CombinedSkills: [],
+    Project: []
   });
   const [recc, setRecc] = useState<Project[]>([]);
   const [editModal, setEditModal] = useState(false);
@@ -68,8 +69,11 @@ const GroupDetails = () => {
 
   useEffect(() => {
     fetchDetails();
+  }, [fetchDetails]);
+
+  useEffect(() => {
     checkUserInGroup();
-  }, [fetchDetails, checkUserInGroup]);
+  }, [checkUserInGroup]);
 
   const leaveGroup = async () => {
     try {
@@ -139,7 +143,9 @@ const GroupDetails = () => {
             (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recc.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
+                  <Link key={project.id} to={`/group/${groupId}/project/${project.id}`}>
+                    <ProjectCard project={project} />
+                  </Link>
                 ))}
               </div>
             )

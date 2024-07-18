@@ -27,6 +27,7 @@ export interface Details {
   MaxMembers: number;
   groupOwnerName: string;
   CombinedSkills: string[];
+  Project: Project[];
 }
 
 export type UserType = "admin" | "student" | "academic" | null;
