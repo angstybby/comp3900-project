@@ -222,17 +222,17 @@ export const dbAcceptGroupToProject = async (
     });
 
     // update all other applications
-    await prisma.projectInterest.updateMany({
-        where: {
-            projectId,
-            groupId: {
-                not: groupId,
-            },
-        },
-        data: {
-            status: InterestStatus.DENIED,
-        },
-    });
+    // await prisma.projectInterest.updateMany({
+    //     where: {
+    //         projectId,
+    //         groupId: {
+    //             not: groupId,
+    //         },
+    //     },
+    //     data: {
+    //         status: InterestStatus.DENIED,
+    //     },
+    // });
 };
 
 export const dbRejectGroupToProject = async (

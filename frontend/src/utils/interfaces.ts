@@ -16,6 +16,11 @@ export interface Project {
     id: number;
     skillName: string;
   }[];
+  ProjectInterest: {
+    groupId: number;
+    projectId: number;
+    status: string;
+  }[];
 }
 
 export interface Details {
@@ -31,3 +36,5 @@ export interface Details {
 }
 
 export type UserType = "admin" | "student" | "academic" | null;
+
+export type ProjectStatus = "PENDING" | "ACCEPTED" | "REJECTED" | null;

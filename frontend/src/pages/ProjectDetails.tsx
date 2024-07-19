@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import SkillsGapAnalysis from "@/components/ProjectsComponents/SkillsGapAnalysis";
 import { useParams } from "react-router-dom";
 import { axiosInstanceWithAuth } from "@/api/Axios";
-import { Details, Project } from "@/utils/interfaces";
+import { Details, Project, ProjectStatus } from "@/utils/interfaces";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import EditProjectModal from "@/components/Modals/EditProjectModal";
 import ButtonPrimary from "@/components/Buttons/ButtonPrimary";
@@ -20,7 +20,8 @@ const ProjectDetails = () => {
     skills: [],
     ProjectOwner: {
       zid: "",
-    }
+    },
+    ProjectInterest: [],
   });
   const [groupDetail, setGroupDetail] = useState<Details>({
     id: 0,
@@ -33,6 +34,8 @@ const ProjectDetails = () => {
     CombinedSkills: [],
     Project: []
   });
+
+  const [projectStatus, setProjectStatus] = useState<ProjectStatus>(null);
 
   const [editProjectModalOpen, setEditProjectModalOpen] = useState(false);
   const [confirmApplyProjectModalOpen, setConfirmApplyProjectModalOpen] = useState(false);
@@ -51,7 +54,6 @@ const ProjectDetails = () => {
   }, [projectId]);
 
   const fetchGroupDetails = useCallback(async () => {
-    console.log(groupId)
     try {
       const response = await axiosInstanceWithAuth.get(`/group/details/${groupId}`);
       const skills = response.data.CombinedSkills.map((skill: { skillName: string }) => skill.skillName);
@@ -60,7 +62,14 @@ const ProjectDetails = () => {
 
       const projectGroup = response.data.Project.some((project: { id: number }) => project.id === projectDetail.id);
       setProjectInGroup(projectGroup);
-      console.log(projectGroup);
+
+      // Check if Project is still pending or rejected
+      const projectInterest = response.data.ProjectInterest
+        .filter((projectInterest: { projectId: number; }) => projectInterest.projectId === projectDetail.id);
+
+      if (projectInterest.length > 0) {
+        setProjectStatus(projectInterest[0].status as ProjectStatus);
+      }
 
       const groupOwner = response.data.groupOwnerId === profileData.zid;
       setIsGroupOwner(groupOwner);
@@ -69,12 +78,14 @@ const ProjectDetails = () => {
     } catch (error) {
       console.error("Error fetching group details:", error);
     }
-  }, [groupId]);
+  }, [groupId, projectDetail?.id, profileData.zid]);
 
   useEffect(() => {
     fetchProjectDetails();
     fetchGroupDetails();
-  }, []);
+    console.log(projectDetail);
+    console.log(groupDetail);
+  }, [fetchProjectDetails, fetchGroupDetails]);
 
   const openEditModal = () => {
     setEditProjectModalOpen(true);
@@ -109,8 +120,10 @@ const ProjectDetails = () => {
               <div>
                 {projectInGroup ? (
                   <ButtonUtility text="Leave Project" onClick={() => { }} />
+                ) : projectStatus === "PENDING" ? (
+                  <ButtonUtility classname="disabled:bg-orange-300" disabled={true} text="Application Pending" onClick={() => { }} />
                 ) : (
-                  <ButtonUtility text="Apply for Project" onClick={openApplyProjectModal} />
+                  <ButtonUtility text="Apply" onClick={openApplyProjectModal} />
                 )}
               </div>
             )

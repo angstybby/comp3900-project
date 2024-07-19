@@ -663,6 +663,7 @@ export const dbGetGroup = async (groupId: number) => {
                     },
                 },
                 Project: true,
+                ProjectInterest: true,
             },
         });
 
