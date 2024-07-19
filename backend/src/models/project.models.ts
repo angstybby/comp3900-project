@@ -104,6 +104,11 @@ export const dbGetAllProjectApplications = async (projectId: number) => {
                     },
                 },
             },
+            project: {
+                select: {
+                    title: true,
+                },
+            },
         },
     });
 };
@@ -208,6 +213,8 @@ export const dbAcceptGroupToProject = async (
     projectId: number,
 ) => {
     // update the group application status
+    console.log("project id", projectId);
+    console.log("group id", groupId);
     await prisma.projectInterest.update({
         where: {
             projectId_groupId: {

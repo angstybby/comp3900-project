@@ -350,7 +350,13 @@ router.post("/remove-skills", async (req: Request, res: Response) => {
  * @throws {500} If an error occurs while accepting group to project
  */
 router.post("/accept", async (req: Request, res: Response) => {
-    const { projectId, groupId } = req.body;
+    let { projectId, groupId } = req.body;
+
+    projectId = parseInt(projectId);
+    groupId = parseInt(groupId);
+
+    console.log(projectId, groupId);
+
     if (!projectId || !groupId) {
         return res.status(400).send("Missing fields");
     }
@@ -369,7 +375,7 @@ router.post("/accept", async (req: Request, res: Response) => {
 
     try {
         // Accept group
-        await dbAcceptGroupToProject(projectId, groupId);
+        await dbAcceptGroupToProject(groupId, projectId);
         res.status(200).send("Group accepted");
     } catch (error) {
         console.error(error);
@@ -388,7 +394,11 @@ router.post("/accept", async (req: Request, res: Response) => {
  * @throws {500} If an error occurs
  */
 router.post("/reject", async (req: Request, res: Response) => {
-    const { projectId, groupId } = req.body;
+    let { projectId, groupId } = req.body;
+
+    projectId = parseInt(projectId);
+    groupId = parseInt(groupId);
+
     if (!projectId || !groupId) {
         return res.status(400).send("Missing fields");
     }
@@ -407,7 +417,7 @@ router.post("/reject", async (req: Request, res: Response) => {
 
     try {
         // Accept group
-        await dbRejectGroupToProject(projectId, groupId);
+        await dbRejectGroupToProject(groupId, projectId);
         res.status(200).send("Group rejected");
     } catch (error) {
         console.error(error);

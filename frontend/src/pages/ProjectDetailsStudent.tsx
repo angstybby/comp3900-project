@@ -92,7 +92,7 @@ const ProjectDetailsStudent = () => {
 
   return (
     <>
-      <ApplyProjectConfirmationModal open={confirmApplyProjectModalOpen} close={closeApplyProjectModal} group={groupDetail} project={projectDetail} refetchData={fetchProjectDetails} />
+      <ApplyProjectConfirmationModal open={confirmApplyProjectModalOpen} close={closeApplyProjectModal} group={groupDetail} project={projectDetail} refetchData={fetchGroupDetails} />
       <div className="p-14">
         <div className="flex justify-between">
           <h1 className="text-4xl font-medium">{projectDetail?.title}</h1>
