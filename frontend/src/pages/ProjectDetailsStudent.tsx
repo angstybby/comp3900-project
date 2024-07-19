@@ -5,11 +5,9 @@ import { useParams } from "react-router-dom";
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import { Details, Project, ProjectStatus } from "@/utils/interfaces";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
-import EditProjectModal from "@/components/Modals/EditProjectModal";
-import ButtonPrimary from "@/components/Buttons/ButtonPrimary";
 import ApplyProjectConfirmationModal from "@/components/Modals/ApplyProjectConfirmation";
 
-const ProjectDetails = () => {
+const ProjectDetailsStudent = () => {
   const { groupId, projectId } = useParams();
   const { profileData } = useProfile();
 
@@ -37,12 +35,9 @@ const ProjectDetails = () => {
 
   const [projectStatus, setProjectStatus] = useState<ProjectStatus>(null);
 
-  const [editProjectModalOpen, setEditProjectModalOpen] = useState(false);
   const [confirmApplyProjectModalOpen, setConfirmApplyProjectModalOpen] = useState(false);
   const [projectInGroup, setProjectInGroup] = useState(false);
   const [isGroupOwner, setIsGroupOwner] = useState(false);
-
-  const isProjectOwner = projectDetail?.ProjectOwner.zid === profileData.zid;
 
   const fetchProjectDetails = useCallback(async () => {
     try {
@@ -87,14 +82,6 @@ const ProjectDetails = () => {
     console.log(groupDetail);
   }, [fetchProjectDetails, fetchGroupDetails]);
 
-  const openEditModal = () => {
-    setEditProjectModalOpen(true);
-  };
-
-  const closeEditModal = () => {
-    setEditProjectModalOpen(false);
-  };
-
   const openApplyProjectModal = () => {
     setConfirmApplyProjectModalOpen(true);
   }
@@ -106,28 +93,26 @@ const ProjectDetails = () => {
   return (
     <>
       <ApplyProjectConfirmationModal open={confirmApplyProjectModalOpen} close={closeApplyProjectModal} group={groupDetail} project={projectDetail} refetchData={fetchProjectDetails} />
-      <EditProjectModal open={editProjectModalOpen} close={closeEditModal} refetchData={fetchProjectDetails} initValues={projectDetail} />
       <div className="p-14">
         <div className="flex justify-between">
           <h1 className="text-4xl font-medium">{projectDetail?.title}</h1>
-          {isProjectOwner ? (
-            <div className="flex flex-row gap-5">
-              <ButtonUtility text="Edit Project" onClick={openEditModal} />
-              <ButtonPrimary classname="bg-orange-600 hover:bg-orange-800" text="Group Applications" url={`/project/${projectDetail.id}/applications`} />
+          {isGroupOwner && (
+            <div>
+              {projectInGroup ? (
+                <ButtonUtility text="Leave Project" onClick={() => { }} />
+              ) : projectStatus === "PENDING" ? (
+                <ButtonUtility
+                  classname="disabled:bg-orange-300"
+                  disabled={true}
+                  text="Application Pending"
+                  onClick={() => { }}
+                />
+              ) : (
+                <ButtonUtility text="Apply" onClick={openApplyProjectModal} />
+              )}
             </div>
-          ) : (
-            isGroupOwner && (
-              <div>
-                {projectInGroup ? (
-                  <ButtonUtility text="Leave Project" onClick={() => { }} />
-                ) : projectStatus === "PENDING" ? (
-                  <ButtonUtility classname="disabled:bg-orange-300" disabled={true} text="Application Pending" onClick={() => { }} />
-                ) : (
-                  <ButtonUtility text="Apply" onClick={openApplyProjectModal} />
-                )}
-              </div>
-            )
           )}
+
 
         </div>
         <div className="mt-8">
@@ -143,4 +128,4 @@ const ProjectDetails = () => {
   );
 };
 
-export default ProjectDetails;
+export default ProjectDetailsStudent;

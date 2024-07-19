@@ -2,6 +2,7 @@ import { axiosInstanceWithAuth } from "@/api/Axios";
 import { Project } from "@/utils/interfaces";
 import { useEffect, useRef, useState } from "react";
 import ProjectCard from "./ProjectCard";
+import { Link } from "react-router-dom";
 
 export default function ProjectList({ searchTerm }: { searchTerm: string }) {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -84,7 +85,9 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
             ) : (
                 <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12 ">
                     {projects.map((project) => (
-                        <ProjectCard key={project.id} project={project} />
+                        <Link key={project.id} to={`/project/${project.id}`}>
+                            <ProjectCard key={project.id} project={project} />
+                        </Link>
                     ))}
                 </div>
             )}

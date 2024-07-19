@@ -90,7 +90,20 @@ export const dbGetAllProjectApplications = async (projectId: number) => {
             projectId,
         },
         include: {
-            group: true,
+            group: {
+                select: {
+                    id: true,
+                    groupName: true,
+                    description: true,
+                    groupOwnerId: true,
+                    MaxMembers: true,
+                    CombinedSkills: {
+                        select: {
+                            skillName: true,
+                        },
+                    },
+                },
+            },
         },
     });
 };
