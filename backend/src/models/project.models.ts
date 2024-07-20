@@ -90,7 +90,25 @@ export const dbGetAllProjectApplications = async (projectId: number) => {
             projectId,
         },
         include: {
-            group: true,
+            group: {
+                select: {
+                    id: true,
+                    groupName: true,
+                    description: true,
+                    groupOwnerId: true,
+                    MaxMembers: true,
+                    CombinedSkills: {
+                        select: {
+                            skillName: true,
+                        },
+                    },
+                },
+            },
+            project: {
+                select: {
+                    title: true,
+                },
+            },
         },
     });
 };
@@ -140,11 +158,63 @@ export const dbGetProjects = async (skip: number) => {
     });
 };
 
+// Get all projects a user is a part of based on groups and have a limit of 25 and a skip value
+export const dbGetUserJoinedProjects = async (
+    zid: string,
+    skip: number = 0,
+) => {
+    return await prisma.groupJoined.findMany({
+        where: {
+            zid: zid,
+        },
+        select: {
+            group: {
+                select: {
+                    Project: {
+                        include: {
+                            ProjectOwner: true,
+                            skills: {
+                                select: {
+                                    id: true,
+                                    skillName: true,
+                                },
+                            },
+                        },
+                        skip: skip,
+                        take: 25,
+                    },
+                },
+            },
+        },
+    });
+};
+
+export const dbGetProjectsOwnedByUser = async (zid: string, skip: number) => {
+    return await prisma.project.findMany({
+        skip,
+        take: 25,
+        where: {
+            projectOwnerId: zid,
+        },
+        include: {
+            ProjectOwner: true,
+            skills: {
+                select: {
+                    id: true,
+                    skillName: true,
+                },
+            },
+        },
+    });
+};
+
 export const dbAcceptGroupToProject = async (
     groupId: number,
     projectId: number,
 ) => {
     // update the group application status
+    console.log("project id", projectId);
+    console.log("group id", groupId);
     await prisma.projectInterest.update({
         where: {
             projectId_groupId: {
@@ -172,17 +242,17 @@ export const dbAcceptGroupToProject = async (
     });
 
     // update all other applications
-    await prisma.projectInterest.updateMany({
-        where: {
-            projectId,
-            groupId: {
-                not: groupId,
-            },
-        },
-        data: {
-            status: InterestStatus.DENIED,
-        },
-    });
+    // await prisma.projectInterest.updateMany({
+    //     where: {
+    //         projectId,
+    //         groupId: {
+    //             not: groupId,
+    //         },
+    //     },
+    //     data: {
+    //         status: InterestStatus.DENIED,
+    //     },
+    // });
 };
 
 export const dbRejectGroupToProject = async (
@@ -198,14 +268,6 @@ export const dbRejectGroupToProject = async (
         },
         data: {
             status: InterestStatus.DENIED,
-        },
-    });
-};
-
-export const dbGetProjectByTitle = async (projectId: number) => {
-    return await prisma.project.findUnique({
-        where: {
-            id: projectId,
         },
     });
 };
@@ -249,4 +311,40 @@ export const dbGetAllProjectsWithSkills = async () => {
         returnProjects.push(tempProject);
     }
     return returnProjects;
+};
+
+export const dbUpdateProject = async (
+    projectId: number,
+    title: string,
+    description: string,
+    skills: number[],
+) => {
+    await prisma.project.update({
+        where: {
+            id: projectId,
+        },
+        data: {
+            title: title,
+            description: description,
+        },
+    });
+
+    const currentSkills = await prisma.project.findUnique({
+        where: { id: projectId },
+        select: { skills: { select: { id: true } } },
+    });
+
+    const currentSkillIds =
+        currentSkills?.skills.map((skill) => skill.id) || [];
+
+    // Determine which skills to add and which to remove
+    const skillsToAdd = skills.filter(
+        (skillId) => !currentSkillIds.includes(skillId),
+    );
+    const skillsToRemove = currentSkillIds.filter(
+        (skillId) => !skills.includes(skillId),
+    );
+
+    await dbAddProjectSkills(projectId, skillsToAdd);
+    await dbDeleteProjectSkills(projectId, skillsToRemove);
 };

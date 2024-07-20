@@ -539,10 +539,11 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
             )
             .join("\n");
 
-        const promptForAi = `This group currently has these skills: ${prompt}. Here are the current existing projects: ${stringProjects}. Based on this set of projects, recommend the three most suitable projects for this group. Format the response as a comma-separated list of ProjectId: <id>`;
+        const promptForAi = `This group currently has these skills: ${prompt}. Here are the current existing projects: ${stringProjects}. Based on this set of projects, recommend the three most suitable projects for this group. Format the response as a comma-separated list of project title for example: <title1>, <title2>, <title3>`;
 
         const chat = model.startChat();
         const result = await chat.sendMessage(promptForAi);
+
         const projectIds = result.response
             .text()
             .trim()

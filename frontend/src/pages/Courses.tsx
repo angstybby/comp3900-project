@@ -1,6 +1,5 @@
 import "react-multi-carousel/lib/styles.css";
 import CourseCard from "@/components/CoursesComponents/CourseCard";
-import { useNavigate } from 'react-router-dom';
 import Cookies from "js-cookie";
 import AddCourseModal from "@/components/Modals/AddCourseModal";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
@@ -14,7 +13,7 @@ import UploadModal from "@/components/Modals/UploadModal";
 interface Course {
   id: string;
   courseName: string;
-} 
+}
 
 type UserType = 'admin' | 'student' | 'academic' | null;
 
@@ -78,24 +77,26 @@ export default function Courses() {
               </div>
             )}
           </div>
-          <div className="mt-8">
-            <h2 className="text-2xl font-medium mb-4">Your Courses</h2>
-            {loading && 
-              <div className="flex justify-center my-5">
-                <LoadingCircle/>
+          {userType === 'student' &&
+            <div className="mt-8">
+              <h2 className="text-2xl font-medium mb-4">Your Courses</h2>
+              {loading &&
+                <div className="flex justify-center my-5">
+                  <LoadingCircle />
+                </div>
+              }
+              <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-5">
+                {userCourses.map((course) => (
+                  <CourseCard key={course.id} id={course.id} courseName={course.courseName} />
+                ))}
               </div>
-            }
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-5">
-              {userCourses.map((course) => (
-                <CourseCard key={course.id} id={course.id} courseName={course.courseName} />
-              ))}
             </div>
-          </div>
+          }
           <div className="w-[95%] my-5">
             <SearchBar onSearchTermChange={setSearchTerm} />
           </div>
           <h2 className="text-2xl font-medium mb-4">All courses</h2>
-          <CourseList searchTerm={searchTerm}/>
+          <CourseList searchTerm={searchTerm} />
         </div>
       </div>
     </div >

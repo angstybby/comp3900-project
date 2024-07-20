@@ -50,8 +50,21 @@ export const dbGenerateGapAnalysis = async (
     }
     const projectSkills = project.skills.map((skill) => skill);
 
-    const matchingSkills = projectSkills.filter((skill) => groupSkills.includes(skill));
-    const unmatchedSkills = projectSkills.filter((skill) => !groupSkills.includes(skill));
+    const matchingSkills = projectSkills.filter((skill) =>
+        groupSkills.includes(skill),
+    );
+    const unmatchedSkills = projectSkills.filter(
+        (skill) => !groupSkills.includes(skill),
+    );
 
-    return {matchingSkills, unmatchedSkills};
+    return { matchingSkills, unmatchedSkills };
+};
+
+export const dbGetSkills = async () => {
+    return await prisma.skills.findMany({
+        select: {
+            id: true,
+            skillName: true,
+        },
+    });
 };

@@ -1,5 +1,6 @@
 import { Radar } from 'react-chartjs-2';
 import { Chart as ChartJS, Tooltip, Legend, RadialLinearScale, LineElement, PointElement, Filler } from 'chart.js';
+import React from 'react';
 
 
 ChartJS.register(
@@ -33,11 +34,11 @@ const CourseCharts: React.FC = () => {
         data: skillImportance,
         borderColor: 'rgb(255, 99, 132)',
       },
-      
+
     ],
     options: {
       responsive: false,
-   },
+    },
   };
 
   return (

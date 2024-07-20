@@ -3,159 +3,59 @@ import {
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
-  Textarea
 } from '@headlessui/react';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { axiosInstanceWithAuth } from '@/api/Axios';
-import ButtonLoading from '../Buttons/ButtonLoading';
-import ButtonSubmit from '../Buttons/ButtonSubmit';
-import Textbox from '../Inputs/Textbox';
 
 interface EditGroupModalProps {
   open: boolean;
   close: () => void;
-  refetchData: () => void;
-  initValues: {
-    id: number;
-    groupName: string;
-    description: string;
-    members: number;
-    MaxMembers: number;
-  }
 }
 
-const EditGroupModal: React.FC<EditGroupModalProps> = ({ open, close, refetchData, initValues }) => {
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [form, setForm] = useState({
-    groupName: initValues.groupName,
-    groupDescription: initValues.description,
-    maxMembers: initValues.MaxMembers,
-  });
-
-  useEffect(() => {
-    if (open) {
-      setForm({
-        groupName: initValues.groupName,
-        groupDescription: initValues.description,
-        maxMembers: initValues.MaxMembers,
-      });
-    }
-  }, [open, initValues]);
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
-
-  const validateInputs = () => {
-    if (!form.groupName) return 'Group name is required';
-    if (form.maxMembers < 1 || form.maxMembers > 10) return 'Max members should be between 1 and 10';
-    if (initValues.members > form.maxMembers) return 'Max members should be greater than the current number of members';
-    return '';
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setErrorMessage('');
-
-    const validationError = validateInputs();
-    if (validationError) {
-      setErrorMessage(validationError);
-      return;
-    }
-    const data = {
-      groupId: initValues.id,
-      groupName: form.groupName,
-      description: form.groupDescription,
-      maxMembers: form.maxMembers,
-    }
-
-
-    setLoading(true);
-    try {
-      const response = await axiosInstanceWithAuth.put('/group/update', data);
-      if (response.status === 200) {
-        close(); // Close modal on successful creation
-        refetchData(); // Refetch data to update the UI
-      }
-    } catch (error: any) {
-      if (error.response.status === 400) {
-        setErrorMessage(error.response.data);
-      }
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const EditGroupModal: React.FC<EditGroupModalProps> = ({ open, close }) => {
   return (
-    <Dialog
-      open={open}
-      as="div"
-      className="relative z-[100] focus:outline-none transition duration-150 ease-out"
-      transition
-      onClose={() => {
-        close();
-      }}
-    >
+    <Dialog open={open} onClose={() => close()} className="relative z-10">
       <DialogBackdrop
-        className="fixed inset-0 bg-black/30 data-[closed]:opacity-0 duration-150 ease-out"
         transition
+        className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
       />
+
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div className="flex flex-wrap min-h-full items-center justify-center p-6">
+        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
           <DialogPanel
             transition
-            className="w-full max-w-2xl rounded-xl bg-white/60 p-6 px-8 backdrop-blur-2xl duration-150 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+            className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
           >
-            <form onSubmit={handleSubmit}>
-              <DialogTitle className='mb-5'>
-                <p className='font-bold text-2xl'>Create your Group!</p>
-                <p className='font-thin text-sm opacity-90 mt-1'>Each student can only create one group.</p>
-              </DialogTitle>
-              <p className="my-2 font-bold">Group Name (Required)</p>
-              <Textbox
-                placeholder={'Enter your group name...'}
-                id='groupName'
-                name='groupName'
-                value={form.groupName}
-                onChange={handleInputChange}
-                disabled={loading}
-              />
-              <p className="my-2 font-bold">Description (Required)</p>
-              <Textarea
-                placeholder={'Enter the description of your group...'}
-                id='groupDescription'
-                name='groupDescription'
-                className='block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-md sm:leading-6'
-                value={form.groupDescription}
-                onChange={handleInputChange}
-                autoComplete={'off'}
-                disabled={loading}
-              />
-              <p className="my-2 font-bold">Max Users (Required)</p>
-              <Textbox
-                id='maxMembers'
-                name='maxMembers'
-                type='number'
-                value={form.maxMembers}
-                onChange={handleInputChange}
-                max={10}
-                min={1}
-                disabled={loading}
-              />
-              {errorMessage && <p className='text-red-500 text-sm mt-2'>{errorMessage}</p>}
-
-
-              <div className='mt-5 flex justify-center'>
-                {loading ? (
-                  <ButtonLoading />
-                ) : (
-                  <ButtonSubmit text='Edit Details' />
-                )}
+            <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+              <div className="sm:flex sm:items-start">
+                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                    View Members
+                  </DialogTitle>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to deactivate your account? All of your data will be permanently removed.
+                      This action cannot be undone.
+                    </p>
+                  </div>
+                </div>
               </div>
-            </form>
+            </div>
+            <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+              <button
+                type="button"
+                onClick={() => close()}
+                className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+              >
+                Deactivate
+              </button>
+              <button
+                type="button"
+                data-autofocus
+                onClick={() => close()}
+                className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              >
+                Cancel
+              </button>
+            </div>
           </DialogPanel>
         </div>
       </div>
