@@ -21,16 +21,16 @@ interface Group {
   updatedAt: Date;
 }
 
-export default function ProjectGroupOptions() {
-//   {
-//   chooseOptions,
-// }: {
-//   chooseOptions: () => void;
-// }
+export default function ProjectGroupOptions({
+  chooseOptions,
+}: {
+  chooseOptions: (value: number) => void;
+}) {
   const [groups, setGroups] = useState<Group[]>([]);
 
   const handleChooseOptions = (value: string) => {
     console.log("Choose options", value);
+    chooseOptions(Number(value));
   };
 
   useEffect(() => {

@@ -1,34 +1,43 @@
 import { Chart } from "chart.js";
 import { useEffect, useRef, useState } from "react";
 import ProjectGroupOptions from "./ProjectGroupOptions";
+import { axiosInstanceWithAuth } from "@/api/Axios";
 
 interface SkillsGapAnalysisProps {
   projectId: number;
 }
 
+interface Skill {
+  id: number;
+  skillName: string;
+  createdAt: Date;
+}
+
 export default function SkillsGapAnalysis({
   projectId,
 }: SkillsGapAnalysisProps) {
-  const [projectSkills, setProjectSkills] = useState<string[]>([]);
-  const [studentSkills, setStudentSkills] = useState<string[]>([]);
+  const [projectSkills, setProjectSkills] = useState<Skill[]>([]);
+  const [studentSkills, setStudentSkills] = useState<Skill[]>([]);
   const [groupId, setGroupId] = useState<number>(-1);
-  const [skillsGap, setSkillsGap] = useState<string[]>([]);
+  const [skillsGap, setSkillsGap] = useState<Skill[]>([]);
   const chartRef = useRef<HTMLCanvasElement | null>(null);
 
-  //stubs
-  const projectSkillsStub = ["JavaScript", "React", "Node.js", "SQL"];
-
-  const studentSkillsStub = ["JavaScript", "HTML", "CSS"];
-
-  useEffect(() => {
-    setProjectSkills(projectSkillsStub);
-    setStudentSkills(studentSkillsStub);
-  }, []);
+  const chooseOptions = (value: number) => {
+    setGroupId(value);
+  };
 
   useEffect(() => {
-    const gap = projectSkills.filter((skill) => !studentSkills.includes(skill));
-    setSkillsGap(gap);
-  }, [projectSkills, studentSkills]);
+    if (groupId != -1) {
+      axiosInstanceWithAuth
+        .post("/skills/gap-analysis", { groupId, projectId })
+        .then((res) => {
+          setProjectSkills(res.data.projectSkills);
+          setStudentSkills(res.data.matchingSkills);
+          setSkillsGap(res.data.unmatchedSkills);
+          console.log(res.data);
+        });
+    }
+  }, [groupId]);
 
   useEffect(() => {
     if (chartRef.current && skillsGap.length > 0) {
@@ -69,7 +78,7 @@ export default function SkillsGapAnalysis({
       {groupId == -1 ? (
         <div>
           <h1>Please choose a group</h1>
-          <ProjectGroupOptions/>
+          <ProjectGroupOptions chooseOptions={chooseOptions} />
         </div>
       ) : (
         <p></p>
@@ -84,24 +93,24 @@ export default function SkillsGapAnalysis({
         <div className="mr-4">
           <h2 className="font-semibold">Skills Required:</h2>
           <ul>
-            {projectSkills.map((skill) => (
-              <li key={skill}>{skill}</li>
+            {projectSkills.map((skill, index) => (
+              <li key={`project-${skill.id}-${index}`}>{skill.skillName}</li>
             ))}
           </ul>
         </div>
         <div className="mr-4">
-          <h2 className="font-semibold">Skills Possesed:</h2>
+          <h2 className="font-semibold">Skills Possessed:</h2>
           <ul>
-            {studentSkills.map((skill) => (
-              <li key={skill}>{skill}</li>
+            {studentSkills.map((skill, index) => (
+              <li key={`student-${skill.id}-${index}`}>{skill.skillName}</li>
             ))}
           </ul>
         </div>
         <div className="mr-4">
           <h2 className="font-semibold">Skills Lacking:</h2>
           <ul>
-            {skillsGap.map((skill) => (
-              <li key={skill}>{skill}</li>
+            {skillsGap.map((skill, index) => (
+              <li key={`gap-${skill.id}-${index}`}>{skill.skillName}</li>
             ))}
           </ul>
         </div>
