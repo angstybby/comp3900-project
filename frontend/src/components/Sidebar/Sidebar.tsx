@@ -53,7 +53,9 @@ const Sidebar = () => {
         <div className='flex flex-col w-full gap-10 mt-14 mb-10'>
           <SidebarButton href='/dashboard' Icon={<HomeIcon />} text='Dashboard' />
           <SidebarButton href='/courses' text='Courses' Icon={<BookOpenIcon />} />
-          <SidebarButton href='/groups' text='Groups' Icon={<UserGroupIcon />} />
+          {Cookies.get('userType') !== 'academic' &&
+            <SidebarButton href='/groups' text='Groups' Icon={<UserGroupIcon />} />
+          }
           <SidebarButton href='/projects' text='Projects' Icon={<CalculatorIcon />} />
           <SidebarButton href='/profile' text='Profile' Icon={<UserIcon />} />
           {Cookies.get('userType') == 'admin' &&

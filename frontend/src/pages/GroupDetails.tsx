@@ -2,7 +2,7 @@ import { axiosInstanceWithAuth } from "@/api/Axios";
 
 import { useCallback, useEffect, useState } from "react";
 
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 
 import { useProfile } from "@/contexts/ProfileContext";
 
@@ -15,6 +15,7 @@ import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 
 import { Project, Details } from "@/utils/interfaces";
+import LoadingCircle from "@/components/LoadingCircle";
 
 const GroupDetails = () => {
   const [details, setDetails] = useState<Details>({
@@ -25,12 +26,14 @@ const GroupDetails = () => {
     members: 0,
     MaxMembers: 0,
     groupOwnerName: "",
-    CombinedSkills: []
+    CombinedSkills: [],
+    Project: []
   });
   const [recc, setRecc] = useState<Project[]>([]);
   const [editModal, setEditModal] = useState(false);
   const [inviteUserModal, setInviteUserModal] = useState(false);
   const [userInGroup, setUserInGroup] = useState(false);
+  const [projectLoading, setProjectLoading] = useState(false);
 
   const { groupId } = useParams<{ groupId: string }>();
   const { profileData } = useProfile();
@@ -46,8 +49,10 @@ const GroupDetails = () => {
       setDetails(response.data);
 
       // Get recommendations
+      setProjectLoading(true);
       const response2 = await axiosInstanceWithAuth.post('/group/get-reccs', { prompt: skills.join(',') });
       setRecc(response2.data);
+      setProjectLoading(false);
     } catch (error) {
       console.error("Error fetching group details:", error);
     }
@@ -64,8 +69,11 @@ const GroupDetails = () => {
 
   useEffect(() => {
     fetchDetails();
+  }, [fetchDetails]);
+
+  useEffect(() => {
     checkUserInGroup();
-  }, [fetchDetails, checkUserInGroup]);
+  }, [checkUserInGroup]);
 
   const leaveGroup = async () => {
     try {
@@ -126,12 +134,25 @@ const GroupDetails = () => {
 
         <p className="mt-10 text-2xl font-bold mb-5">{`Recommended Projects`}</p>
 
-        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5">
-          {recc.map(project => (
-            <ProjectCard project={project} />
-          ))}
+        <div>
+          {projectLoading ? (
+            <div className="w-full text-center">
+              <LoadingCircle />
+            </div>
+          ) :
+            (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {recc.map((project) => (
+                  <Link key={project.id} to={`/group/${groupId}/project/${project.id}`}>
+                    <ProjectCard project={project} />
+                  </Link>
+                ))}
+              </div>
+            )
+          }
+
         </div>
-      </div>
+      </div >
     </>
   )
 }

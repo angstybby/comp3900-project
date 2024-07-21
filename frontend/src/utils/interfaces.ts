@@ -8,7 +8,19 @@ export interface JwtUser {
 export interface Project {
   id: number;
   title: string;
-  description: string | null;
+  description: string;
+  ProjectOwner: {
+    zid: string;
+  };
+  skills: {
+    id: number;
+    skillName: string;
+  }[];
+  ProjectInterest: {
+    groupId: number;
+    projectId: number;
+    status: string;
+  }[];
 }
 
 export interface Details {
@@ -20,4 +32,9 @@ export interface Details {
   MaxMembers: number;
   groupOwnerName: string;
   CombinedSkills: string[];
+  Project: Project[];
 }
+
+export type UserType = "admin" | "student" | "academic" | null;
+
+export type ProjectStatus = "PENDING" | "ACCEPTED" | "REJECTED" | null;

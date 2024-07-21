@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom"
 interface ProjectCardProps {
     project: {
         id: number;
@@ -8,13 +7,8 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
-    const navigate = useNavigate();
-    const onClick = () => {
-        navigate(`/project/${project.id}`);
-    }
     return (
-        <div className="h-32 bg-gray-200 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-80 hover:cursor-pointer"
-            onClick={onClick}
+        <div className="h-40 bg-gray-100 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-full hover:cursor-pointer transition duration-150 shadow-lg"
         >
             <div className="text-start flex flex-col gap-1">
                 <div className="flex flex-row justify-between items-center">
