@@ -33,7 +33,22 @@ export default function Upload() {
             'Content-Type': 'multipart/form-data'
           }
         });
-        setScrapedText(response.data); // Assuming this contains the necessary data
+        // const extractedCourses = response.data.courses;
+        setScrapedText(response.data.text); // Assuming this contains the scraped text
+        console.log("scraped course: %s", scrapedText);
+        console.log("selected course: %s", selectedCourses);
+
+        // // Add the extracted courses to selectedCourses
+        // setSelectedCourses((prevCourses) => {
+        //   const newCourses = extractedCourses.filter((newCourse: Course) =>
+        //     !prevCourses.some((course) => course.id === newCourse.id)
+        //   );
+        //   console.log("============================");
+        //   console.log(newCourses);
+        //   return [...prevCourses, ...newCourses];
+        // });   
+        
+        
       } catch (error) {
         console.error('Error uploading file', error);
       }
