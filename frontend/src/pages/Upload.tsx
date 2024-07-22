@@ -34,20 +34,24 @@ export default function Upload() {
           }
         });
         // const extractedCourses = response.data.courses;
-        setScrapedText(response.data.text); // Assuming this contains the scraped text
-        console.log("scraped course: %s", scrapedText);
-        console.log("selected course: %s", selectedCourses);
+        setScrapedText(response.data); // Assuming this contains the scraped text
+        const extractedCourses = response.data
+        const courseCodeRegex = /\b[A-Z]{4}[0-9]{4}\b/g;
+        const courseCodes = extractedCourses.match(courseCodeRegex) || [];
+        console.log(courseCodes);
 
-        // // Add the extracted courses to selectedCourses
-        // setSelectedCourses((prevCourses) => {
-        //   const newCourses = extractedCourses.filter((newCourse: Course) =>
-        //     !prevCourses.some((course) => course.id === newCourse.id)
-        //   );
-        //   console.log("============================");
-        //   console.log(newCourses);
-        //   return [...prevCourses, ...newCourses];
-        // });   
-        
+        setSelectedCourses((prevCourses) => {
+          const newCourses = courseCodes.filter((newCourse: string) =>
+            !prevCourses.some((course) => course.id === newCourse)
+          ).map((courseCode: string) => ({
+            id: courseCode,
+            courseName: courseCode // Assuming course name is same as course code for simplicity
+          }));
+          console.log("============================");
+          console.log(newCourses);
+          return [...prevCourses, ...newCourses];
+        });
+         
         
       } catch (error) {
         console.error('Error uploading file', error);
