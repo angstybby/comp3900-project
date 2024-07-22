@@ -70,7 +70,7 @@ const ProjectDetailsOther = () => {
         </div>
         <div className="mt-8">
           <h2 className="text-2xl font-medium">Skills Gap Analysis</h2>
-          <SkillsGapAnalysis />
+          <SkillsGapAnalysis projectId={Number(projectId)}/>
         </div>
       </div>
     </>

@@ -57,7 +57,7 @@ export const dbGenerateGapAnalysis = async (
         (skill) => !groupSkills.includes(skill),
     );
 
-    return { matchingSkills, unmatchedSkills };
+    return { projectSkills, matchingSkills, unmatchedSkills };
 };
 
 export const dbGetSkills = async () => {
