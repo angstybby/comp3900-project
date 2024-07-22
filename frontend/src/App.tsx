@@ -14,11 +14,13 @@ import Notification from '@/pages/Notification'
 import Admin from '@/pages/Admin'
 import ResetPassword from '@/pages/ResetPassword'
 import CourseDetails from '@/pages/CourseDetails'
-import ProjectDetails from './pages/ProjectDetails'
 import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ModalProvider } from '@/contexts/DeleteModalContext'
 import GroupDetails from './pages/GroupDetails'
 import PublicProfile from '@/pages/PublicProfile';
+import ProjectApplications from './pages/ProjectApplications'
+import ProjectDetailsStudent from './pages/ProjectDetailsStudent'
+import ProjectDetailsOther from './pages/ProjectDetailsOther'
 
 
 
@@ -37,7 +39,9 @@ function App() {
               <Route path={`/profile/:zId`} element={<PublicProfile />} />
               <Route path={`/notifications`} element={<Notification />} />
               <Route path={`/course/:courseId`} element={<CourseDetails />} />
-              <Route path={`/project/:projectId`} element={<ProjectDetails />} />
+              <Route path={`/group/:groupId/project/:projectId`} element={<ProjectDetailsStudent />} />
+              <Route path='/project/:projectId/' element={<ProjectDetailsOther />} />
+              <Route path={`/project/:projectId/applications`} element={<ProjectApplications />} />
               <Route path={`/group/:groupId`} element={<GroupDetails />} />
               <Route path={`/manage-users`} element={<Admin />} />
             </Route>

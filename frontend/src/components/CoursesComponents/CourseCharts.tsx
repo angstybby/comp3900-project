@@ -1,8 +1,8 @@
 import { Radar } from 'react-chartjs-2';
 import { Chart as ChartJS, Tooltip, Legend, RadialLinearScale, LineElement, PointElement, Filler } from 'chart.js';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { axiosInstanceWithAuth } from '@/api/Axios';
+import React from 'react';
 
 
 ChartJS.register(
@@ -45,11 +45,10 @@ const CourseCharts: React.FC = () => {
         data: skillsData.map(skill => skill.popularity),
         backgroundColor: 'rgba(54, 162, 235, 0.5)',
       },
-      
     ],
     options: {
       responsive: false,
-   },
+    },
   };
 
   return (

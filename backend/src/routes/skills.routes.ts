@@ -1,10 +1,25 @@
 import express, { Request, Response } from "express";
-import { dbGetSkillsPopularity, dbSearchSkillByName } from "../models/skills.models";
+import {
+    dbGenerateGapAnalysis,
+    dbGetSkills,
+    dbGetSkillsPopularity,
+    dbSearchSkillByName,
+} from "../models/skills.models";
 
 const router = express.Router();
 
+router.get("/", async (req: Request, res: Response) => {
+    try {
+        const result = await dbGetSkills();
+        res.status(200).send(result);
+    } catch (error) {
+        console.error("Error in /skill:", error);
+        res.status(500).send("An error occurred while getting skills");
+    }
+});
+
 /**
- * @route GET /skill
+ * @route GET /skill/search
  * @desc Get the first 10 skills matching the search query
  * @access Private
  * @returns {Array} Array of skills
@@ -40,6 +55,18 @@ router.get("/popularity", async (req, res) => {
     } catch (error) {
         console.error("Error in /popularity:", error);
         res.status(500).send("An error occured getting skills popularity.")
+    }
+});
+
+router.post("/gap-analysis", async (req, res) => {
+    const { groupId, projectId } = req.body;
+
+    try {
+        const result = await dbGenerateGapAnalysis(groupId, projectId);
+        res.status(200).send(result);
+    } catch (error) {
+        console.error("Error in /skill/gap-analysis:", error);
+        res.status(500).send("An error occurred while generating gap analysis");
     }
 });
 
