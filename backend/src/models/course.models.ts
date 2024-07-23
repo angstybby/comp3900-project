@@ -407,3 +407,14 @@ export const dbUpdateCourse = async (
 
     //TODO: Update all groups that have this course
 };
+
+export const dbGetCourse = async (courseId: string) => {
+    return await prisma.course.findFirst({
+        where: {
+            id: courseId,
+        },
+        include: {
+            skills: true,
+        }
+    });
+};
