@@ -18,7 +18,6 @@ export default function Upload() {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<Course[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
-  const [scrapedText, setScrapedText] = useState("");
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -33,10 +32,6 @@ export default function Upload() {
             'Content-Type': 'multipart/form-data'
           }
       });
-
-      // create an array of course codes
-      // setScrapedText(response.data); // Assuming this contains the scraped text
-      console.log(response.data);
 
       // Fetch course details for each extracted course code
       const detailedCoursesPromises = response.data.map(async (courseCode: string) => {
@@ -146,12 +141,6 @@ export default function Upload() {
       throw new Error('No file selected');
     }
     formData.append('pdfUpload', selectedFile);
-    // formData.append('scrapped', scrapedText);
-
-    // // Add selected courses to the form data
-    // selectedCourses.forEach(course => {
-    //   formData.append('courses[]', course.id);
-    // });
 
     setLoading(true);
     try {

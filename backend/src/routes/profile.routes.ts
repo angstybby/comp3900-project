@@ -123,18 +123,7 @@ router.post(
             const courseCodeRegex = /\b[A-Z]{4}[0-9]{4}\b/g;
             const courseCodes = responseText.match(courseCodeRegex) || [];
             console.log(courseCodes);
-
-            // // Add each course to the user's profile
-            // for (const course of courseCodes) {
-            //     console.log(course);
-            //     // const addcourse = await dbFindCourseByString(course, 0);
-            //     const addcourse = await dbFindCourseByStringExcTaken(course, customReq.token.zid);
-            //     if (addcourse.length > 0) {
-            //       console.log( addcourse[0].id);
-            //       await dbAddCourse(addcourse[0].id, customReq.token.zid);
-            //     }
-            // }
-
+            
             res.status(200).send(courseCodes);
         } catch (error) {
             console.error(error);
@@ -210,7 +199,6 @@ router.post('/add-courses-from-pdf', upload.single('pdfUpload'), async (req, res
       if (file.mimetype !== 'application/pdf') {
           throw new Error('File is not a pdf');
       }
-      // const scrapedTextArray = JSON.parse(scrapped);
       const courseCodes = JSON.parse(req.body.scrapped);
       console.log(courseCodes);
       // Add each course to the user's profile
