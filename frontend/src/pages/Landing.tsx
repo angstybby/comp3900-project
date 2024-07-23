@@ -84,7 +84,11 @@ export default function Landing() {
             <div className="mt-8">
               <div className="flex justify-between">
                 <label className="block text-gray-700 text-sm mb-2">Password</label>
-                <Link to="/reset-password" className="text-xs font-normal text-indigo-600 hover:underline h-fit">
+                <Link
+                  to="/reset-password"
+                  className="text-xs font-normal text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  aria-label="Forgot your password? Click here to reset it."
+                >
                   Forgot your password?
                 </Link>
               </div>
