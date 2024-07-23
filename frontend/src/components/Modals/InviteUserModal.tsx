@@ -22,6 +22,7 @@ interface InviteUserModalProps {
 
 interface User {
   zid: string;
+  fullname: string;
 }
 
 const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchData, groupId }) => {
@@ -37,6 +38,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
         try {
           const response = await axiosInstanceWithAuth.get(`/group/not-in-group/${groupId}`);
           setUsers(response.data);
+          console.log(response.data);
         } catch (error) {
           console.error(error);
         }
@@ -47,8 +49,9 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
 
   const filteredUsers = query === ''
     ? users
-    : users.filter(user =>
-      user.zid.includes(query)
+    : users.filter(user => 
+      user.zid.includes(query) 
+      || user.fullname.toLowerCase().includes(query.toLowerCase())
     );
 
   const handleSubmit = async (event: FormEvent) => {
@@ -81,6 +84,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
       className="relative z-[100] focus:outline-none transition duration-150 ease-out"
       transition
       onClose={() => {
+        setSelectedUsers([]);
         close();
       }}
     >
@@ -110,7 +114,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                       <ul>
                         {selectedUsers.map(user => (
                           <li key={user.zid}>
-                            {user.zid}
+                            {`${user.fullname} - ${user.zid}`}
                           </li>
                         ))}
                       </ul>
@@ -130,8 +134,9 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                     <ComboboxOption
                       key={user.zid}
                       value={user}
-                      className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-indigo-500/30">
-                      {user.zid}
+                      className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-indigo-500/30"
+                      >
+                      {`${user.fullname} - ${user.zid}`}
                     </ComboboxOption>
                   ))}
                 </ComboboxOptions>
@@ -142,7 +147,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                 {loading ? (
                   <ButtonLoading />
                 ) : (
-                  <ButtonSubmit text='Create Group' />
+                  <ButtonSubmit text='Send Invite' />
                 )}
               </div>
             </form>

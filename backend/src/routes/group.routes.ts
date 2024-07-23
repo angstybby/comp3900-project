@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import {
     dbAcceptUserToGroup,
     dbCreateGroup,
@@ -19,14 +19,10 @@ import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
 import { model } from "../utils/ai";
-import { PrismaClient } from "@prisma/client";
 import {
     dbGetAllProjectsWithSkills,
-    dbGetProject,
     dbGetProjectByName,
-    dbGetProjects,
 } from "../models/project.models";
-import { Project } from "../utils/project.utils";
 
 const router = express.Router();
 
@@ -411,6 +407,16 @@ router.get("/groups", authMiddleWare, async (req, res) => {
     }
 });
 
+/**
+ * @route GET /group/details/:groupId
+ * @desc Get the details of a group
+ * @access Private
+ * @type RequestHandler
+ * @param {number} groupId - The id of the group
+ * @returns {Group} - The group details
+ * @throws {Error} - If the request body is missing required fields
+ * @throws {Error} - If an error occurs while fetching group details
+ */
 router.get("/details/:groupId", authMiddleWare, async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
