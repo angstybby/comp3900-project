@@ -117,7 +117,14 @@ router.post(
             // 4. Print their response
             console.log("--------------------");
             console.log(result.response.text());
-            res.status(200).send(result.response.text());
+
+            // Extract the course codes from the AI response
+            const responseText = result.response.text();
+            const courseCodeRegex = /\b[A-Z]{4}[0-9]{4}\b/g;
+            const courseCodes = responseText.match(courseCodeRegex) || [];
+            console.log(courseCodes);
+            
+            res.status(200).send(courseCodes);
         } catch (error) {
             console.error(error);
             res.status(500).send("An error occured when scraping the PDF File");
@@ -149,23 +156,6 @@ router.post(
 
             const date = new Date().toISOString();
 
-            // Extract the course codes from the AI response
-            const responseText = req.body.scrapped;
-            const courseCodeRegex = /\b[A-Z]{4}[0-9]{4}\b/g;
-            const courseCodes = responseText.match(courseCodeRegex) || [];
-            console.log(courseCodes);
-
-            // Add each course to the user's profile
-            for (const course of courseCodes) {
-                console.log(course);
-                // const addcourse = await dbFindCourseByString(course, 0);
-                const addcourse = await dbFindCourseByStringExcTaken(course, customReq.token.zid);
-                if (addcourse.length > 0) {
-                  console.log( addcourse[0].id);
-                  await dbAddCourse(addcourse[0].id, customReq.token.zid);
-                }
-            }
-
             // Upload file to S3
             try {
                 const upload = new Upload({
@@ -189,5 +179,42 @@ router.post(
         }
     },
 );
+
+// Route for handling course addition by transcript
+router.post('/add-courses-from-pdf', upload.single('pdfUpload'), async (req, res) => {
+  try {
+      const customReq = req as CustomRequest;
+      if (!customReq.token || typeof customReq.token === 'string') {
+          throw new Error('Token is not valid');
+      }
+
+      const file = req.file;
+
+      // Check if file is present
+      if (!file) {
+          throw new Error('No file uploaded');
+      }
+
+      // Check if file is a pdf
+      if (file.mimetype !== 'application/pdf') {
+          throw new Error('File is not a pdf');
+      }
+      const courseCodes = JSON.parse(req.body.scrapped);
+      console.log(courseCodes);
+      // Add each course to the user's profile
+      for (const course of courseCodes) {
+          console.log(course);
+          const addcourse = await dbFindCourseByStringExcTaken(course, customReq.token.zid);
+          if (addcourse.length > 0) {
+              console.log(addcourse[0].id);
+              await dbAddCourse(addcourse[0].id, customReq.token.zid);
+          }
+      }
+      res.status(200).send('Courses added successfully');
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('An error occurred while processing the file');
+  }
+});
 
 export default router;
