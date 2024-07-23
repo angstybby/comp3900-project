@@ -12,6 +12,15 @@ import { useState, useEffect, FormEvent } from 'react';
 import { axiosInstanceWithAuth } from '@/api/Axios';
 import ButtonLoading from '../Buttons/ButtonLoading';
 import ButtonSubmit from '../Buttons/ButtonSubmit';
+import RecommendedStudentCard from '../StudentComponents/RecommendedStudentCard';
+import { STUB_IMAGE } from '@/utils/constants';
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselPrevious, 
+  CarouselNext, 
+  CarouselItem 
+} from '../ui/carousel';
 
 interface InviteUserModalProps {
   open: boolean;
@@ -31,6 +40,13 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [query, setQuery] = useState('');
+  const [recommendedStudents, setRecommendedStudents] = useState<User[]>([
+    { zid: 'z1234567', fullname: 'John Doe' },
+    { zid: 'z7654321', fullname: 'Anak Agung Ngurah Agung Nararya Kusuma' },
+    { zid: 'z5373431', fullname: 'Jane Doe' },
+    { zid: 'z1234534', fullname: 'John Doe' },
+    { zid: 'z7653455', fullname: 'Anak Agung Ngurah Agung Nararya Kusuma' },
+  ]);
 
   useEffect(() => {
     if (open) {
@@ -77,6 +93,10 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
     }
   };
 
+  const handleCarouselClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  }
+
   return (
     <Dialog
       open={open}
@@ -121,6 +141,20 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                     </div>
                   )
                 }
+                <p className='font-semibold my-2'>Recommended Users</p>
+                <div className=''>
+                  <Carousel className="h-full max-w-[90%] mx-auto">
+                    <CarouselContent>
+                      {recommendedStudents.map(user => (
+                        <RecommendedStudentCard key={user.zid} zId={user.zid} fullname={user.fullname} profilePicture={STUB_IMAGE} />
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious onClick={(e) => e.stopPropagation()} />
+                    <CarouselNext onClick={handleCarouselClick} />
+                  </Carousel>
+                </div>
+
+                <p className='font-semibold my-2'>Search Users Manually</p>
                 <ComboboxInput
                   onChange={(event) => setQuery(event.target.value)}
                   className="block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-md sm:leading-6"
