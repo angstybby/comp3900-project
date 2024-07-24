@@ -1,5 +1,4 @@
 import { STUB_IMAGE } from "@/utils/constants";
-import { useState } from "react";
 import ButtonSelect from "../Buttons/ButtonSelect";
 
 interface RecommendedStudentCardProps {
@@ -11,6 +10,9 @@ interface RecommendedStudentCardProps {
 }
 
 const RecommendedStudentCard: React.FC<RecommendedStudentCardProps> = ({ zId, fullname, profilePicture, selected, selectFunction}) => {
+  let bg = "bg-indigo-600"; 
+  if (selected) bg = "bg-indigo-300";
+
   return (
     <div className="py-1 select-none">
       <div className="bg-gray-100 p-5 py-3 text-center rounded-lg hover:bg-gray-300 hover:cursor-pointer flex h-16">
@@ -24,10 +26,9 @@ const RecommendedStudentCard: React.FC<RecommendedStudentCardProps> = ({ zId, fu
           <div className="self-center w-1/10" onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              if (selected) return;
               selectFunction();
           }}>
-            <ButtonSelect text={!selected ? "Select" : "Selected"} />
+            <ButtonSelect text={!selected ? "Select" : "Selected"} classname={`w-20 ${bg}`}/>
           </div>
         </div>
       </div>

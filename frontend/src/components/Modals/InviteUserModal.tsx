@@ -13,46 +13,45 @@ import { axiosInstanceWithAuth } from '@/api/Axios';
 import ButtonLoading from '../Buttons/ButtonLoading';
 import ButtonSubmit from '../Buttons/ButtonSubmit';
 import RecommendedStudentCard from '../StudentComponents/RecommendedStudentCard';
-import { STUB_IMAGE } from '@/utils/constants';
 
 interface InviteUserModalProps {
   open: boolean;
   close: () => void;
   refetchData: () => void;
   groupId: number;
+  groupSkills: string[];
 }
 
 interface User {
   zid: string;
   fullname: string;
   profilePicture: string;
+  skills?: string[];
 }
 
-const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchData, groupId }) => {
+const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchData, groupId, groupSkills }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  const [recommendedStudents, setRecommendedStudents] = useState<User[]>([]);
   const [query, setQuery] = useState('');
-  const [recommendedStudents, setRecommendedStudents] = useState<User[]>([
-    { zid: 'z1234567', fullname: 'John Doe', profilePicture: STUB_IMAGE },
-    { zid: 'z7654321', fullname: 'Anak Agung Ngurah Agung Nararya Kusuma', profilePicture: STUB_IMAGE },
-    { zid: 'z5373431', fullname: 'Jane Doe', profilePicture: STUB_IMAGE },
-    { zid: 'z1234534', fullname: 'John Doe', profilePicture: STUB_IMAGE },
-    { zid: 'z7653455', fullname: 'Anak Agung Ngurah Agung Nararya Kusuma', profilePicture: STUB_IMAGE },
-  ]);
 
   useEffect(() => {
     if (open) {
       const fetchUsers = async () => {
         try {
-          const response = await axiosInstanceWithAuth.get(`/group/not-in-group/${groupId}`);
-          setUsers(response.data);
+          const response = await axiosInstanceWithAuth.post(`/group/not-in-group/${groupId}`, {
+            groupSkills: groupSkills.join(','),
+          });
+          setUsers(response.data.generalUsers);
+          setRecommendedStudents(response.data.recommendedUsers);
           console.log(response.data);
         } catch (error) {
           console.error(error);
         }
       }
+
       fetchUsers();
     }
   }, [open, groupId]);
@@ -68,7 +67,6 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
     event.preventDefault();
     setLoading(true);
     try {
-      // Call your API to invite users
       users.forEach(async user => {
         if (selectedUsers.includes(user)) {
           await axiosInstanceWithAuth.post(`/group/invite`, {
@@ -139,14 +137,20 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                 }
                 <p className='font-semibold my-2'>Recommended Users</p>
                 <div className='max-h-48 overflow-y-scroll pr-3'>
-                  {filteredUsers.map(user => (
+                  {recommendedStudents.map(user => (
                     <RecommendedStudentCard 
                       key={user.zid} 
                       zId={user.zid} 
                       fullname={user.fullname} 
                       profilePicture={user.profilePicture} 
                       selected={selectedUsers.includes(user)}
-                      selectFunction={() => setSelectedUsers([...selectedUsers, user])}
+                      selectFunction={() => {
+                        if (selectedUsers.includes(user)) {
+                          setSelectedUsers(selectedUsers.filter(s => s !== user));
+                        } else {
+                          setSelectedUsers([...selectedUsers, user])
+                        }
+                      }}
                     />
                   ))}
                 </div>

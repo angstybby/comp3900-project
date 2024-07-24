@@ -95,7 +95,7 @@ const GroupDetails = () => {
   return (
     <>
       <EditGroupModal open={editModal} close={() => setEditModal(false)} refetchData={fetchDetails} initValues={details} />
-      <InviteUserModal open={inviteUserModal} close={() => setInviteUserModal(false)} refetchData={fetchDetails} groupId={details.id} />
+      <InviteUserModal open={inviteUserModal} close={() => setInviteUserModal(false)} refetchData={fetchDetails} groupId={details.id} groupSkills={details.CombinedSkills} />
       <div className="p-14">
         <div className="flex flex-row justify-between">
           <div className="flex items-center gap-7">

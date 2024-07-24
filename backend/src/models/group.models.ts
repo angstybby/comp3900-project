@@ -733,6 +733,11 @@ export const dbGetUsersNotInGroup = async (groupId: number) => {
                     zid: true,
                     fullname: true,
                     profilePicture: true,
+                    Skills: {
+                        select: {
+                            skillName: true,
+                        },
+                    },
             },
         });
 
