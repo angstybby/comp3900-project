@@ -13,7 +13,8 @@ interface UploadModalProps {
 const UploadModal: React.FC<UploadModalProps> = ({ isVisible, close, refetchData }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [scrapedText, setScrapedText] = useState("");
+  const [scrapedText, setScrapedText] = useState<string[]>([]);
+  
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -44,26 +45,35 @@ const UploadModal: React.FC<UploadModalProps> = ({ isVisible, close, refetchData
       throw new Error('No file selected');
     }
     formData.append('pdfUpload', selectedFile);
-    formData.append('scrapped', scrapedText);
-
+    const scrapedTextJson = JSON.stringify(scrapedText);
+    formData.append('scrapped', scrapedTextJson);
     setLoading(true);
+    
     try {
-      const response = await axiosInstanceWithAuth.post('/profile/upload-transcript', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      if (response.status === 200) {
-        console.log('File uploaded successfully');
+
+      const [response1, response2] = await Promise.all([
+        axiosInstanceWithAuth.post('/profile/upload-transcript', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+        axiosInstanceWithAuth.post('/profile/add-courses-from-pdf', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+      ]);
+
+      if (response1.status === 200) {
+        console.log('Transcript uploaded successfully');
+      } else {
+        console.error('Error uploading transcript', response1.statusText);
+      }
+    
+      if (response2.status === 200) {
+        console.log('Courses added successfully');
         refetchData();
         close();
       } else {
-        console.error('Error uploading file');
+        console.error('Error adding courses', response2.statusText);
       }
     } catch (error) {
-      console.error('Error uploading file', error);
+      console.error('Error during processing', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

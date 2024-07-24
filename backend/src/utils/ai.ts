@@ -13,6 +13,46 @@ export const generationConfig = {
     responseMimeType: "text/plain",
 };
 
+export const getCourseSkillsRatingContext = (skillStrings: string[], title: string, description: string) => {
+    return `Please analyze the following skills based on the provided course description and give each skill a rating from 1 to 5. Do not add ** ** into the output and do not include explanation on the output.
+    
+    **Output Format:**
+    [Skill 1]: Rating [1-5]
+    [Skill 2]: Rating [1-5]
+    [Skill 3]: Rating [1-5]
+    [Skill 4]: Rating [1-5]
+    [Skill 5]: Rating [1-5]
+    
+    **Example:**
+    
+    **Course Description:**
+    This course focuses on developing advanced communication skills, including public speaking, persuasive writing, and interpersonal communication. Students will engage in practical exercises to enhance their clarity of speech, active listening, and adaptability in various communication settings.
+    
+    **Skills to Analyze:**
+    1. Communication
+    2. Public Speaking
+    3. Writing
+    4. Listening
+    5. Adaptability
+    
+    **Output:**
+    Communication: Rating 4
+    Public Speaking: Rating 5
+    Writing: Rating 3
+    Listening: Rating 4
+    Adaptability: Rating 4
+    
+    **Actual Input:**
+    
+    **Course Description:**
+    ${title + ": " + description}
+    
+    **Skills to Analyze:**
+    ${skillStrings.map((skill, index) => `${index}. ${skill} `).join("\n")}
+    **Output:**
+    `;
+};
+
 export const getCompletedCourseContext =
     "Course codes are labelled by <ABCD> <1234> and then followed by their title. <ABCD> can be any combination of letters and <1234> can be a combination of numbers. Example is COMP 2501. Given this, list all the courses that are mentioned and have grades alongside them. Only return their course codes and discard their title, also remove the space in between.";
 

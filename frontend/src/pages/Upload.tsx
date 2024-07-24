@@ -18,7 +18,6 @@ export default function Upload() {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<Course[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
-  const [scrapedText, setScrapedText] = useState("");
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,8 +31,32 @@ export default function Upload() {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
-        });
-        setScrapedText(response.data); // Assuming this contains the necessary data
+      });
+
+      // Fetch course details for each extracted course code
+      const detailedCoursesPromises = response.data.map(async (courseCode: string) => {
+        const courseDetails = await fetchCourseDetails(courseCode);
+        if (courseDetails && courseDetails.length > 0) {
+          return {
+            id: courseDetails[0].id,
+            courseName: courseDetails[0].courseName
+          };
+        }
+        return null;
+      });
+
+      const detailedCourses = await Promise.all(detailedCoursesPromises);
+      const newCourses = detailedCourses.filter(course => course !== null);
+
+      // Update selected courses state
+      setSelectedCourses((prevCourses) => {
+        const nonDuplicateCourses = newCourses.filter((newCourse) =>
+          !prevCourses.some((course) => course.id === newCourse.id)
+        );
+        return [...prevCourses, ...nonDuplicateCourses];
+      });
+         
+        
       } catch (error) {
         console.error('Error uploading file', error);
       }
@@ -57,6 +80,16 @@ export default function Upload() {
       setSuggestions([]);
     }
   }, [searchTerm]);
+
+  const fetchCourseDetails = async (courseCode: string) => {
+    try {
+      const response = await axiosInstanceWithAuth.post("/course/searchExc", { name: courseCode });
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching details for course ${courseCode}`, error);
+      return null;
+    }
+  };
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -108,12 +141,6 @@ export default function Upload() {
       throw new Error('No file selected');
     }
     formData.append('pdfUpload', selectedFile);
-    formData.append('scrapped', scrapedText);
-
-    // Add selected courses to the form data
-    selectedCourses.forEach(course => {
-      formData.append('courses[]', course.id);
-    });
 
     setLoading(true);
     try {
