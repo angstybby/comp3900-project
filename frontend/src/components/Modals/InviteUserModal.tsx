@@ -144,7 +144,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                   {
                     fetchLoading 
                     ? 
-                      ( <LoadingCircle/> ) 
+                      ( <div className='w-full flex justify-center'><LoadingCircle/></div> ) 
                     :
                       (
                         recommendedStudents.map(user => (
