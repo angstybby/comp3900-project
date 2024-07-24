@@ -6,6 +6,7 @@ import {
     dbFindCourseByString,
     dbFindCourseByStringExcTaken,
     dbGetAllCourses,
+    dbGetCourse,
     dbGetUserCourses,
     dbUpdateCourse,
 } from "../models/course.models";
@@ -16,8 +17,10 @@ import {
     getCourseSkillsContext,
     summarizeCourseOutlineContext,
     generationConfig,
+    getCourseSkillsRatingContext,
 } from "../utils/ai";
 import multer from "multer";
+import { dbUpdateSkillsRatings } from "../models/skills.models";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -272,6 +275,67 @@ router.post("/update-details", async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).send("An error occurred while updating course details");
+    }
+});
+
+router.get("/generate-skill-rating", async (req, res) => {
+    const { courseId } = req.body;
+
+    try {
+        const course = await dbGetCourse(courseId);
+        if (!course) {
+            return res.status(400).send("Course not found");
+        }
+
+        const skills = course.skills.map((skill) => skill.skillName);
+        const description = course.summary;
+        const title = course.courseName;
+
+        if (!skills || skills.length === 0) {
+            return res.status(400).send("No skills found for course");
+        }
+
+        if (!description || description.length === 0) {
+            return res.status(400).send("No description found for course");
+        }
+
+        if (!title || title.length === 0) {
+            return res.status(400).send("No title found for course");
+        }
+
+        const prompt = getCourseSkillsRatingContext(skills, title, description);
+
+        const chat = model.startChat();
+        const result = await chat.sendMessage(prompt);
+        const response = result.response.text();
+
+        console.log(response);
+
+        const lines = response.trim().split("\n");
+
+        // Initialize arrays to hold skill names and ratings
+        const skillNames: string[] = [];
+        const skillRatings: number[] = [];
+
+        // Process each line to extract skill names and ratings
+        lines.forEach((line) => {
+            const [skill, rating] = line.split(":");
+            console.log(skill, rating);
+            skillNames.push(skill.trim());
+            skillRatings.push(parseInt(rating.replace(/\D/g, "")));
+        });
+
+        // update course skills with ratings
+        await dbUpdateSkillsRatings(courseId, skillNames, skillRatings);
+
+        res.status(200).send("Course skills ratings generated successfully");
+    } catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .send(
+                "An error occurred while generating course skills rating context",
+            );
     }
 });
 

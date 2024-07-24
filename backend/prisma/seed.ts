@@ -186,6 +186,40 @@ const seedSkills = async () => {
     }
 };
 
+const seedAdmin = async () => {
+    await prisma.user.create({
+        data: {
+            zid: "z0000000",
+            email: "admin@gmail.com",
+            userType: "admin",
+            password:
+                "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+            isAdmin: true,
+        },
+    });
+
+    await prisma.profile.create({
+        data: {
+            fullname: "Admin",
+            profileOwner: {
+                connect: {
+                    zid: "z0000000",
+                },
+            },
+        },
+    });
+};
+
+seedAdmin()
+    .then(() => {
+        console.log("Admin Done");
+        prisma.$disconnect();
+    })
+    .catch((e) => {
+        console.error(e);
+        prisma.$disconnect();
+    });
+
 seedCourses()
     .then(() => {
         console.log("Courses Done");

@@ -68,3 +68,39 @@ export const dbGetSkills = async () => {
         },
     });
 };
+
+export const dbUpdateSkillsRatings = async (
+    courseId: string,
+    skillNames: string[],
+    skillRatings: number[],
+) => {
+    if (skillNames.length !== skillRatings.length) {
+        throw new Error("Skill names and ratings do not match");
+    }
+
+    // deletes all the course skills
+    await prisma.courseSkill.deleteMany({
+        where: {
+            courseId,
+        },
+    });
+
+    // remake it
+    for (let i = 0; i < skillNames.length; i++) {
+        await prisma.courseSkill.create({
+            data: {
+                course: {
+                    connect: {
+                        id: courseId,
+                    },
+                },
+                skill: {
+                    connect: {
+                        skillName: skillNames[i],
+                    },
+                },
+                rating: skillRatings[i],
+            },
+        });
+    }
+};
