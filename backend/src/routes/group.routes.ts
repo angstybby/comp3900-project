@@ -18,7 +18,11 @@ import {
 import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
-import { model } from "../utils/ai";
+import {
+    getProjectReccsContext,
+    getStudentReccsContext,
+    model,
+} from "../utils/ai";
 import {
     dbGetAllProjectsWithSkills,
     dbGetProjectByName,
@@ -502,11 +506,13 @@ router.post("/not-in-group/:groupId", authMiddleWare, async (req, res) => {
         }
 
         const chat = model.startChat();
-        const promptForAi = `This group currently has these skills: ${groupSkills}. Here are the current existing users: ${userSkillMap}. Based on this set of users, recommend the three most suitable users for this group. Format the response as a comma-separated list of zid for example: <zid1>, <zid2>, <zid3> and do not include explanations.`;
+        const promptForAi = getStudentReccsContext(groupSkills, userSkillMap);
         const result = await chat.sendMessage(promptForAi);
         const recommendations = result.response.text().trim().split(",");
 
-        const generalUsers = users.filter(user => !recommendations.includes(user.zid));
+        const generalUsers = users.filter(
+            (user) => !recommendations.includes(user.zid),
+        );
         // Have to manually select to make sure the recommendations are provided in order
         const recommendedUsers = [];
         for (const recc of recommendations) {
@@ -516,7 +522,7 @@ router.post("/not-in-group/:groupId", authMiddleWare, async (req, res) => {
                 }
             }
         }
-        
+
         const payload = {
             recommendedUsers,
             generalUsers,
@@ -578,8 +584,8 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
         return res.status(401).send("Unauthorized");
     }
 
-    const { prompt } = req.body;
-    if (!prompt) {
+    const { groupSkills } = req.body;
+    if (!groupSkills) {
         return res.status(400).send("Bad Request: Prompt is required");
     }
 
@@ -596,8 +602,7 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
             )
             .join("\n");
 
-        const promptForAi = `This group currently has these skills: ${prompt}. Here are the current existing projects: ${stringProjects}. Based on this set of projects, recommend the three most suitable projects for this group. Format the response as a comma-separated list of project title for example: <title1>, <title2>, <title3>`;
-
+        const promptForAi = getProjectReccsContext(groupSkills, stringProjects);
         const chat = model.startChat();
         const result = await chat.sendMessage(promptForAi);
 
