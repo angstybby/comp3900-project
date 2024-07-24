@@ -54,7 +54,7 @@ router.put("/update-profile", async (req, res) => {
     }
 
     // Check all the fields are present or correct
-    let { zid, profilePicture, fullname, description, resume } = req.body;
+    let { zid, profilePicture, fullname, description, resume, CareerPath } = req.body;
 
     // Checks if zid matches
     if (customReq.token.zid !== zid) {
@@ -72,6 +72,7 @@ router.put("/update-profile", async (req, res) => {
         fullname,
         description,
         resume,
+        CareerPath,
     };
 
     try {
