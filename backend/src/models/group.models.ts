@@ -730,8 +730,9 @@ export const dbGetUsersNotInGroup = async (groupId: number) => {
                 },
             },
                 select: {
-                zid: true,
-                fullname: true,
+                    zid: true,
+                    fullname: true,
+                    profilePicture: true,
             },
         });
 

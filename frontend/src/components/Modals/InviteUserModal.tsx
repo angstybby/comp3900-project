@@ -14,13 +14,6 @@ import ButtonLoading from '../Buttons/ButtonLoading';
 import ButtonSubmit from '../Buttons/ButtonSubmit';
 import RecommendedStudentCard from '../StudentComponents/RecommendedStudentCard';
 import { STUB_IMAGE } from '@/utils/constants';
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselPrevious, 
-  CarouselNext, 
-  CarouselItem 
-} from '../ui/carousel';
 
 interface InviteUserModalProps {
   open: boolean;
@@ -32,6 +25,7 @@ interface InviteUserModalProps {
 interface User {
   zid: string;
   fullname: string;
+  profilePicture: string;
 }
 
 const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchData, groupId }) => {
@@ -41,11 +35,11 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [query, setQuery] = useState('');
   const [recommendedStudents, setRecommendedStudents] = useState<User[]>([
-    { zid: 'z1234567', fullname: 'John Doe' },
-    { zid: 'z7654321', fullname: 'Anak Agung Ngurah Agung Nararya Kusuma' },
-    { zid: 'z5373431', fullname: 'Jane Doe' },
-    { zid: 'z1234534', fullname: 'John Doe' },
-    { zid: 'z7653455', fullname: 'Anak Agung Ngurah Agung Nararya Kusuma' },
+    { zid: 'z1234567', fullname: 'John Doe', profilePicture: STUB_IMAGE },
+    { zid: 'z7654321', fullname: 'Anak Agung Ngurah Agung Nararya Kusuma', profilePicture: STUB_IMAGE },
+    { zid: 'z5373431', fullname: 'Jane Doe', profilePicture: STUB_IMAGE },
+    { zid: 'z1234534', fullname: 'John Doe', profilePicture: STUB_IMAGE },
+    { zid: 'z7653455', fullname: 'Anak Agung Ngurah Agung Nararya Kusuma', profilePicture: STUB_IMAGE },
   ]);
 
   useEffect(() => {
@@ -93,10 +87,6 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
     }
   };
 
-  const handleCarouselClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  }
-
   return (
     <Dialog
       open={open}
@@ -128,30 +118,37 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                 {
                   selectedUsers.length > 0 && (
                     <div className='mb-5'>
-                      <p className='text-lg text-black'>
+                      <p className='text-lg text-black mb-2'>
                         Selected users:
                       </p>
                       <ul>
                         {selectedUsers.map(user => (
-                          <li key={user.zid}>
-                            {`${user.fullname} - ${user.zid}`}
-                          </li>
+                          <button 
+                            key={user.zid} 
+                            className='bg-green-200 p-1.5 rounded-lg hover:bg-red-200 mr-2 mb-2' 
+                            onClick={() => {
+                              setSelectedUsers(selectedUsers.filter(s => s !== user));
+                            }}
+                          >
+                            {user.fullname} - {user.zid}
+                          </button>
                         ))}
                       </ul>
                     </div>
                   )
                 }
                 <p className='font-semibold my-2'>Recommended Users</p>
-                <div className=''>
-                  <Carousel className="h-full max-w-[90%] mx-auto">
-                    <CarouselContent>
-                      {recommendedStudents.map(user => (
-                        <RecommendedStudentCard key={user.zid} zId={user.zid} fullname={user.fullname} profilePicture={STUB_IMAGE} />
-                      ))}
-                    </CarouselContent>
-                    <CarouselPrevious onClick={(e) => e.stopPropagation()} />
-                    <CarouselNext onClick={handleCarouselClick} />
-                  </Carousel>
+                <div className='max-h-48 overflow-y-scroll pr-3'>
+                  {filteredUsers.map(user => (
+                    <RecommendedStudentCard 
+                      key={user.zid} 
+                      zId={user.zid} 
+                      fullname={user.fullname} 
+                      profilePicture={user.profilePicture} 
+                      selected={selectedUsers.includes(user)}
+                      selectFunction={() => setSelectedUsers([...selectedUsers, user])}
+                    />
+                  ))}
                 </div>
 
                 <p className='font-semibold my-2'>Search Users Manually</p>
@@ -169,7 +166,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                       key={user.zid}
                       value={user}
                       className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-indigo-500/30"
-                      >
+                    >
                       {`${user.fullname} - ${user.zid}`}
                     </ComboboxOption>
                   ))}
