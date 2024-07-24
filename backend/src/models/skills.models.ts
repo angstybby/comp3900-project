@@ -17,29 +17,6 @@ export const dbSearchSkillByName = async (skillName: string) => {
     });
 };
 
-export const dbGetSkillsPopularity = async () => {
-    const skills = await prisma.skills.findMany({
-        include: {
-            Course: true,
-            Group: true,
-            Project: true,
-        },
-    });
-
-    const skillsPopularity = skills.map(skill => {
-        const coursesCount = skill.Course.length;
-        const groupsCount = skill.Group.length;
-        const projectsCount = skill.Project.length;
-        const totalCount = coursesCount + groupsCount + projectsCount;
-
-        return {
-            skillName: skill.skillName,
-            popularity: totalCount,
-        };
-    });
-    return skillsPopularity;
-}
-
 export const dbGenerateGapAnalysis = async (
     groupId: number,
     projectId: number,
