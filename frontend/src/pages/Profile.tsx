@@ -10,6 +10,8 @@ import imageCompression from "browser-image-compression";
 import { useProfile } from "@/contexts/ProfileContext";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import EditProfileModal from "@/components/Modals/EditProfileModal";
+import ChangeProfilePicModal from "@/components/Modals/ChangeProfilePicModal";
 
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
@@ -162,97 +164,25 @@ const copyLinkToClipboard = () => {
 
       <ToastContainer />
 
-      {/* Edit profile details modal */}
-      {showEditProfileModal && (
-        <div
-          id="edit-profile-modal"
-          className="fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full h-full bg-gray-800 bg-opacity-75"
-        >
-          <div className="relative w-full max-w-3xl bg-white rounded-lg shadow dark:bg-gray-700">
-            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Edit Profile
-              </h3>
-              <button
-                type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={() => setShowEditProfileModal(false)}
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-            <div className="p-4 md:p-5">
-              <form className="space-y-4" onSubmit={handleSaveEditProfile}>
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="fullname"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    value={editProfileInfo.fullname}
-                    onChange={handleEditProfileChange}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="description"
-                    className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
-                  >
-                    Description
-                  </label>
-                  <textarea
-                    id="description"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    value={editProfileInfo.description}
-                    onChange={handleEditProfileChange}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="zid"
-                    className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
-                  >
-                    zID
-                  </label>
-                  <input
-                    type="zid"
-                    id="zid"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    value={editProfileInfo.zid}
-                    onChange={handleEditProfileChange}
-                  />
-                </div>
-                {loading ? (
-                  <ButtonLoading />
-                ) : (
-                  <ButtonSubmit text={"Save"} />
-                )}
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditProfileModal
+        show={showEditProfileModal}
+        loading={loading}
+        editProfileInfo={editProfileInfo}
+        onClose={() => setShowEditProfileModal(false)}
+        handleEditProfileChange={handleEditProfileChange}
+        handleSaveEditProfile={handleSaveEditProfile}
+      />
+
+      <ChangeProfilePicModal
+        show={showChangeProfPicModal}
+        loading={loading}
+        onClose={() => setShowChangeProfPicModal(false)}
+        handleFileChange={handleFileChange}
+        handleSaveProfilePic={handleSaveProfilePic}
+      />
 
       {/* Change profile picture modal */}
-      {showChangeProfPicModal && (
+      {/* {showChangeProfPicModal && (
         <div
           id="change-profile-pic-modal"
           className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75"
@@ -305,7 +235,7 @@ const copyLinkToClipboard = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
