@@ -13,6 +13,7 @@ import { axiosInstanceWithAuth } from '@/api/Axios';
 import ButtonLoading from '../Buttons/ButtonLoading';
 import ButtonSubmit from '../Buttons/ButtonSubmit';
 import RecommendedStudentCard from '../StudentComponents/RecommendedStudentCard';
+import LoadingCircle from '../LoadingCircle';
 
 interface InviteUserModalProps {
   open: boolean;
@@ -31,6 +32,7 @@ interface User {
 
 const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchData, groupId, groupSkills }) => {
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
   const [error, setError] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
@@ -40,6 +42,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
   useEffect(() => {
     if (open) {
       const fetchUsers = async () => {
+        setFetchLoading(true);
         try {
           const response = await axiosInstanceWithAuth.post(`/group/not-in-group/${groupId}`, {
             groupSkills: groupSkills.join(','),
@@ -50,6 +53,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
         } catch (error) {
           console.error(error);
         }
+        setFetchLoading(false);
       }
 
       fetchUsers();
@@ -136,23 +140,31 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                   )
                 }
                 <p className='font-semibold my-2'>Recommended Users</p>
-                <div className='max-h-48 overflow-y-scroll pr-3'>
-                  {recommendedStudents.map(user => (
-                    <RecommendedStudentCard 
-                      key={user.zid} 
-                      zId={user.zid} 
-                      fullname={user.fullname} 
-                      profilePicture={user.profilePicture} 
-                      selected={selectedUsers.includes(user)}
-                      selectFunction={() => {
-                        if (selectedUsers.includes(user)) {
-                          setSelectedUsers(selectedUsers.filter(s => s !== user));
-                        } else {
-                          setSelectedUsers([...selectedUsers, user])
-                        }
-                      }}
-                    />
-                  ))}
+                <div className={`max-h-48 ${!fetchLoading && "overflow-y-scroll"} pr-3`}>
+                  {
+                    fetchLoading 
+                    ? 
+                      ( <LoadingCircle/> ) 
+                    :
+                      (
+                        recommendedStudents.map(user => (
+                          <RecommendedStudentCard 
+                            key={user.zid} 
+                            zId={user.zid} 
+                            fullname={user.fullname} 
+                            profilePicture={user.profilePicture} 
+                            selected={selectedUsers.includes(user)}
+                            selectFunction={() => {
+                              if (selectedUsers.includes(user)) {
+                                setSelectedUsers(selectedUsers.filter(s => s !== user));
+                              } else {
+                                setSelectedUsers([...selectedUsers, user])
+                              }
+                            }}
+                          />
+                        ))
+                      )
+                  }
                 </div>
 
                 <p className='font-semibold my-2'>Search Users Manually</p>
@@ -160,6 +172,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ open, close, refetchD
                   onChange={(event) => setQuery(event.target.value)}
                   className="block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-md sm:leading-6"
                   placeholder="Search for users and select all that you want to invite..."
+                  disabled={fetchLoading}
                 />
                 <ComboboxOptions
                   transition
