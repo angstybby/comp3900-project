@@ -133,8 +133,7 @@ model Project {
   updatedAt       DateTime          @updatedAt
   ProjectOwner    Profile           @relation(fields: [projectOwnerId], references: [zid])
   projectOwnerId  String
-  groupId         Int?
-  assignedGroup   Group?            @relation(fields: [groupId], references: [id])
+  Group           Group[]
   skills          Skills[]
   ProjectInterest ProjectInterest[]
 }
