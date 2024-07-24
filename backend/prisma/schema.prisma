@@ -9,26 +9,37 @@ datasource db {
 }
 
 model User {
-  zid        String   @id
-  email      String   @unique
-  userType   UserType
-  password   String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  profile    Profile?
-  isAdmin    Boolean  @default(false)
-  resetToken String?  @unique
+  zid           String         @id
+  email         String         @unique
+  userType      UserType
+  password      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  profile       Profile?
+  isAdmin       Boolean        @default(false)
+  resetToken    String?        @unique
   notifications Notification[]
 }
 
 model Skills {
-  id        Int       @id @default(autoincrement())
-  skillName String
-  createdAt DateTime  @default(now())
-  Profile   Profile[]
-  Course    Course[]
-  Group     Group[]
-  Project   Project[]
+  id          Int           @id @default(autoincrement())
+  skillName   String        @unique
+  createdAt   DateTime      @default(now())
+  Profile     Profile[]
+  Course      Course[]
+  Group       Group[]
+  Project     Project[]
+  CourseSkill CourseSkill[]
+}
+
+model CourseSkill {
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id])
+  skillId  Int
+  skill    Skills @relation(fields: [skillId], references: [id])
+  rating   Int
+
+  @@id([courseId, skillId])
 }
 
 enum UserType {
@@ -58,6 +69,7 @@ model Course {
   skills      Skills[]
   summary     String?       @db.Text
   CourseTaken CourseTaken[]
+  CourseSkill CourseSkill[]
 }
 
 model CourseTaken {
@@ -156,9 +168,9 @@ enum GroupEntryStatus {
 }
 
 model Notification {
-  zid       String      @id
-  user      User     @relation(fields: [zid], references: [zid])
-  action    String
-  sentWhen  DateTime @default(now())
-  msgRead   Boolean  @default(false)
+  zid      String   @id
+  user     User     @relation(fields: [zid], references: [zid])
+  action   String
+  sentWhen DateTime @default(now())
+  msgRead  Boolean  @default(false)
 }
