@@ -12,7 +12,6 @@ import { useState } from "react";
 import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import { JwtUser } from "@/utils/interfaces";
 import { jwtDecode } from "jwt-decode";
-// import { axiosNoAuth, getToken } from "../api/Axios";
 import { axiosNoAuth, getToken } from "../api/Axios";
 import Cookies from "js-cookie";
 
@@ -57,7 +56,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen min-w-screen flex">
-      <div className="mx-auto self-center flex bg-white rounded-lg shadow-lg overflow-hidden sm:w-3/5 md:max-w-lg lg:max-w-4xl lg:max-h-3/5 lg:w-4/5">
+      <div className="mx-auto self-center flex bg-white rounded-lg md:shadow-lg overflow-hidden max-h-full w-full md:max-w-lg lg:max-w-4xl md:max-h-3/5 lg:w-4/5">
         <div className="hidden lg:block lg:w-1/2 bg-cover bg-[url('/src/assets/random-image.webp')]"></div>
         <div className="w-full p-8 lg:w-1/2">
           <h2 className="text-2xl font-semibold text-gray-700 text-center">
@@ -76,6 +75,7 @@ export default function Landing() {
                 name="email"
                 type="email"
                 autoComplete="email"
+                aria-label="Email Address"
               />
               {errors.email && (
                 <p className="text-red-600 text-sm">{errors.email.message}</p>
@@ -84,7 +84,11 @@ export default function Landing() {
             <div className="mt-8">
               <div className="flex justify-between">
                 <label className="block text-gray-700 text-sm mb-2">Password</label>
-                <Link to="/reset-password" className="text-xs font-normal text-indigo-600 hover:underline h-fit">
+                <Link
+                  to="/reset-password"
+                  className="text-xs font-normal text-indigo-600 hover:underline focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  aria-label="Forgot your password? Click here to reset it."
+                >
                   Forgot your password?
                 </Link>
               </div>
@@ -94,6 +98,7 @@ export default function Landing() {
                 name="password"
                 type="password"
                 autoComplete="password"
+                aria-label="Password"
               />
               {errors.password && (
                 <p className="text-red-600 text-sm">
