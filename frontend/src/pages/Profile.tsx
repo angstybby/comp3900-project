@@ -28,6 +28,13 @@ export default function Profile() {
   const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  //STUB FEEDBACK DATA
+  const [feedbacks, setFeedbacks] = useState([
+    { id: 1, rating: 4, comment: "Great work on the project!" },
+    { id: 2, rating: 5, comment: "Excellent contribution and teamwork!" },
+    { id: 3, rating: 3, comment: "Good effort, but could improve in communication." },
+  ]);
+
   useEffect(() => {
     fetchProfileData();
   }, []);
@@ -127,43 +134,65 @@ const copyLinkToClipboard = () => {
 };
   
   return (
-    <div className="h-screen flex items-center justify-start flex-col">
-      <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
-      <div className="flex flex-col items-center justify-center mt-10 relative group">
-        <div className="relative w-32 h-32">
-          <img
-            src={profileData.profilePicture}
-            alt="Profile Picture"
-            className="w-full h-full rounded-full cursor-pointer"
-            onClick={() => setShowChangeProfPicModal(true)}
-          />
-          <div
-            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-80 bg-black bg-opacity-50 rounded-full transition-opacity duration-300"
-            onClick={() => setShowChangeProfPicModal(true)}
-          >
-            <svg
-              className="w-8 h-8 text-white"
-              fill="currentColor"
-              viewBox="0 0 20 20"
+    <div className="h-screen flex flex-col">
+      <div className="mx-auto">
+        <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
+        <div className="flex flex-col items-center justify-center mt-10 relative group">
+          <div className="relative w-32 h-32">
+            <img
+              src={profileData.profilePicture}
+              alt="Profile Picture"
+              className="w-full h-full rounded-full cursor-pointer"
+              onClick={() => setShowChangeProfPicModal(true)}
+            />
+            <div
+              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-80 bg-black bg-opacity-50 rounded-full transition-opacity duration-300"
+              onClick={() => setShowChangeProfPicModal(true)}
             >
-              <path d="M4 13V16H7L16 7L13 4L4 13Z" />
-            </svg>
+              <svg
+                className="w-8 h-8 text-white"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M4 13V16H7L16 7L13 4L4 13Z" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-2xl font-semibold mt-4">{profileData.fullname}</h2>
+          <p className="text-xl text-gray-600 mt-2">{profileData.description}</p>
+          <h3 className="text-sm text-gray-500 mt-2">{profileData.zid}</h3>
+        </div>
+      
+
+        <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
+          <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
+          <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Share
+          </button>
+        </div>
+      </div>  
+
+      <div className="mx-auto">
+        <div className="mt-10 w-80 mx-auto">
+          <h1 className="text-3xl font-semibold text-center mt-10">Your Feedback</h1>
+          <div className="mt-4 space-y-4">
+            {feedbacks.map(feedback => (
+              <div key={feedback.id} className="border p-4 rounded-md">
+                <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span 
+                      key={star}
+                      className={`text-2xl ${feedback.rating >= star ? "text-yellow-500" : "text-gray-400"}`}
+                    >
+                      ⭐️
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-2">{feedback.comment}</p>
+              </div>
+            ))}
           </div>
         </div>
-        <h2 className="text-2xl font-semibold mt-4">{profileData.fullname}</h2>
-        <p className="text-xl text-gray-600 mt-2">{profileData.description}</p>
-        <h3 className="text-sm text-gray-500 mt-2">{profileData.zid}</h3>
-      </div>
-
-      <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
-        <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
-        <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Share
-        </button>
-      </div>
-
-      <div>
-        <h1 className="text-3xl font-semibold text-center mt-10">Your Feedback</h1>
       </div>
 
       <ToastContainer />
