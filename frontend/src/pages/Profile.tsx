@@ -162,6 +162,10 @@ const copyLinkToClipboard = () => {
         </button>
       </div>
 
+      <div>
+        <h1 className="text-3xl font-semibold text-center mt-10">Your Feedback</h1>
+      </div>
+
       <ToastContainer />
 
       <EditProfileModal
