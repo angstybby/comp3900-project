@@ -136,7 +136,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ open, close, refetc
                 placeholder={'Enter the description of your group...'}
                 id='groupDescription'
                 name='groupDescription'
-                className='block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-md sm:leading-6'
+                className='resize-none block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-md sm:leading-6'
                 value={form.groupDescription}
                 onChange={handleInputChange}
                 autoComplete={'off'}
@@ -152,6 +152,7 @@ const CreateGroupModal: React.FC<CreateGroupModalProps> = ({ open, close, refetc
                 autoComplete={'off'}
                 disabled={loading}
               />
+              <p className="my-2 text-xs">Similar Users:</p>
               <p className="my-2 font-bold">Max Users (Required)</p>
               <Textbox
                 id='maxMembers'

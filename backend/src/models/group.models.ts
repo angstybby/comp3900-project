@@ -725,9 +725,19 @@ export const dbGetUsersNotInGroup = async (groupId: number) => {
                 zid: {
                     notIn: groupMemberIds,
                 },
+                profileOwner: {
+                    userType: "student",
+                },
             },
-            select: {
-                zid: true,
+                select: {
+                    zid: true,
+                    fullname: true,
+                    profilePicture: true,
+                    Skills: {
+                        select: {
+                            skillName: true,
+                        },
+                    },
             },
         });
 
