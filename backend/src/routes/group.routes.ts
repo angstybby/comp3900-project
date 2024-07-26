@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import {
     dbAcceptUserToGroup,
     dbCreateGroup,
@@ -18,15 +18,15 @@ import {
 import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
-import { model } from "../utils/ai";
-import { PrismaClient } from "@prisma/client";
+import {
+    getProjectReccsContext,
+    getStudentReccsContext,
+    model,
+} from "../utils/ai";
 import {
     dbGetAllProjectsWithSkills,
-    dbGetProject,
     dbGetProjectByName,
-    dbGetProjects,
 } from "../models/project.models";
-import { Project } from "../utils/project.utils";
 
 const router = express.Router();
 
@@ -411,6 +411,16 @@ router.get("/groups", authMiddleWare, async (req, res) => {
     }
 });
 
+/**
+ * @route GET /group/details/:groupId
+ * @desc Get the details of a group
+ * @access Private
+ * @type RequestHandler
+ * @param {number} groupId - The id of the group
+ * @returns {Group} - The group details
+ * @throws {Error} - If the request body is missing required fields
+ * @throws {Error} - If an error occurs while fetching group details
+ */
 router.get("/details/:groupId", authMiddleWare, async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -475,14 +485,50 @@ router.post("/apply-project", async (req, res) => {
  * @returns {Error} - If an error occurs while fetching users not in group
  * @throws {500} - If an error occurs while fetching users not in group
  */
-router.get("/not-in-group/:groupId", authMiddleWare, async (req, res) => {
+router.post("/not-in-group/:groupId", authMiddleWare, async (req, res) => {
     const { groupId } = req.params;
-
     const groupIdInt = parseInt(groupId);
+
+    const groupSkills = req.body.groupSkills;
+    if (!groupSkills) {
+        return res.status(400).send("Bad Request: Group skills are required");
+    }
 
     try {
         const users = await dbGetUsersNotInGroup(groupIdInt);
-        return res.status(200).send(users);
+        let userSkillMap = "";
+        for (const user of users) {
+            let joinedSkills = "";
+            for (const skills of user.Skills) {
+                joinedSkills += skills.skillName + ", ";
+            }
+            userSkillMap += `${user.zid} - ${user.fullname} - ${joinedSkills}\n`;
+        }
+
+        const chat = model.startChat();
+        const promptForAi = getStudentReccsContext(groupSkills, userSkillMap);
+        const result = await chat.sendMessage(promptForAi);
+        const recommendations = result.response.text().trim().split(",");
+
+        const generalUsers = users.filter(
+            (user) => !recommendations.includes(user.zid),
+        );
+        // Have to manually select to make sure the recommendations are provided in order
+        const recommendedUsers = [];
+        for (const recc of recommendations) {
+            for (const user of users) {
+                if (user.zid === recc) {
+                    recommendedUsers.push(user);
+                }
+            }
+        }
+
+        const payload = {
+            recommendedUsers,
+            generalUsers,
+        };
+
+        return res.status(200).send(payload);
     } catch (error) {
         console.error(error);
         return res
@@ -491,6 +537,14 @@ router.get("/not-in-group/:groupId", authMiddleWare, async (req, res) => {
     }
 });
 
+/**
+ * @route GET /group/user-in-group/:groupId
+ * @desc Get all the users in a group
+ * @access Private
+ * @returns {User[]} - Array of users in the group
+ * @returns {Error} - If an error occurs while fetching users in group
+ * @throws {500} - If an error occurs while fetching users in group
+ */
 router.get("/user-in-group/:groupId", authMiddleWare, async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
@@ -515,14 +569,23 @@ router.get("/user-in-group/:groupId", authMiddleWare, async (req, res) => {
     }
 });
 
+/**
+ * @route POST /group/get-reccs
+ * @desc Get recommendations for a group
+ * @access Private
+ * @returns {Project[]} - Array of recommended projects
+ * @returns {Error} - If the request body is missing required fields
+ * @throws {400} - If the request body is missing required fields
+ * @throws {500} - If an error occurs while getting recommendations
+ */
 router.post("/get-reccs", authMiddleWare, async (req, res) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {
         return res.status(401).send("Unauthorized");
     }
 
-    const { prompt } = req.body;
-    if (!prompt) {
+    const { groupSkills } = req.body;
+    if (!groupSkills) {
         return res.status(400).send("Bad Request: Prompt is required");
     }
 
@@ -539,8 +602,7 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
             )
             .join("\n");
 
-        const promptForAi = `This group currently has these skills: ${prompt}. Here are the current existing projects: ${stringProjects}. Based on this set of projects, recommend the three most suitable projects for this group. Format the response as a comma-separated list of project title for example: <title1>, <title2>, <title3>`;
-
+        const promptForAi = getProjectReccsContext(groupSkills, stringProjects);
         const chat = model.startChat();
         const result = await chat.sendMessage(promptForAi);
 

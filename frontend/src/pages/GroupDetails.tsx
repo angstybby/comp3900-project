@@ -9,6 +9,7 @@ import { useProfile } from "@/contexts/ProfileContext";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import EditGroupModal from "@/components/Modals/EditGroupModal";
 import InviteUserModal from "@/components/Modals/InviteUserModal";
+import ViewMembersModal from "@/components/Modals/ViewMembersModal";
 import GroupOwnerOptions from "@/components/GroupsComponents/GroupOwnerOptions";
 import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
 
@@ -16,6 +17,7 @@ import { UserGroupIcon } from "@heroicons/react/24/outline";
 
 import { Project, Details } from "@/utils/interfaces";
 import LoadingCircle from "@/components/LoadingCircle";
+import GroupMemberOptions from "@/components/GroupsComponents/GroupMemberOptions";
 
 const GroupDetails = () => {
   const [details, setDetails] = useState<Details>({
@@ -34,6 +36,7 @@ const GroupDetails = () => {
   const [inviteUserModal, setInviteUserModal] = useState(false);
   const [userInGroup, setUserInGroup] = useState(false);
   const [projectLoading, setProjectLoading] = useState(false);
+  const [viewMembersModal, setViewMembersModal] = useState(false);
 
   const { groupId } = useParams<{ groupId: string }>();
   const { profileData } = useProfile();
@@ -94,8 +97,12 @@ const GroupDetails = () => {
 
   return (
     <>
+      {/* MODALS */}
       <EditGroupModal open={editModal} close={() => setEditModal(false)} refetchData={fetchDetails} initValues={details} />
-      <InviteUserModal open={inviteUserModal} close={() => setInviteUserModal(false)} refetchData={fetchDetails} groupId={details.id} />
+      <InviteUserModal open={inviteUserModal} close={() => setInviteUserModal(false)} refetchData={fetchDetails} groupId={details.id} groupSkills={details.CombinedSkills} />
+      <ViewMembersModal open={viewMembersModal} close={() => setViewMembersModal(false)} />
+
+      
       <div className="p-14">
         <div className="flex flex-row justify-between">
           <div className="flex items-center gap-7">
@@ -109,17 +116,21 @@ const GroupDetails = () => {
             <div className="flex flex-row gap-5">
               {isOwner ? (
                 <>
-                  <GroupOwnerOptions openEditModal={() => setEditModal(true)} openInviteUserModal={() => setInviteUserModal(true)} />
+                  <GroupOwnerOptions openEditModal={() => setEditModal(true)} openInviteUserModal={() => setInviteUserModal(true)} openMembersDetailsModal={() => setViewMembersModal(true)}/>
                 </>
               ) : (
                 <>
-                  {userInGroup ?
-                    (<ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />)
+                  {userInGroup ? 
+                    (
+                      <>
+                      <GroupMemberOptions openMembersDetailsModal={() => setViewMembersModal(true)}/>
+                      <ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />
+                      </>
+                    )
                     :
                     (<ButtonUtility classname="p-10 text-lg bg-green-700 hover:bg-green-800" text="Apply to Join" onClick={expressInterest} />)}
                 </>
               )}
-
 
             </div>
           </div>
