@@ -1,5 +1,5 @@
 import { axiosInstanceWithAuth } from "@/api/Axios";
-import { Project, UserType } from "@/utils/interfaces";
+import { Project } from "@/utils/interfaces";
 import { useEffect, useRef, useState } from "react";
 import ProjectCard from "./ProjectCardBlank";
 import { Link } from "react-router-dom";
