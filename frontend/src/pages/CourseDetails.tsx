@@ -61,7 +61,9 @@ const CourseDetails = () => {
   const handleGenerateSkills = async () => {
     try {
       setLoading(true);
-      await axiosInstanceWithAuth.post(`/course/generate-skill-rating/${courseId}`);
+      await axiosInstanceWithAuth.post(
+        `/course/generate-skill-rating/${courseId}`,
+      );
       await fetchDetails();
       setLoading(false);
     } catch (error) {
@@ -121,15 +123,26 @@ const CourseDetails = () => {
           </div>
         </div>
         {/* Generate button should be here TODO */}
-        { loading ? <ButtonLoading/> : <ButtonUtility text={"Generate Skills"} onClick={handleGenerateSkills} />}
-        <div className="w-[500px] h-[500px] mx-auto">
-          <CourseCharts
-            skillLabels={courseDetails.skills.map((skill) => skill.skillName)}
-            skillLevels={courseDetails.courseSkill.map((skill) =>
-              skill.rating.toString(),
-            )}
+        {loading ? (
+          <ButtonLoading />
+        ) : (
+          <ButtonUtility
+            text={"Generate Skills"}
+            onClick={handleGenerateSkills}
           />
-        </div>
+        )}
+        {courseDetails.courseSkill.length === 0 ? (
+          <p className="text-red-500">No skill ratings found for this course</p>
+        ) : (
+          <div className="w-[500px] h-[500px] mx-auto">
+            <CourseCharts
+              skillLabels={courseDetails.skills.map((skill) => skill.skillName)}
+              skillLevels={courseDetails.courseSkill.map((skill) =>
+                skill.rating.toString(),
+              )}
+            />
+          </div> 
+        )}
         {userType === "student" ? (
           <CourseDetailsActions courseId={courseDetails.id} />
         ) : (
