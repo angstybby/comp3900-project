@@ -45,6 +45,7 @@ export const dbUpdateProfile = async (profile: Profile): Promise<Profile> => {
                 fullname: profile.fullname,
                 description: profile.description,
                 resume: profile.resume,
+                CareerPath: profile.CareerPath,
             },
         });
         return user;

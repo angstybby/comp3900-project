@@ -11,6 +11,7 @@ interface EditProfileModalProps {
     fullname: string;
     description: string;
     resume: string;
+    CareerPath: string;
   };
   onClose: () => void;
   handleEditProfileChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
@@ -101,6 +102,21 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 id="zid"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                 value={editProfileInfo.zid}
+                onChange={handleEditProfileChange}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="CareerPath"
+                className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
+              >
+                Career Path
+              </label>
+              <input
+                type="CareerPath"
+                id="CareerPath"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                value={editProfileInfo.CareerPath}
                 onChange={handleEditProfileChange}
               />
             </div>

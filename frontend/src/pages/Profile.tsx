@@ -20,6 +20,7 @@ export default function Profile() {
     fullname: "",
     description: "",
     resume: "",
+    CareerPath: "",
   });
 
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -45,6 +46,7 @@ export default function Profile() {
         fullname: profileData.fullname || '',
         description: profileData.description || '',
         resume: profileData.resume || '',
+        CareerPath: profileData.CareerPath || '',
       });
     }
   }, [profileData]);
@@ -105,6 +107,7 @@ export default function Profile() {
         fullname: profileData.fullname,
         description: profileData.description,
         resume: profileData.resume,
+        CareerPath: profileData.CareerPath,
       });
       updateProfileContext();
     } catch (error) {
@@ -161,6 +164,7 @@ const copyLinkToClipboard = () => {
             <h2 className="text-2xl font-semibold mt-4">{profileData.fullname}</h2>
             <p className="text-xl text-gray-600 mt-2">{profileData.description}</p>
             <h3 className="text-sm text-gray-500 mt-2">{profileData.zid}</h3>
+            <h4 className="text-sm text-gray-500 mt-1"> Career Path: {profileData.CareerPath}</h4>
           </div>
 
 
