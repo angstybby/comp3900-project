@@ -16,6 +16,7 @@ import { UserGroupIcon } from "@heroicons/react/24/outline";
 
 import { Project, Details } from "@/utils/interfaces";
 import LoadingCircle from "@/components/LoadingCircle";
+import GroupMemberOptions from "@/components/GroupsComponents/GroupMemberOptions";
 
 const GroupDetails = () => {
   const [details, setDetails] = useState<Details>({
@@ -34,6 +35,7 @@ const GroupDetails = () => {
   const [inviteUserModal, setInviteUserModal] = useState(false);
   const [userInGroup, setUserInGroup] = useState(false);
   const [projectLoading, setProjectLoading] = useState(false);
+  const [viewMembersDetailsModal, setViewMembersDetailsModal] = useState(false);
 
   const { groupId } = useParams<{ groupId: string }>();
   const { profileData } = useProfile();
@@ -113,13 +115,17 @@ const GroupDetails = () => {
                 </>
               ) : (
                 <>
-                  {userInGroup ?
-                    (<ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />)
+                  {userInGroup ? 
+                    (
+                      <>
+                      <GroupMemberOptions openMembersDetailsModal={() => setViewMembersDetailsModal(true)}/>
+                      <ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />
+                      </>
+                    )
                     :
                     (<ButtonUtility classname="p-10 text-lg bg-green-700 hover:bg-green-800" text="Apply to Join" onClick={expressInterest} />)}
                 </>
               )}
-
 
             </div>
           </div>
