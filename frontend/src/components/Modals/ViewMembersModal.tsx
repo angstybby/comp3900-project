@@ -58,16 +58,22 @@ const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
                     Your Group Members
                   </DialogTitle>
                   <div className="space-y-4 pt-4">
-                    {members.map((member) => (
-                      <div key={member.zid} className="flex items-center space-x-4">
-                        <div className="text-lg font-medium text-gray-900">
-                          {member.fullname}
+                    {members.length > 0 ? (
+                      members.map((member) => (
+                        <div key={member.zid} className="flex items-center space-x-4">
+                          <div className="text-lg font-medium text-gray-900">
+                            {member.fullname}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {member.zid}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {member.zid}
-                        </div>
+                      ))
+                    ) : (
+                      <div className="text-sm text-gray-500">
+                        No members in this group yet.
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>

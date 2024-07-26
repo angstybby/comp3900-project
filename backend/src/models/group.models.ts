@@ -775,6 +775,10 @@ export const dbGetGroupMembers = async (groupId: number) => {
             },
         });
 
+        if (!groupMembers) {
+            throw new Error("Group members does not exist");
+        }
+
         const groupMemberIds = groupMembers.map((member) => member.zid);
 
         const memberDetails = await prisma.profile.findMany({
