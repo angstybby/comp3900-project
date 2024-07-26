@@ -31,7 +31,7 @@ export default function GroupCard({ groupId, group, inCarousel, profile }: Group
     const isOwner = group.groupOwnerId === profile.zid
 
     const content = (
-        <div onClick={handleClick} className="h-40 bg-gray-100 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-full hover:cursor-pointer transition duration-150 shadow-lg">
+        <div onClick={handleClick} className="h-32 bg-gray-100 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-full hover:cursor-pointer transition duration-150 shadow-lg">
             <div className="flex flex-col justify-between h-full">
                 <div className="text-start flex flex-col gap-1">
                     <div className="flex flex-row justify-between items-center">
