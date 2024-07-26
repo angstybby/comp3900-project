@@ -3,9 +3,12 @@ import { Project } from "@/utils/interfaces";
 import { useEffect, useRef, useState } from "react";
 import ProjectCard from "./ProjectCard";
 import { Link } from "react-router-dom";
+import LoadingCircle from "../LoadingCircle";
 
 export default function ProjectList({ searchTerm }: { searchTerm: string }) {
     const [projects, setProjects] = useState<Project[]>([]);
+    const [recommendedProjects, setRecommendedProjects] = useState<Project[]>([]);
+    const [projectLoading, setProjectLoading] = useState(false);
     const indexRef = useRef(25);
     const paginateNoSearch = 25;
     const paginateWithSearch = 10;
@@ -24,10 +27,24 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
             response.data.forEach((project: any) => {
                 project.id = parseInt(project.id);
             });
-            console.log(response.data);
             setProjects(response.data);
         } catch (error) {
             console.error('Failed to fetch projects:', error);
+        }
+    };
+
+    const fetchRecommendedProjects = async () => {
+        try {
+            setProjectLoading(true);
+            const response = await axiosInstanceWithAuth.post('/projects/get-career-reco'); // Replace with real skills data
+            console.log("Recommended Projects:",response.data);
+            response.data.forEach((project: any) => {
+                project.id = parseInt(project.id);
+            });
+            setRecommendedProjects(response.data);
+            setProjectLoading(false);
+        } catch (error) {
+            console.error('Failed to fetch recommended projects:', error);
         }
     };
 
@@ -72,6 +89,7 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
             indexRef.current = 10;
         }
         fetchProjects();
+        fetchRecommendedProjects();
         window.addEventListener('scroll', loadOnScroll);
         return () => window.removeEventListener('scroll', loadOnScroll);
     }, [searchTerm]);
@@ -91,6 +109,25 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
                     ))}
                 </div>
             )}
+
+            {projectLoading ? (
+              <div className="w-full text-center">
+                <LoadingCircle />
+              </div>
+            ) :
+              (
+                <div className="mt-10">
+                    <h2 className="text-3xl font-semibold mb-5">Recommended Projects</h2>
+                    <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12 ">
+                        {recommendedProjects.map((project) => (
+                            <Link key={project.id} to={`/project/${project.id}`}>
+                                <ProjectCard key={project.id} project={project} />
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+              )
+            } 
         </div>
     );
 }

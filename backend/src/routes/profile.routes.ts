@@ -75,7 +75,7 @@ router.put("/update-profile", async (req, res) => {
         CareerPath,
     };
 
-    console.log(profile.CareerPath);
+    console.log(CareerPath);
 
     try {
         // Update the user's profile in the database
