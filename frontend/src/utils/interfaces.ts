@@ -21,6 +21,20 @@ export interface Project {
     projectId: number;
     status: string;
   }[];
+  groups: {
+    groupName: string;
+    groupId: number;
+  }[];
+}
+
+export interface ProjectCardStudent {
+  id: number;
+  title: string;
+  description: string;
+  groups: {
+    groupId: number;
+    groupName: string;
+  }[];
 }
 
 export interface Details {

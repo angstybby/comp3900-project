@@ -171,18 +171,11 @@ export const dbGetUserJoinedProjects = async (
             group: {
                 select: {
                     Project: {
-                        include: {
-                            ProjectOwner: true,
-                            skills: {
-                                select: {
-                                    id: true,
-                                    skillName: true,
-                                },
-                            },
-                        },
                         skip: skip,
                         take: 25,
                     },
+                    groupName: true,
+                    id: true,
                 },
             },
         },

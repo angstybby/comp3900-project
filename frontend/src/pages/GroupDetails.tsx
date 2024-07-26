@@ -11,7 +11,7 @@ import EditGroupModal from "@/components/Modals/EditGroupModal";
 import InviteUserModal from "@/components/Modals/InviteUserModal";
 import ViewMembersModal from "@/components/Modals/ViewMembersModal";
 import GroupOwnerOptions from "@/components/GroupsComponents/GroupOwnerOptions";
-import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
+import ProjectCard from "@/components/ProjectsComponents/ProjectCardBlank";
 
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 
@@ -53,7 +53,7 @@ const GroupDetails = () => {
 
       // Get recommendations
       setProjectLoading(true);
-      const response2 = await axiosInstanceWithAuth.post('/group/get-reccs', { prompt: skills.join(',') });
+      const response2 = await axiosInstanceWithAuth.post('/group/get-reccs', { groupSkills: skills.join(',') });
       setRecc(response2.data);
       setProjectLoading(false);
     } catch (error) {
@@ -102,7 +102,7 @@ const GroupDetails = () => {
       <InviteUserModal open={inviteUserModal} close={() => setInviteUserModal(false)} refetchData={fetchDetails} groupId={details.id} groupSkills={details.CombinedSkills} />
       <ViewMembersModal open={viewMembersModal} close={() => setViewMembersModal(false)} />
 
-      
+
       <div className="p-14">
         <div className="flex flex-row justify-between">
           <div className="flex items-center gap-7">
@@ -116,15 +116,15 @@ const GroupDetails = () => {
             <div className="flex flex-row gap-5">
               {isOwner ? (
                 <>
-                  <GroupOwnerOptions openEditModal={() => setEditModal(true)} openInviteUserModal={() => setInviteUserModal(true)} openMembersDetailsModal={() => setViewMembersModal(true)}/>
+                  <GroupOwnerOptions openEditModal={() => setEditModal(true)} openInviteUserModal={() => setInviteUserModal(true)} openMembersDetailsModal={() => setViewMembersModal(true)} />
                 </>
               ) : (
                 <>
-                  {userInGroup ? 
+                  {userInGroup ?
                     (
                       <>
-                      <GroupMemberOptions openMembersDetailsModal={() => setViewMembersModal(true)}/>
-                      <ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />
+                        <GroupMemberOptions openMembersDetailsModal={() => setViewMembersModal(true)} />
+                        <ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />
                       </>
                     )
                     :
