@@ -720,6 +720,7 @@ export const dbGetUsersNotInGroup = async (groupId: number) => {
 
         const groupMemberIds = groupMembers.map((member) => member.zid);
 
+        
         const usersNotInGroup = await prisma.profile.findMany({
             where: {
                 zid: {
@@ -759,6 +760,39 @@ export const dbIsUserJoinedGroup = async (groupId: number, zId: string) => {
         return !!groupMember;
     } catch (error) {
         console.error("Error checking if user joined group:", error);
+        throw error;
+    }
+};
+
+export const dbGetGroupMembers = async (groupId: number) => {
+    try {
+        const groupMembers = await prisma.groupJoined.findMany({
+            where: {
+                groupId,
+            },
+            select: {
+                zid: true,
+            },
+        });
+
+        const groupMemberIds = groupMembers.map((member) => member.zid);
+
+        const memberDetails = await prisma.profile.findMany({
+            where: {
+                zid: {
+                    in: groupMemberIds,
+                },
+            },
+                select: {
+                    zid: true,
+                    fullname: true,
+            },
+        });
+
+        return memberDetails;
+
+    } catch (error) {
+        console.error("error getting group members.", error);
         throw error;
     }
 };

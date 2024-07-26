@@ -15,6 +15,7 @@ interface ViewMembersModalProps {
 
 interface Member {
   zid: string,
+  fullname: string,
 }
 
 const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
@@ -53,16 +54,21 @@ const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
             <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
               <div className="sm:flex sm:items-start">
                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                  <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                  <DialogTitle as="h3" className="text-xl font-semibold leading-6 text-gray-900">
                     Your Group Members
                   </DialogTitle>
-                  {members.map((member) => (
-                    <div>
-                    
-                      <h2 className="text-xl font-semibold text-center mt-2">{member.zid}</h2>
-  
-                    </div>
-                  ))}
+                  <div className="space-y-4 pt-4">
+                    {members.map((member) => (
+                      <div key={member.zid} className="flex items-center space-x-4">
+                        <div className="text-lg font-medium text-gray-900">
+                          {member.fullname}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {member.zid}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
