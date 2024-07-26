@@ -328,3 +328,33 @@ export const dbUpdateProject = async (
     await dbAddProjectSkills(projectId, skillsToAdd);
     await dbDeleteProjectSkills(projectId, skillsToRemove);
 };
+
+export const dbGetUserInProject = async (projectId: number, zid: string) => {
+    // Check the user's groups and then check if any of the groups are in the project
+    // Just return a boolean
+    const groups = await prisma.groupJoined.findMany({
+        where: {
+            zid,
+        },
+        select: {
+            group: {
+                select: {
+                    id: true,
+                },
+            },
+        },
+    });
+
+    for (const group of groups) {
+        const groupInProject = await prisma.projectInterest.findFirst({
+            where: {
+                groupId: group.group.id,
+                projectId,
+            },
+        });
+
+        if (groupInProject) {
+            return true;
+        }
+    }
+};

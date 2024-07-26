@@ -7,6 +7,7 @@ import { Project } from "@/utils/interfaces";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import EditProjectModal from "@/components/Modals/EditProjectModal";
 import ButtonPrimary from "@/components/Buttons/ButtonPrimary";
+import LoadingCircle from "@/components/LoadingCircle";
 
 const ProjectDetailsOther = () => {
   const { projectId } = useParams();
@@ -23,6 +24,7 @@ const ProjectDetailsOther = () => {
     ProjectInterest: [],
     groups: []
   });
+  const [userInGroup, setUserInGroup] = useState(false);
 
   const [editProjectModalOpen, setEditProjectModalOpen] = useState(false);
 
@@ -32,15 +34,19 @@ const ProjectDetailsOther = () => {
     try {
       const response = await axiosInstanceWithAuth.get(`/projects/${projectId}`);
       setProjectDetail(response.data);
+      const response2 = await axiosInstanceWithAuth.get(`/projects/user-in-group/${profileData.zid}/${projectId}`);
+      setUserInGroup(response2.data);
     } catch (error) {
       console.error('Failed to fetch project:', error);
     }
-  }, [projectId]);
+  }, [projectId, profileData.zid]);
 
   useEffect(() => {
-    fetchProjectDetails();
-    console.log(projectDetail);
-  }, [fetchProjectDetails]);
+    if (profileData) {
+      fetchProjectDetails();
+      console.log(projectDetail);
+    }
+  }, [fetchProjectDetails, profileData]);
 
   const openEditModal = () => {
     setEditProjectModalOpen(true);
@@ -50,20 +56,30 @@ const ProjectDetailsOther = () => {
     setEditProjectModalOpen(false);
   };
 
+  if (!profileData) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <LoadingCircle />
+      </div>
+    );
+  }
+
 
   return (
     <>
       <EditProjectModal open={editProjectModalOpen} close={closeEditModal} refetchData={fetchProjectDetails} initValues={projectDetail} />
       <div className="p-14">
         <div className="flex justify-between">
-          <h1 className="text-4xl font-medium">{projectDetail?.title}</h1>
+          <div>
+            <h1 className="text-4xl font-medium">{projectDetail?.title}</h1>
+            <p className="mt-4 text-lg">Project Owner: {projectDetail?.ProjectOwner.zid}</p>
+          </div>
           {isProjectOwner && (
             <div className="flex flex-row gap-5">
               <ButtonUtility text="Edit Project" onClick={openEditModal} />
               <ButtonPrimary classname="bg-orange-600 hover:bg-orange-800" text="Group Applications" url={`/project/${projectDetail.id}/applications`} />
             </div>
           )}
-
         </div>
         <div className="mt-8">
           <h2 className="text-2xl font-medium">Description</h2>

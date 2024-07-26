@@ -20,6 +20,7 @@ const ProjectDetailsStudent = () => {
       zid: "",
     },
     ProjectInterest: [],
+    groups: []
   });
   const [groupDetail, setGroupDetail] = useState<Details>({
     id: 0,
@@ -121,7 +122,7 @@ const ProjectDetailsStudent = () => {
         </div>
         <div className="mt-8">
           <h2 className="text-2xl font-medium">Skills Gap Analysis</h2>
-          <SkillsGapAnalysis projectId={Number(projectId)}/>
+          <SkillsGapAnalysis projectId={Number(projectId)} />
         </div>
       </div>
     </>

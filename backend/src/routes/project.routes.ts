@@ -13,6 +13,7 @@ import {
     dbGetUserJoinedProjects,
     dbGetProjectsOwnedByUser,
     dbUpdateProject,
+    dbGetUserInProject,
 } from "../models/project.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { isProjectOwner } from "../utils/project.utils";
@@ -474,5 +475,23 @@ router.put("/update", async (req: Request, res: Response) => {
         res.status(500).send("Failed updating project");
     }
 });
+
+router.get(
+    "/user-in-group/:userId/:projectId",
+    authMiddleWare,
+    async (req: Request, res: Response) => {
+        const { userId, projectId } = req.params;
+        try {
+            const response = await dbGetUserInProject(
+                parseInt(projectId),
+                userId,
+            );
+            res.status(200).send(response);
+        } catch (error) {
+            console.error("Failed to fetch user in group:", error);
+            res.status(500).send("Failed to fetch user in group");
+        }
+    },
+);
 
 export default router;
