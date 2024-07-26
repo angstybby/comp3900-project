@@ -1,7 +1,14 @@
-import { Radar } from 'react-chartjs-2';
-import { Chart as ChartJS, Tooltip, Legend, RadialLinearScale, LineElement, PointElement, Filler } from 'chart.js';
-import React from 'react';
-
+import { Radar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  Tooltip,
+  Legend,
+  RadialLinearScale,
+  LineElement,
+  PointElement,
+  Filler,
+} from "chart.js";
+import React from "react";
 
 ChartJS.register(
   LineElement,
@@ -9,32 +16,21 @@ ChartJS.register(
   Tooltip,
   Legend,
   RadialLinearScale,
-  Filler
-)
-const CourseCharts: React.FC = () => {
-
-  //still stubs
-  const skillLabels = ['Javascript', 'Software design', 'Software testing', 'Object-Oriented', 'Most important Skill'];
-  const skillLevels = ['3', '2', '5', '4', '3'];
-  const skillImportance = ['1', '2', '4', '3', '5'];
-  // const popularity = 50;
-
-
-
+  Filler,
+);
+const CourseCharts: React.FC<{ skillLabels: string[]; skillLevels: string[] }> = ({
+  skillLabels,
+  skillLevels,
+}) => {
   const radarData = {
     labels: skillLabels,
     datasets: [
       {
-        label: 'Skill Level',
+        label: "Skill Importance",
         data: skillLevels,
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+        borderColor: "rgb(255, 99, 132)",
+        backgroundColor: "rgba(54, 162, 235, 0.5)",
       },
-      {
-        label: 'Skill Importance',
-        data: skillImportance,
-        borderColor: 'rgb(255, 99, 132)',
-      },
-
     ],
     options: {
       responsive: false,
@@ -45,7 +41,7 @@ const CourseCharts: React.FC = () => {
     <div className="flex">
       <Radar data={radarData}></Radar>
     </div>
-  )
-}
+  );
+};
 
 export default CourseCharts;

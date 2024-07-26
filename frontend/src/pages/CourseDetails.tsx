@@ -5,8 +5,8 @@ import EditCourseDetailsModal from "@/components/Modals/EditCourseDetailsModal";
 import CourseCharts from "@/components/CoursesComponents/CourseCharts";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"
-
+import { useParams } from "react-router-dom";
+import ButtonPrimary from "@/components/Buttons/ButtonPrimary";
 
 interface Skills {
   skillName: string;
@@ -19,6 +19,8 @@ interface CourseDetails {
   popularity: number; //need to implement for fetching
 }
 
+interface CourseSkillRatings {}
+
 const CourseDetails = () => {
   const [open, setOpen] = useState(false);
   const openCloseModal = () => setOpen(!open);
@@ -30,30 +32,34 @@ const CourseDetails = () => {
     summary: "",
     popularity: 10, //STUB
   });
+  const [skillLabels, setSkillLabels] = useState<string[]>([]);
+  const [skillLevels, setSkillLevels] = useState<string[]>([]);
 
   const fetchDetails = async () => {
     try {
-      const response = await axiosInstanceWithAuth.get(`/course/course-details/${courseId}`);
+      const response = await axiosInstanceWithAuth.get(
+        `/course/course-details/${courseId}`,
+      );
       const details = {
         id: response.data.id,
         courseName: response.data.courseName,
         skills: response.data.skills ? response.data.skills : [],
         summary: response.data.summary,
         popularity: 10, //STUB
-      }
+      };
       setCourseDetails(details);
-      console.log('Course details:', details);
+      console.log("Course details:", details);
     } catch (error) {
-      console.error('Failed to fetch course details:', error);
+      console.error("Failed to fetch course details:", error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchDetails();
-  }, [])
+  }, []);
 
   // Page auth protection
-  let userType = Cookies.get('userType');
+  let userType = Cookies.get("userType");
 
   return (
     <>
@@ -64,7 +70,7 @@ const CourseDetails = () => {
         refetchData={fetchDetails}
         initialValues={{
           summary: courseDetails.summary,
-          skills: courseDetails.skills.join(', ')
+          skills: courseDetails.skills.join(", "),
         }}
       />
       <div className="px-14 py-5">
@@ -72,38 +78,45 @@ const CourseDetails = () => {
         <div className="mb-5">
           <p className="mb-2">
             {`Course Code: `}
-            <span className="font-bold">
-              {`${courseDetails.id}`}
-            </span>
+            <span className="font-bold">{`${courseDetails.id}`}</span>
           </p>
           <p>
             {`Course Title: `}
-            <span className="font-bold">
-              {`${courseDetails.courseName}`}
-            </span>
+            <span className="font-bold">{`${courseDetails.courseName}`}</span>
           </p>
           <p className="font-bold mt-5">Course Summary:</p>
-          <p className="mb-5">{courseDetails.summary ? courseDetails.summary : 'No summary for this course.'}</p>
+          <p className="mb-5">
+            {courseDetails.summary
+              ? courseDetails.summary
+              : "No summary for this course."}
+          </p>
           <p className="font-bold">Course Skills:</p>
           <div>
-            {courseDetails.skills.length > 0 ?
-              (
-                courseDetails.skills.filter(skill => skill).map((skill, index) => (
-                  <p key={index} className="">{`\u2022 ${skill.skillName}`}</p>
-                ))
-              )
-              :
-              'No skills found for this course'}
+            {courseDetails.skills.length > 0
+              ? courseDetails.skills
+                  .filter((skill) => skill)
+                  .map((skill, index) => (
+                    <p
+                      key={index}
+                      className=""
+                    >{`\u2022 ${skill.skillName}`}</p>
+                  ))
+              : "No skills found for this course"}
           </div>
-          
         </div>
+        {/* Generate button should be here TODO */}
+        <ButtonUtility text={"Generate Skills"} onClick={() => {}} />
         <div className="w-[500px] h-[500px] mx-auto">
-          <CourseCharts/>
+          <CourseCharts skillLabels={skillLabels} skillLevels={skillLevels} />
         </div>
-        {userType === 'student' ? <CourseDetailsActions courseId={courseDetails.id} /> : <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />}
+        {userType === "student" ? (
+          <CourseDetailsActions courseId={courseDetails.id} />
+        ) : (
+          <ButtonUtility text="Edit Course Details" onClick={openCloseModal} />
+        )}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default CourseDetails
+export default CourseDetails;
