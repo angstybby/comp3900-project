@@ -1,6 +1,5 @@
-import { Carousel, CarouselContent, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent } from '@/components/ui/carousel';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
-import { Fragment } from 'react/jsx-runtime';
 
 const Home = () => {
 const tabOptions = [
@@ -16,18 +15,29 @@ const tabOptions = [
     name: 'CANVA',
     content: 'https://widgets.sociablekit.com/linkedin-page-posts/iframe/25442088',
   },
+  {
+    name: 'AWS',
+    content: 'https://widgets.sociablekit.com/linkedin-page-posts/iframe/25442312',
+  },
+  {
+    name: 'OPTIVER',
+    content: 'https://widgets.sociablekit.com/linkedin-page-posts/iframe/25442307',
+  },
 ];
 
   return (
-    <div className="h-screen flex">
+    <div className="h-screen flex overflow-hidden">
       <div className="w-2/3 flex flex-wrap p-2 rounded-md mx-auto my-auto">
         <div className="w-full text-center my-2">You Have Reached the Home (Dashboard) Page</div>
       </div>
-      <div className="w-1/3 pt-2 shadow-xl hidden lg:block h-screen">
-        <TabGroup manual as={Fragment}>
-          <div className='relative w-full bg-gray'>
+      <div className="w-1/3 pt-2 shadow-xl hidden lg:flex h-screen flex-col box-border">
+        <p className='w-full p-2 ml-4 my-2 text-xl font-semibold'>
+          Keep in the Loop with the latest leaders!
+        </p>
+        <TabGroup className='flex flex-col h-full flex-grow'>
+          <div className='w-full bg-gray flex-grow-0 '>
             <TabList className="flex gap-4"> 
-              <Carousel className="h-full w-[90%] ml-2" opts={{
+              <Carousel className="w-[90%] ml-2" opts={{
                     align: "start",
                   }}>
                 <CarouselContent className='mx-1'>
@@ -42,17 +52,15 @@ const tabOptions = [
                   ))
                 }
                 </CarouselContent>
-                {/* <CarouselPrevious />
-                <CarouselNext /> */}
               </Carousel>
             </TabList>
           </div>
-          <div>
-            <TabPanels className="mt-2 flex h-screen">
+          <div className='w-full flex-grow'>
+            <TabPanels className="mt-4 h-full">
               {
                 tabOptions.map(option => (
-                  <TabPanel key={option.name} className='w-full'>
-                    <iframe src={option.content} width='100%' height='100%'></iframe>
+                  <TabPanel key={option.name} className='w-full h-full'>
+                    <iframe src={option.content} style={{ width: '100%', height: '96%' }}></iframe>
                   </TabPanel>
                 ))
               }
