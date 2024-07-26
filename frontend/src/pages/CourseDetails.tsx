@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ButtonLoading from "@/components/Buttons/ButtonLoading";
+import { ErrorAlert } from "@/components/errorAlert";
 
 interface Skills {
   skillName: string;
@@ -36,6 +37,7 @@ const CourseDetails = () => {
     courseSkill: [],
   });
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchDetails = async () => {
     try {
@@ -65,11 +67,15 @@ const CourseDetails = () => {
         `/course/generate-skill-rating/${courseId}`,
       );
       await fetchDetails();
-      setLoading(false);
+      setErrorMessage("");
     } catch (error) {
       console.log(error);
       // show the error somewhere
+      setErrorMessage(
+        "Failed to generate skills, Please ensure the course has skills",
+      );
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -122,17 +128,10 @@ const CourseDetails = () => {
               : "No skills found for this course"}
           </div>
         </div>
-        {/* Generate button should be here TODO */}
-        {loading ? (
-          <ButtonLoading />
-        ) : (
-          <ButtonUtility
-            text={"Generate Skills"}
-            onClick={handleGenerateSkills}
-          />
-        )}
         {courseDetails.courseSkill.length === 0 ? (
-          <p className="text-red-500">No skill ratings found for this course</p>
+          <p className="text-red-500 my-5">
+            No skill ratings found for this course
+          </p>
         ) : (
           <div className="w-[500px] h-[500px] mx-auto">
             <CourseCharts
@@ -141,8 +140,22 @@ const CourseDetails = () => {
                 skill.rating.toString(),
               )}
             />
-          </div> 
+          </div>
         )}
+        {errorMessage === "" ? null : (
+          <ErrorAlert errorMessage={errorMessage} />
+        )}
+        <div className="my-8">
+          {/* Error message TODO */}
+          {loading ? (
+            <ButtonLoading />
+          ) : (
+            <ButtonUtility
+              text={"Generate Skills"}
+              onClick={handleGenerateSkills}
+            />
+          )}
+        </div>
         {userType === "student" ? (
           <CourseDetailsActions courseId={courseDetails.id} />
         ) : (
