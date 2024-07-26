@@ -18,6 +18,7 @@ const ProjectDetailsStudent = () => {
     skills: [],
     ProjectOwner: {
       zid: "",
+      fullname: "",
     },
     ProjectInterest: [],
     groups: []

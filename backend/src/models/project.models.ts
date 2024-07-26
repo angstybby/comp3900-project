@@ -330,31 +330,50 @@ export const dbUpdateProject = async (
 };
 
 export const dbGetUserInProject = async (projectId: number, zid: string) => {
-    // Check the user's groups and then check if any of the groups are in the project
-    // Just return a boolean
+    // Check the user's groups and return the groupName if they are in the project
     const groups = await prisma.groupJoined.findMany({
         where: {
-            zid,
+            zid: zid,
         },
         select: {
             group: {
                 select: {
                     id: true,
+                    groupName: true,
+                    description: true,
+                    GroupMembers: {
+                        select: {
+                            zid: true,
+                        },
+                    },
+                    MaxMembers: true,
+                    groupOwnerId: true,
+                    Project: {
+                        select: {
+                            id: true,
+                        },
+                    },
                 },
             },
         },
     });
 
-    for (const group of groups) {
-        const groupInProject = await prisma.projectInterest.findFirst({
-            where: {
-                groupId: group.group.id,
-                projectId,
-            },
+    // Filter out groups that are in the project and add group member count
+    const userGroups = groups
+        .filter((group) => {
+            return group.group.Project.some(
+                (project) => project.id === projectId,
+            );
+        })
+        .map((group) => {
+            return {
+                id: group.group.id,
+                groupName: group.group.groupName,
+                description: group.group.description,
+                members: group.group.GroupMembers.length,
+                MaxMembers: group.group.MaxMembers,
+            };
         });
 
-        if (groupInProject) {
-            return true;
-        }
-    }
+    return userGroups;
 };

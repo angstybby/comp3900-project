@@ -11,6 +11,7 @@ export interface Project {
   description: string;
   ProjectOwner: {
     zid: string;
+    fullname: string;
   };
   skills: {
     id: number;

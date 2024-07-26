@@ -88,7 +88,7 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
                     <p className="text-2xl font-bold">No projects found</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12 ">
+                <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12">
                     {userType === 'student' ? (
                         projects.map((project) => (
                             <Link key={project.id} to={`/project/${project.id}`}>
