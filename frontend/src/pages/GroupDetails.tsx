@@ -9,6 +9,7 @@ import { useProfile } from "@/contexts/ProfileContext";
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
 import EditGroupModal from "@/components/Modals/EditGroupModal";
 import InviteUserModal from "@/components/Modals/InviteUserModal";
+import ViewMembersModal from "@/components/Modals/ViewMembersModal";
 import GroupOwnerOptions from "@/components/GroupsComponents/GroupOwnerOptions";
 import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
 
@@ -35,7 +36,7 @@ const GroupDetails = () => {
   const [inviteUserModal, setInviteUserModal] = useState(false);
   const [userInGroup, setUserInGroup] = useState(false);
   const [projectLoading, setProjectLoading] = useState(false);
-  const [viewMembersDetailsModal, setViewMembersDetailsModal] = useState(false);
+  const [viewMembersModal, setViewMembersModal] = useState(false);
 
   const { groupId } = useParams<{ groupId: string }>();
   const { profileData } = useProfile();
@@ -96,8 +97,11 @@ const GroupDetails = () => {
 
   return (
     <>
+      {/* MODALS */}
       <EditGroupModal open={editModal} close={() => setEditModal(false)} refetchData={fetchDetails} initValues={details} />
       <InviteUserModal open={inviteUserModal} close={() => setInviteUserModal(false)} refetchData={fetchDetails} groupId={details.id} />
+      <ViewMembersModal open={viewMembersModal} close={() => setViewMembersModal(false)} />
+
       <div className="p-14">
         <div className="flex flex-row justify-between">
           <div className="flex items-center gap-7">
@@ -111,14 +115,14 @@ const GroupDetails = () => {
             <div className="flex flex-row gap-5">
               {isOwner ? (
                 <>
-                  <GroupOwnerOptions openEditModal={() => setEditModal(true)} openInviteUserModal={() => setInviteUserModal(true)} />
+                  <GroupOwnerOptions openEditModal={() => setEditModal(true)} openInviteUserModal={() => setInviteUserModal(true)} openMembersDetailsModal={() => setViewMembersModal(true)}/>
                 </>
               ) : (
                 <>
                   {userInGroup ? 
                     (
                       <>
-                      <GroupMemberOptions openMembersDetailsModal={() => setViewMembersDetailsModal(true)}/>
+                      <GroupMemberOptions openMembersDetailsModal={() => setViewMembersModal(true)}/>
                       <ButtonUtility classname="p-10 text-lg bg-red-700 hover:bg-red-800" text="Leave Group" onClick={leaveGroup} />
                       </>
                     )
