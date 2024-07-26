@@ -1,16 +1,42 @@
+import { axiosInstanceWithAuth } from '@/api/Axios';
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
 } from '@headlessui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 interface ViewMembersModalProps {
   open: boolean;
   close: () => void;
 }
 
+interface Member {
+  zid: string,
+}
+
 const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
+ 
+  const [members, setMembers] = useState<Member[]>([]);
+  const { groupId } = useParams<{ groupId: string }>();
+  
+  const fetchMemberDetails = useCallback(async () => {
+    try {
+      const response = await axiosInstanceWithAuth.get(`/group/members/${groupId}`)
+      setMembers(response.data);
+    } catch (error) {
+      console.error("Error getting group members:", error);
+    }
+
+  }, [groupId]);
+
+  useEffect(() => {
+    fetchMemberDetails();
+  }, [fetchMemberDetails]);
+
+  
   return (
     <Dialog open={open} onClose={() => close()} className="relative z-10">
       <DialogBackdrop
@@ -30,6 +56,13 @@ const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
                   <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
                     Your Group Members
                   </DialogTitle>
+                  {members.map((member) => (
+                    <div>
+                    
+                      <h2 className="text-xl font-semibold text-center mt-2">{member.zid}</h2>
+  
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
