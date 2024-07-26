@@ -6,20 +6,22 @@ import CourseCharts from "@/components/CoursesComponents/CourseCharts";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import ButtonPrimary from "@/components/Buttons/ButtonPrimary";
+import ButtonLoading from "@/components/Buttons/ButtonLoading";
 
 interface Skills {
   skillName: string;
 }
+
 interface CourseDetails {
   id: string;
   courseName: string;
   skills: Skills[];
   summary: string;
   popularity: number; //need to implement for fetching
+  courseSkill: {
+    rating: number;
+  }[];
 }
-
-interface CourseSkillRatings {}
 
 const CourseDetails = () => {
   const [open, setOpen] = useState(false);
@@ -31,9 +33,9 @@ const CourseDetails = () => {
     skills: [],
     summary: "",
     popularity: 10, //STUB
+    courseSkill: [],
   });
-  const [skillLabels, setSkillLabels] = useState<string[]>([]);
-  const [skillLevels, setSkillLevels] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchDetails = async () => {
     try {
@@ -46,11 +48,25 @@ const CourseDetails = () => {
         skills: response.data.skills ? response.data.skills : [],
         summary: response.data.summary,
         popularity: 10, //STUB
+        courseSkill: response.data.CourseSkill,
       };
+      console.log(details);
       setCourseDetails(details);
       console.log("Course details:", details);
     } catch (error) {
       console.error("Failed to fetch course details:", error);
+    }
+  };
+
+  const handleGenerateSkills = async () => {
+    try {
+      setLoading(true);
+      await axiosInstanceWithAuth.post(`/course/generate-skill-rating/${courseId}`);
+      await fetchDetails();
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      // show the error somewhere
     }
   };
 
@@ -105,9 +121,14 @@ const CourseDetails = () => {
           </div>
         </div>
         {/* Generate button should be here TODO */}
-        <ButtonUtility text={"Generate Skills"} onClick={() => {}} />
+        { loading ? <ButtonLoading/> : <ButtonUtility text={"Generate Skills"} onClick={handleGenerateSkills} />}
         <div className="w-[500px] h-[500px] mx-auto">
-          <CourseCharts skillLabels={skillLabels} skillLevels={skillLevels} />
+          <CourseCharts
+            skillLabels={courseDetails.skills.map((skill) => skill.skillName)}
+            skillLevels={courseDetails.courseSkill.map((skill) =>
+              skill.rating.toString(),
+            )}
+          />
         </div>
         {userType === "student" ? (
           <CourseDetailsActions courseId={courseDetails.id} />

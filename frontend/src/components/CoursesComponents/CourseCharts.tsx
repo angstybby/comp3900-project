@@ -7,6 +7,7 @@ import {
   LineElement,
   PointElement,
   Filler,
+  scales,
 } from "chart.js";
 import React from "react";
 
@@ -18,10 +19,11 @@ ChartJS.register(
   RadialLinearScale,
   Filler,
 );
-const CourseCharts: React.FC<{ skillLabels: string[]; skillLevels: string[] }> = ({
-  skillLabels,
-  skillLevels,
-}) => {
+const CourseCharts: React.FC<{
+  skillLabels: string[];
+  skillLevels: string[];
+}> = ({ skillLabels, skillLevels }) => {
+  console.log(skillLabels, skillLevels);
   const radarData = {
     labels: skillLabels,
     datasets: [
@@ -32,14 +34,24 @@ const CourseCharts: React.FC<{ skillLabels: string[]; skillLevels: string[] }> =
         backgroundColor: "rgba(54, 162, 235, 0.5)",
       },
     ],
-    options: {
-      responsive: false,
+  };
+
+  const radarOptions = {
+    scales: {
+      r: {
+        min: 0,
+        max: 5,
+        ticks: {
+          stepSize: 1,
+        },
+      },
     },
+    responsive: true,
   };
 
   return (
     <div className="flex">
-      <Radar data={radarData}></Radar>
+      <Radar data={radarData} options={radarOptions}></Radar>
     </div>
   );
 };

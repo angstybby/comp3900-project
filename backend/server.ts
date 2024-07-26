@@ -14,16 +14,19 @@ const app = express();
 const cookieParser = require("cookie-parser");
 
 app.use((req, res, next) => {
-  console.log(`Received request: ${req.method} ${req.url}`);
-  next();
+    console.log(`Received request: ${req.method} ${req.url}`);
+    next();
 });
 
 // Define the port to run the server on
 const PORT = 3000;
 
 const corsOptions = {
-  origin: process.env.NODE_ENV == "production" ? "http://localhost:80" : "http://localhost:5173",
-  credentials: true, 
+    origin:
+        process.env.NODE_ENV == "production"
+            ? "http://localhost:80"
+            : "http://localhost:5173",
+    credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -37,6 +40,11 @@ app.use("/api/user", authMiddleWare, user);
 app.use("/api/course", authMiddleWare, course);
 app.use("/api/skills", authMiddleWare, skills);
 app.use("/api/projects", authMiddleWare, projects);
+
+app.use((req, res, next) => {
+    console.log(`Unknown request: ${req.method} ${req.url}`);
+    res.status(404).send("Unknown request");
+});
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
