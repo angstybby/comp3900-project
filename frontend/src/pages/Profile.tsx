@@ -123,6 +123,10 @@ const copyLinkToClipboard = () => {
     });
   });
 };
+
+const connectToLinkedIn = () => {
+  console.log("STUB");
+}
   
   return (
     <div className="h-screen flex items-center justify-start flex-col">
@@ -155,9 +159,14 @@ const copyLinkToClipboard = () => {
 
       <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
         <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
-        <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Share
-        </button>
+      </div>
+
+      <div className="mt-4">
+        <ButtonUtility text={"Share"} onClick={copyLinkToClipboard} bg={"bg-blue-500"} />
+      </div>
+
+      <div className="mt-4">
+        <ButtonUtility text={"Connect to LinkedIn"} onClick={connectToLinkedIn} />
       </div>
 
       <ToastContainer />
