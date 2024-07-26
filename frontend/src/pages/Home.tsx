@@ -1,3 +1,5 @@
+import ProjectCard from "@/components/ProjectsComponents/ProjectCard";
+
 const Home = () => {
   return (
     <div className="h-screen flex">

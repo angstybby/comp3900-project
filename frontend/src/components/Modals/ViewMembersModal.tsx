@@ -5,12 +5,12 @@ import {
   DialogTitle,
 } from '@headlessui/react';
 
-interface EditGroupModalProps {
+interface ViewMembersModalProps {
   open: boolean;
   close: () => void;
 }
 
-const EditGroupModal: React.FC<EditGroupModalProps> = ({ open, close }) => {
+const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
   return (
     <Dialog open={open} onClose={() => close()} className="relative z-10">
       <DialogBackdrop
@@ -28,33 +28,10 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({ open, close }) => {
               <div className="sm:flex sm:items-start">
                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                   <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
-                    View Members
+                    Your Group Members
                   </DialogTitle>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Are you sure you want to deactivate your account? All of your data will be permanently removed.
-                      This action cannot be undone.
-                    </p>
-                  </div>
                 </div>
               </div>
-            </div>
-            <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-              <button
-                type="button"
-                onClick={() => close()}
-                className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
-              >
-                Deactivate
-              </button>
-              <button
-                type="button"
-                data-autofocus
-                onClick={() => close()}
-                className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-              >
-                Cancel
-              </button>
             </div>
           </DialogPanel>
         </div>
@@ -63,4 +40,4 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({ open, close }) => {
   )
 }
 
-export default EditGroupModal;
+export default ViewMembersModal;
