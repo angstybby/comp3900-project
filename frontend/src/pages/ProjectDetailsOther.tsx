@@ -9,6 +9,7 @@ import EditProjectModal from "@/components/Modals/EditProjectModal";
 import ButtonPrimary from "@/components/Buttons/ButtonPrimary";
 import LoadingCircle from "@/components/LoadingCircle";
 import GroupCard from "@/components/GroupsComponents/GroupCard";
+import { Carousel, CarouselContent, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 interface GroupParams {
   id: number;
@@ -80,11 +81,11 @@ const ProjectDetailsOther = () => {
   return (
     <>
       <EditProjectModal open={editProjectModalOpen} close={closeEditModal} refetchData={fetchProjectDetails} initValues={projectDetail} />
-      <div className="p-14">
+      <div className="p-14 h-screen">
         <div className="flex justify-between">
           <div>
-            <h1 className="text-4xl font-medium">{projectDetail?.title}</h1>
-            <p className="mt-2 text-lg">Project Owner: {projectDetail?.ProjectOwner.fullname} ({projectDetail?.ProjectOwner.zid})</p>
+            <h1 className="text-4xl font-normal">{projectDetail?.title}</h1>
+            <p className="mt-4 text-xl font-normal text-gray-500">Project Owner: <span className="font-medium">{projectDetail?.ProjectOwner.fullname} ({projectDetail?.ProjectOwner.zid})</span></p>
           </div>
           {isProjectOwner && (
             <div className="flex flex-row gap-5">
@@ -94,22 +95,31 @@ const ProjectDetailsOther = () => {
           )}
         </div>
         <div className="mt-4">
-          <h2 className="text-lg font-bold">Description: <span className="font-normal">{projectDetail?.description}</span></h2>
-          <h2 className="text-lg font-bold">Skills: <span className="font-normal">{projectDetail?.skills.map(skill => skill.skillName).join(", ")}</span></h2>
+          <h2 className="text-xl font-normal">Description: <span className="font-bold">{projectDetail?.description}</span></h2>
+          <h2 className="text-xl font-normal">Skills: <span className="font-bold">{projectDetail?.skills.map(skill => skill.skillName).join(", ")}</span></h2>
         </div>
-        <div className="mt-4">
-          <h1 className="text-2xl font-medium">Your Groups:</h1>
-          <div className="mt-4 grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12">
-            {userGroups.map((group, index) => (
-              <GroupCard key={index} group={group} groupId={group.id} inCarousel={false} profile={profileData} />
-            ))}
+        <div className="mt-8 h-48">
+          <h1 className="text-2xl font-bold">Your Groups in this Project:</h1>
+          <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{
+            align: "start"
+          }}>
+            <CarouselContent >
+              {userGroups.map((group) => (
+                <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} profile={profileData} />
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+        <div className="mt-16">
+          <div className="flex flex-col">
+            <h2 className="text-2xl font-bold">Skills Gap Analysis</h2>
+            <SkillsGapAnalysis projectId={Number(projectId)} />
           </div>
         </div>
-        {/* <div className="mt-8">
-          <h2 className="text-2xl font-medium">Skills Gap Analysis</h2>
-          <SkillsGapAnalysis projectId={Number(projectId)} />
-        </div> */}
-      </div>
+
+      </div >
     </>
   );
 };

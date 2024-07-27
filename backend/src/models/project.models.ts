@@ -372,6 +372,7 @@ export const dbGetUserInProject = async (projectId: number, zid: string) => {
                 description: group.group.description,
                 members: group.group.GroupMembers.length,
                 MaxMembers: group.group.MaxMembers,
+                groupOwnerId: group.group.groupOwnerId,
             };
         });
 

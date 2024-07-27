@@ -2,6 +2,7 @@ import { Chart } from "chart.js";
 import { useEffect, useRef, useState } from "react";
 import ProjectGroupOptions from "./ProjectGroupOptions";
 import { axiosInstanceWithAuth } from "@/api/Axios";
+import { CheckCircleIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
 
 interface SkillsGapAnalysisProps {
   projectId: number;
@@ -55,10 +56,11 @@ export default function SkillsGapAnalysis({
           ],
         },
         options: {
-          responsive: false,
+          responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: {
-              position: "top",
+              position: "left",
             },
             title: {
               display: true,
@@ -75,52 +77,41 @@ export default function SkillsGapAnalysis({
 
   return (
     <div>
-      <div>
-        <h1>Please choose a group</h1>
+      <div className="flex">
         <ProjectGroupOptions chooseOptions={chooseOptions} />
       </div>
       {groupId == -1 ? (
         <></>
       ) : (
         <div>
-          <h1 className="text-xl font-semibold pt-4">
-            Your skills analysis for this project
-          </h1>
-          <div className="mt-8 flex">
-            <canvas ref={chartRef} />
-          </div>
-          <div className="flex mt-8">
-            <div className="mr-4">
-              <h2 className="font-semibold">Skills Required:</h2>
-              <ul>
-                {projectSkills.map((skill, index) => (
-                  <li key={`project-${skill.id}-${index}`}>
-                    {skill.skillName}
-                  </li>
-                ))}
-              </ul>
+          <div className="flex md:flex-row flex-col md:items-center items-start gap-5">
+            <div className="flex flex-row w-full lg:w-1/3 md:w-1/2">
+              <div className=" md:h-60 w-full">
+                <canvas ref={chartRef} />
+              </div>
             </div>
-            <div className="mr-4">
-              <h2 className="font-semibold">Skills Possessed:</h2>
-              <ul>
-                {studentSkills.map((skill, index) => (
-                  <li key={`student-${skill.id}-${index}`}>
-                    {skill.skillName}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="mr-4">
-              <h2 className="font-semibold">Skills Lacking:</h2>
-              <ul>
-                {skillsGap.map((skill, index) => (
-                  <li key={`gap-${skill.id}-${index}`}>{skill.skillName}</li>
-                ))}
-              </ul>
+            <div className="flex flex-col gap-4 mt-2">
+              <div className="mr-4 flex flex-row gap-1 items-center">
+                <CheckCircleIcon className="text-green-400 w-5 h-5" />
+                <h2 className="font-normal">{studentSkills.length} {studentSkills.length === 1 ? "Skill" : "Skills"} on the group:</h2>
+                {/* comma seperated */}
+                <h2 className="font-semibold">
+                  {studentSkills.map((skill) => skill).join(", ")}
+                </h2>
+              </div>
+              <div className="mr-4 flex flex-row gap-1 items-center">
+                <ExclamationCircleIcon className="text-black w-5 h-5" />
+                <h2 className="font-normal">{skillsGap.length} {skillsGap.length === 1 ? "Skill" : "Skills"} missing from the group:</h2>
+                <h2 className="font-semibold">
+                  {skillsGap.map((skill) => skill).join(", ")}
+                </h2>
+              </div>
             </div>
           </div>
+
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }

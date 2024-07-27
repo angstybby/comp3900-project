@@ -123,7 +123,7 @@ export default function Groups() {
                 <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{
                   align: "start"
                 }}>
-                  <CarouselContent>
+                  <CarouselContent >
                     {yourGroups.map((group) => (
                       <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} profile={profileData} />
                     ))}
