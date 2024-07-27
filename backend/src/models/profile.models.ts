@@ -83,8 +83,6 @@ export const dbGetUserSkills = async (zid: string) => {
           },
           select: {
               zid: true,
-              fullname: true,
-              profilePicture: true,
               CareerPath: true,
               Skills: {
                   select: {

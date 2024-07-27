@@ -132,8 +132,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, re
           >
             <form onSubmit={handleSubmit}>
               <DialogTitle className='mb-5'>
-                <p className='font-bold text-2xl'>Create your Group!</p>
-                <p className='font-thin text-sm opacity-90 mt-1'>Each student can only create one group.</p>
+                <p className='font-bold text-2xl'>Create Project</p>
+                <p className='font-thin text-sm opacity-90 mt-1'>Academics can create projects</p>
               </DialogTitle>
               <p className="my-2 font-bold">Project Name (Required)</p>
               <Textbox

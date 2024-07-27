@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import ProjectCard from "./ProjectCard";
 import { Link } from "react-router-dom";
 import LoadingCircle from "../LoadingCircle";
+import Cookies from "js-cookie";
+
+type UserType = 'admin' | 'student' | 'academic' | null;
 
 export default function ProjectList({ searchTerm }: { searchTerm: string }) {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -12,6 +15,7 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
     const indexRef = useRef(25);
     const paginateNoSearch = 25;
     const paginateWithSearch = 10;
+    const [userType, setUserType] = useState<UserType>(null);
 
     const fetchProjects = async () => {
         try {
@@ -83,6 +87,8 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
     }
 
     useEffect(() => {
+        const userTypeFromCookie = Cookies.get('userType') as UserType;
+        setUserType(userTypeFromCookie);
         if (!searchTerm) {
             indexRef.current = 25;
         } else {
@@ -110,24 +116,24 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
                 </div>
             )}
 
-            {projectLoading ? (
-              <div className="w-full text-center">
-                <LoadingCircle />
-              </div>
-            ) :
-              (
+            {userType === 'student' && (
+              projectLoading ? (
+                <div className="w-full text-center">
+                  <LoadingCircle />
+                </div>
+              ) : (
                 <div className="mt-10">
-                    <h2 className="text-3xl font-semibold mb-5">Recommended Projects</h2>
-                    <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12 ">
-                        {recommendedProjects.map((project) => (
-                            <Link key={project.id} to={`/project/${project.id}`}>
-                                <ProjectCard key={project.id} project={project} />
-                            </Link>
-                        ))}
-                    </div>
+                  <h2 className="text-3xl font-semibold mb-5">Recommended Projects</h2>
+                  <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12 ">
+                    {recommendedProjects.map((project) => (
+                      <Link key={project.id} to={`/project/${project.id}`}>
+                        <ProjectCard key={project.id} project={project} />
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )
-            } 
+            )}
         </div>
     );
 }
