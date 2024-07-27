@@ -585,8 +585,8 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
         return res.status(401).send("Unauthorized");
     }
 
-    const groupSkills = req.body;
-    if (!groupSkills.prompt) {
+    const groupSkills = req.body.prompt;
+    if (!groupSkills) {
         return res.status(400).send("Bad Request: Prompt is required");
     }
 
@@ -603,7 +603,7 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
             )
             .join("\n");
 
-        const promptForAi = getProjectReccsContext(groupSkills.prompt, stringProjects);
+        const promptForAi = getProjectReccsContext(groupSkills, stringProjects);
         const chat = model.startChat();
         const result = await chat.sendMessage(promptForAi);
 
