@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ButtonLoading from "@/components/Buttons/ButtonLoading";
-import { ErrorAlert } from "@/components/errorAlert";
+import { ErrorAlert } from "@/components/ErrorAlert";
 
 interface Skills {
   skillName: string;
