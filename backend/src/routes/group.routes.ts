@@ -1,4 +1,4 @@
-import express from "express";
+import express, { request } from "express";
 import {
     dbAcceptUserToGroup,
     dbCreateGroup,
@@ -585,8 +585,8 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
         return res.status(401).send("Unauthorized");
     }
 
-    const { groupSkills } = req.body;
-    if (!groupSkills) {
+    const groupSkills = req.body;
+    if (!groupSkills.prompt) {
         return res.status(400).send("Bad Request: Prompt is required");
     }
 
@@ -603,9 +603,11 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
             )
             .join("\n");
 
-        const promptForAi = getProjectReccsContext(groupSkills, stringProjects);
+        const promptForAi = getProjectReccsContext(groupSkills.prompt, stringProjects);
         const chat = model.startChat();
         const result = await chat.sendMessage(promptForAi);
+
+        console.log(result.response.text());
 
         const projectIds = result.response
             .text()

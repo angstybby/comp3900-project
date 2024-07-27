@@ -476,7 +476,7 @@ const createUserSkillsString = async (zid: string) => {
 
 /**
  * @route POST /projects/get-recommended
- * @desc Get recommended projects
+ * @desc Get recommended projects based on career and skills
  * @access Private
  * @returns {Array} List of recommended projects
  * @throws {500} If an error occurs while fetching recommended projects
@@ -516,9 +516,9 @@ router.post("/get-career-reco", authMiddleWare, async (req, res) => {
       const promptForAi = getProjectReccsContextByCareer(userSkills, stringProjects, user.CareerPath);
 
       const chat = model.startChat();
-      console.log("prompt for AI: ", promptForAi);
+      // console.log("prompt for AI: ", promptForAi);
       const result = await chat.sendMessage(promptForAi);
-      console.log("AI Output: ", result.response.text());
+      // console.log("AI Output: ", result.response.text());
 
       const projectIds = result.response
           .text()
