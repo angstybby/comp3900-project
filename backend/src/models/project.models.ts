@@ -125,7 +125,8 @@ export const dbGetProjectOwnerById = async (projectId: number) => {
 };
 
 export const dbGetProject = async (projectId: number) => {
-    return await prisma.project.findUnique({
+    // Fetch the project details along with the related entities
+    const response = await prisma.project.findUnique({
         where: {
             id: projectId,
         },
@@ -137,8 +138,36 @@ export const dbGetProject = async (projectId: number) => {
                     skillName: true,
                 },
             },
+            Group: {
+                include: {
+                    GroupMembers: true,
+                },
+            },
         },
     });
+
+    if (!response) {
+        throw new Error("Project not found");
+    }
+
+    const groupsWithMemberCount = response.Group.map((group) => {
+        const membersCount = group.GroupMembers.length;
+        return {
+            ...group,
+            members: membersCount,
+        };
+    });
+
+    const cleanedGroups = groupsWithMemberCount.map(
+        ({ GroupMembers, ...rest }) => ({
+            ...rest,
+        }),
+    );
+
+    return {
+        ...response,
+        Group: cleanedGroups,
+    };
 };
 
 // Get all projects with a limit of 25 and a skip value
@@ -265,7 +294,7 @@ export const dbGetProjectByName = async (name: string) => {
     });
 };
 
-export const dbGetAllProjectsWithSkills = async () => {
+export const dbGetAllProjectsWithSkills = async (groupId: number) => {
     const returnProjects: CombinedProject[] = [];
     const projects = await prisma.project.findMany({
         select: {
@@ -275,7 +304,29 @@ export const dbGetAllProjectsWithSkills = async () => {
             projectOwnerId: true,
         },
     });
-    for (const project of projects) {
+
+    const groupProjects = await prisma.group.findFirst({
+        where: {
+            id: groupId,
+        },
+        select: {
+            Project: {
+                select: {
+                    id: true,
+                },
+            },
+        },
+    });
+
+    // Filter out projects that are already in the group
+    const filteredProjects = projects.filter(
+        (project) =>
+            !groupProjects?.Project.some(
+                (groupProject) => groupProject.id === project.id,
+            ),
+    );
+
+    for (const project of filteredProjects) {
         const tempProject: CombinedProject = project;
         const skills = await prisma.skills.findMany({
             where: {

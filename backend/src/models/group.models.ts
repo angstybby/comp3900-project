@@ -671,6 +671,28 @@ export const dbGetGroup = async (groupId: number) => {
             throw new Error("Group does not exist");
         }
 
+        // Add details to projectInterest just name and description
+        const projectInterest = await Promise.all(
+            group.ProjectInterest.map(async (project) => {
+                const projectDetails = await prisma.project.findFirst({
+                    where: {
+                        id: project.projectId,
+                    },
+                    select: {
+                        title: true,
+                        description: true,
+                    },
+                });
+
+                return {
+                    projectId: project.projectId,
+                    groupId: project.groupId,
+                    status: project.status,
+                    ...projectDetails,
+                };
+            }),
+        );
+
         // get the group owner details
         const groupOwnerName = await prisma.profile.findFirst({
             where: {
@@ -682,12 +704,13 @@ export const dbGetGroup = async (groupId: number) => {
         });
 
         // Fetch the member count for the group
-        let members = await prisma.groupJoined.count({
+        const members = await prisma.groupJoined.count({
             where: { groupId },
         });
 
         return {
             ...group,
+            ProjectInterest: projectInterest,
             members,
             groupOwnerName: groupOwnerName?.fullname,
         };
@@ -729,15 +752,15 @@ export const dbGetUsersNotInGroup = async (groupId: number) => {
                     userType: "student",
                 },
             },
-                select: {
-                    zid: true,
-                    fullname: true,
-                    profilePicture: true,
-                    Skills: {
-                        select: {
-                            skillName: true,
-                        },
+            select: {
+                zid: true,
+                fullname: true,
+                profilePicture: true,
+                Skills: {
+                    select: {
+                        skillName: true,
                     },
+                },
             },
         });
 
