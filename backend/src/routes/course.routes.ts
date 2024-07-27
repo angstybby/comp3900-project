@@ -278,8 +278,8 @@ router.post("/update-details", async (req, res) => {
     }
 });
 
-router.get("/generate-skill-rating", async (req, res) => {
-    const { courseId } = req.body;
+router.post("/generate-skill-rating/:id", async (req, res) => {
+    const courseId = req.params.id;
 
     try {
         const course = await dbGetCourse(courseId);
@@ -327,7 +327,7 @@ router.get("/generate-skill-rating", async (req, res) => {
 
         // update course skills with ratings
         await dbUpdateSkillsRatings(courseId, skillNames, skillRatings);
-
+        console.log("Course skills ratings updated successfully");
         res.status(200).send("Course skills ratings generated successfully");
     } catch (error) {
         console.log(error);

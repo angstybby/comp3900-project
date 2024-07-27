@@ -1,16 +1,43 @@
+import { axiosInstanceWithAuth } from '@/api/Axios';
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
 } from '@headlessui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 interface ViewMembersModalProps {
   open: boolean;
   close: () => void;
 }
 
+interface Member {
+  zid: string,
+  fullname: string,
+}
+
 const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
+ 
+  const [members, setMembers] = useState<Member[]>([]);
+  const { groupId } = useParams<{ groupId: string }>();
+  
+  const fetchMemberDetails = useCallback(async () => {
+    try {
+      const response = await axiosInstanceWithAuth.get(`/group/members/${groupId}`)
+      setMembers(response.data);
+    } catch (error) {
+      console.error("Error getting group members:", error);
+    }
+
+  }, [groupId]);
+
+  useEffect(() => {
+    fetchMemberDetails();
+  }, [fetchMemberDetails]);
+
+  
   return (
     <Dialog open={open} onClose={() => close()} className="relative z-10">
       <DialogBackdrop
@@ -27,9 +54,27 @@ const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
             <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
               <div className="sm:flex sm:items-start">
                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                  <DialogTitle as="h3" className="text-base font-semibold leading-6 text-gray-900">
+                  <DialogTitle as="h3" className="text-xl font-semibold leading-6 text-gray-900">
                     Your Group Members
                   </DialogTitle>
+                  <div className="space-y-4 pt-4">
+                    {members.length > 0 ? (
+                      members.map((member) => (
+                        <div key={member.zid} className="flex items-center space-x-4">
+                          <div className="text-lg font-medium text-gray-900">
+                            {member.fullname}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {member.zid}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-sm text-gray-500">
+                        No members in this group yet.
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
