@@ -1,4 +1,4 @@
-import Bubble from "../SkillsComponents/BubbleSkills";
+import Bubble from "./ProjectStatusBubble";
 
 interface ProjectCardStudent {
     project: {
