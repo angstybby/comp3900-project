@@ -18,6 +18,7 @@ import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { Project, Details } from "@/utils/interfaces";
 import LoadingCircle from "@/components/LoadingCircle";
 import GroupMemberOptions from "@/components/GroupsComponents/GroupMemberOptions";
+import ProjectCardStatus from "@/components/ProjectsComponents/ProjectCardStatus";
 
 const GroupDetails = () => {
   const [details, setDetails] = useState<Details>({
@@ -29,7 +30,8 @@ const GroupDetails = () => {
     MaxMembers: 0,
     groupOwnerName: "",
     CombinedSkills: [],
-    Project: []
+    Project: [],
+    ProjectInterest: []
   });
   const [recc, setRecc] = useState<Project[]>([]);
   const [editModal, setEditModal] = useState(false);
@@ -49,11 +51,12 @@ const GroupDetails = () => {
       const response = await axiosInstanceWithAuth.get(`/group/details/${groupId}`);
       const skills = response.data.CombinedSkills.map((skill: { skillName: string }) => skill.skillName);
       response.data.CombinedSkills = skills;
+      console.log(response.data);
       setDetails(response.data);
 
       // Get recommendations
       setProjectLoading(true);
-      const response2 = await axiosInstanceWithAuth.post('/group/get-reccs', { groupSkills: skills.join(',') });
+      const response2 = await axiosInstanceWithAuth.post('/group/get-reccs', { groupSkills: skills.join(','), groupId });
       setRecc(response2.data);
       setProjectLoading(false);
     } catch (error) {
@@ -162,6 +165,32 @@ const GroupDetails = () => {
             )
           }
 
+        </div>
+        <div>
+          <p className="mt-10 text-2xl font-bold mb-5">{`Group Projects`}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {details.Project.length === 0 ? (
+              <p className="text-lg font-normal text-gray-500">No projects found</p>
+            ) : (
+              <>
+                {details.Project.map((project) => (
+                  <Link key={project.id} to={`/group/${groupId}/project/${project.id}`}>
+                    <ProjectCard project={project} />
+                  </Link>
+                ))}
+
+                {details.ProjectInterest.map((project) => {
+                  if (project.status !== "ACCEPTED") {
+                    return (
+                      <Link key={project.projectId} to={`/group/${groupId}/project/${project.projectId}`}>
+                        <ProjectCardStatus project={project} />
+                      </Link>
+                    );
+                  }
+                })}
+              </>
+            )}
+          </div>
         </div>
       </div >
     </>

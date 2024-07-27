@@ -21,7 +21,7 @@ const ProjectDetailsStudent = () => {
       fullname: "",
     },
     ProjectInterest: [],
-    groups: []
+    Group: []
   });
   const [groupDetail, setGroupDetail] = useState<Details>({
     id: 0,
@@ -32,7 +32,8 @@ const ProjectDetailsStudent = () => {
     MaxMembers: 0,
     groupOwnerName: "",
     CombinedSkills: [],
-    Project: []
+    Project: [],
+    ProjectInterest: []
   });
 
   const [projectStatus, setProjectStatus] = useState<ProjectStatus>(null);

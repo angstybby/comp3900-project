@@ -22,9 +22,23 @@ export interface Project {
     projectId: number;
     status: string;
   }[];
-  groups: {
+  Group: {
     groupName: string;
+    id: number;
+    groupOwnerId: string;
+    MaxMembers: number;
+    members: number;
+    description: string;
+  }[];
+}
+
+export interface ProjectListInterface {
+  id: number;
+  title: string;
+  description: string;
+  groups: {
     groupId: number;
+    groupName: string;
   }[];
 }
 
@@ -48,6 +62,13 @@ export interface Details {
   groupOwnerName: string;
   CombinedSkills: string[];
   Project: Project[];
+  ProjectInterest: {
+    groupId: number;
+    projectId: number;
+    status: string;
+    title: string;
+    description: string;
+  }[];
 }
 
 export type UserType = "admin" | "student" | "academic" | null;

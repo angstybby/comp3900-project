@@ -10,6 +10,7 @@ import ButtonPrimary from "@/components/Buttons/ButtonPrimary";
 import LoadingCircle from "@/components/LoadingCircle";
 import GroupCard from "@/components/GroupsComponents/GroupCard";
 import { Carousel, CarouselContent, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Cookies from "js-cookie";
 
 interface GroupParams {
   id: number;
@@ -34,9 +35,10 @@ const ProjectDetailsOther = () => {
       fullname: "",
     },
     ProjectInterest: [],
-    groups: []
+    Group: []
   });
   const [userGroups, setUserGroups] = useState<GroupParams[]>([]);
+  const userType = Cookies.get("userType");
 
   const [editProjectModalOpen, setEditProjectModalOpen] = useState(false);
 
@@ -46,19 +48,21 @@ const ProjectDetailsOther = () => {
     try {
       const response = await axiosInstanceWithAuth.get(`/projects/${projectId}`);
       setProjectDetail(response.data);
-      const response2 = await axiosInstanceWithAuth.get(`/projects/user-in-group/${profileData.zid}/${projectId}`);
-      setUserGroups(response2.data);
-      console.log(response2.data);
+      console.log(response.data);
+      if (userType === "student") {
+        const response2 = await axiosInstanceWithAuth.get(`/projects/user-in-group/${profileData.zid}/${projectId}`);
+        setUserGroups(response2.data);
+        console.log(response2.data);
+      }
     } catch (error) {
       console.error('Failed to fetch project:', error);
     }
   }, [projectId, profileData.zid]);
 
   useEffect(() => {
-    if (profileData.hasOwnProperty('zid')) {
+    if (profileData && profileData.hasOwnProperty('zid')) {
       fetchProjectDetails();
     }
-
   }, [fetchProjectDetails, profileData]);
 
   const openEditModal = () => {
@@ -77,7 +81,6 @@ const ProjectDetailsOther = () => {
     );
   }
 
-
   return (
     <>
       <EditProjectModal open={editProjectModalOpen} close={closeEditModal} refetchData={fetchProjectDetails} initValues={projectDetail} />
@@ -88,7 +91,7 @@ const ProjectDetailsOther = () => {
             <p className="mt-4 text-xl font-normal text-gray-500">Project Owner: <span className="font-medium">{projectDetail?.ProjectOwner.fullname} ({projectDetail?.ProjectOwner.zid})</span></p>
           </div>
           {isProjectOwner && (
-            <div className="flex flex-row gap-5">
+            <div className="flex h-10 flex-row gap-5">
               <ButtonUtility text="Edit Project" onClick={openEditModal} />
               <ButtonPrimary classname="bg-orange-600 hover:bg-orange-800" text="Group Applications" url={`/project/${projectDetail.id}/applications`} />
             </div>
@@ -98,28 +101,38 @@ const ProjectDetailsOther = () => {
           <h2 className="text-xl font-normal">Description: <span className="font-bold">{projectDetail?.description}</span></h2>
           <h2 className="text-xl font-normal">Skills: <span className="font-bold">{projectDetail?.skills.map(skill => skill.skillName).join(", ")}</span></h2>
         </div>
-        <div className="mt-8 h-48">
-          <h1 className="text-2xl font-bold">Your Groups in this Project:</h1>
-          <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{
-            align: "start"
-          }}>
-            <CarouselContent >
-              {userGroups.map((group) => (
-                <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} profile={profileData} />
+        {userType === "student" ? (
+          <>
+            <div className="mt-8 h-48">
+              <h1 className="text-2xl font-bold">Your Groups in this Project:</h1>
+              <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{ align: "start" }}>
+                <CarouselContent>
+                  {userGroups.map((group) => (
+                    <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} profile={profileData} />
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+            </div>
+            <div className="mt-16">
+              <div className="flex flex-col">
+                <h2 className="text-2xl font-bold">Skills Gap Analysis</h2>
+                <SkillsGapAnalysis projectId={Number(projectId)} />
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold">Groups in this Project:</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-5">
+              {projectDetail.Group.map((group) => (
+                <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={false} profile={profileData} />
               ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-        </div>
-        <div className="mt-16">
-          <div className="flex flex-col">
-            <h2 className="text-2xl font-bold">Skills Gap Analysis</h2>
-            <SkillsGapAnalysis projectId={Number(projectId)} />
+            </div>
           </div>
-        </div>
-
-      </div >
+        )}
+      </div>
     </>
   );
 };

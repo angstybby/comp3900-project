@@ -1,5 +1,5 @@
 import { axiosInstanceWithAuth } from "@/api/Axios";
-import { Project } from "@/utils/interfaces";
+import { ProjectListInterface } from "@/utils/interfaces";
 import { useEffect, useRef, useState } from "react";
 import ProjectCard from "./ProjectCardBlank";
 import { Link } from "react-router-dom";
@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import ProjectCardStudent from "./ProjectCardStudent";
 
 export default function ProjectList({ searchTerm }: { searchTerm: string }) {
-    const [projects, setProjects] = useState<Project[]>([]);
+    const [projects, setProjects] = useState<ProjectListInterface[]>([]);
     const indexRef = useRef(25);
     const paginateNoSearch = 25;
     const paginateWithSearch = 10;
@@ -28,8 +28,6 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
             response.data.forEach((project: any) => {
                 project.id = parseInt(project.id);
             });
-
-
             setProjects(response.data);
         } catch (error) {
             console.error('Failed to fetch projects:', error);
