@@ -13,6 +13,7 @@ import {
     dbGetUserJoinedProjects,
     dbGetProjectsOwnedByUser,
     dbUpdateProject,
+    dbGetUserInProject,
 } from "../models/project.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { isProjectOwner } from "../utils/project.utils";
@@ -145,7 +146,7 @@ router.get("/all", async (req: Request, res: Response) => {
     try {
         const skip = parseInt(req.query.skip as string);
 
-        if (!skip && skip !== 0) {
+        if (isNaN(skip)) {
             return res.status(400).send("Invalid skip value");
         }
 
@@ -158,11 +159,33 @@ router.get("/all", async (req: Request, res: Response) => {
             // Get projects of groups they are in
             const projects = await dbGetUserJoinedProjects(zid, skip);
 
-            // Filter out groups with no projects and flatten the project array
-            const projectReturn = projects
-                .map((group) => group.group.Project)
-                .filter((projectArray) => projectArray.length > 0)
-                .flat();
+            // Map and combine projects, including group information
+            const projectMap = new Map();
+            projects.forEach((group) => {
+                group.group.Project.forEach((project) => {
+                    if (!projectMap.has(project.id)) {
+                        projectMap.set(project.id, {
+                            ...project,
+                            groups: [
+                                {
+                                    groupName: group.group.groupName,
+                                    groupId: group.group.id,
+                                },
+                            ],
+                        });
+                    } else {
+                        const existingProject = projectMap.get(project.id);
+                        existingProject.groups.push({
+                            groupName: group.group.groupName,
+                            groupId: group.group.id,
+                        });
+                        projectMap.set(project.id, existingProject);
+                    }
+                });
+            });
+
+            // Convert the map to an array
+            const projectReturn = Array.from(projectMap.values());
 
             return res.status(200).send(projectReturn);
         } else if (userType.userType === UserType.academic) {
@@ -452,5 +475,23 @@ router.put("/update", async (req: Request, res: Response) => {
         res.status(500).send("Failed updating project");
     }
 });
+
+router.get(
+    "/user-in-group/:userId/:projectId",
+    authMiddleWare,
+    async (req: Request, res: Response) => {
+        const { userId, projectId } = req.params;
+        try {
+            const response = await dbGetUserInProject(
+                parseInt(projectId),
+                userId,
+            );
+            res.status(200).send(response);
+        } catch (error) {
+            console.error("Failed to fetch user in group:", error);
+            res.status(500).send("Failed to fetch user in group");
+        }
+    },
+);
 
 export default router;

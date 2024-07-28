@@ -1,14 +1,18 @@
 import { axiosInstanceWithAuth } from "@/api/Axios";
-import { Project } from "@/utils/interfaces";
+import { ProjectListInterface } from "@/utils/interfaces";
 import { useEffect, useRef, useState } from "react";
-import ProjectCard from "./ProjectCard";
+import ProjectCard from "./ProjectCardBlank";
 import { Link } from "react-router-dom";
+import Cookies from "js-cookie";
+import ProjectCardStudent from "./ProjectCardStudent";
 
 export default function ProjectList({ searchTerm }: { searchTerm: string }) {
-    const [projects, setProjects] = useState<Project[]>([]);
+    const [projects, setProjects] = useState<ProjectListInterface[]>([]);
     const indexRef = useRef(25);
     const paginateNoSearch = 25;
     const paginateWithSearch = 10;
+
+    const userType = Cookies.get('userType');
 
     const fetchProjects = async () => {
         try {
@@ -24,7 +28,6 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
             response.data.forEach((project: any) => {
                 project.id = parseInt(project.id);
             });
-            console.log(response.data);
             setProjects(response.data);
         } catch (error) {
             console.error('Failed to fetch projects:', error);
@@ -83,14 +86,23 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
                     <p className="text-2xl font-bold">No projects found</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12 ">
-                    {projects.map((project) => (
-                        <Link key={project.id} to={`/project/${project.id}`}>
-                            <ProjectCard key={project.id} project={project} />
-                        </Link>
-                    ))}
+                <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12">
+                    {userType === 'student' ? (
+                        projects.map((project) => (
+                            <Link key={project.id} to={`/project/${project.id}`}>
+                                <ProjectCardStudent project={project} />
+                            </Link>
+                        ))
+                    ) : (
+                        projects.map((project) => (
+                            <Link key={project.id} to={`/project/${project.id}`}>
+                                <ProjectCard key={project.id} project={project} />
+                            </Link>
+                        ))
+                    )}
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }

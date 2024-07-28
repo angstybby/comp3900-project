@@ -585,13 +585,17 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
         return res.status(401).send("Unauthorized");
     }
 
-    const { groupSkills } = req.body;
+    const { groupSkills, groupId } = req.body;
     if (!groupSkills) {
         return res.status(400).send("Bad Request: Prompt is required");
     }
 
+    if (!groupId) {
+        return res.status(400).send("Group ID is required");
+    }
+
     try {
-        const allProjects = await dbGetAllProjectsWithSkills();
+        const allProjects = await dbGetAllProjectsWithSkills(parseInt(groupId));
         const stringProjects = allProjects
             .map(
                 (project) => `

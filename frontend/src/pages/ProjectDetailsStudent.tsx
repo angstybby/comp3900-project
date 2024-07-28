@@ -1,6 +1,6 @@
 import { useProfile } from "@/contexts/ProfileContext";
 import { useCallback, useEffect, useState } from "react";
-import SkillsGapAnalysis from "@/components/ProjectsComponents/SkillsGapAnalysis";
+import SkillsGapAnalysis from "@/components/ProjectsComponents/SkillsGapAnalysisStudent";
 import { useParams } from "react-router-dom";
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import { Details, Project, ProjectStatus } from "@/utils/interfaces";
@@ -18,8 +18,10 @@ const ProjectDetailsStudent = () => {
     skills: [],
     ProjectOwner: {
       zid: "",
+      fullname: "",
     },
     ProjectInterest: [],
+    Group: []
   });
   const [groupDetail, setGroupDetail] = useState<Details>({
     id: 0,
@@ -30,7 +32,8 @@ const ProjectDetailsStudent = () => {
     MaxMembers: 0,
     groupOwnerName: "",
     CombinedSkills: [],
-    Project: []
+    Project: [],
+    ProjectInterest: []
   });
 
   const [projectStatus, setProjectStatus] = useState<ProjectStatus>(null);
@@ -95,7 +98,10 @@ const ProjectDetailsStudent = () => {
       <ApplyProjectConfirmationModal open={confirmApplyProjectModalOpen} close={closeApplyProjectModal} group={groupDetail} project={projectDetail} refetchData={fetchGroupDetails} />
       <div className="p-14">
         <div className="flex justify-between">
-          <h1 className="text-4xl font-medium">{projectDetail?.title}</h1>
+          <div>
+            <h1 className="text-4xl font-medium">{projectDetail?.title}</h1>
+            <p className="mt-4 text-xl font-normal text-gray-500">Project Owner: <span className="font-medium">{projectDetail?.ProjectOwner.fullname} ({projectDetail?.ProjectOwner.zid})</span></p>
+          </div>
           {isGroupOwner && (
             <div>
               {projectInGroup ? (
@@ -113,15 +119,14 @@ const ProjectDetailsStudent = () => {
             </div>
           )}
 
-
+        </div>
+        <div className="mt-4">
+          <h2 className="text-xl font-normal">Description: <span className="font-bold">{projectDetail?.description}</span></h2>
+          <h2 className="text-xl font-normal">Skills: <span className="font-bold">{projectDetail?.skills.map(skill => skill.skillName).join(", ")}</span></h2>
         </div>
         <div className="mt-8">
-          <h2 className="text-2xl font-medium">Description</h2>
-          <p className="mt-4 text-lg">{projectDetail?.description}</p>
-        </div>
-        <div className="mt-8">
-          <h2 className="text-2xl font-medium">Skills Gap Analysis</h2>
-          <SkillsGapAnalysis projectId={Number(projectId)}/>
+          <h2 className="text-2xl font-medium">Skills Gap Analysis for {groupDetail.groupName}</h2>
+          <SkillsGapAnalysis projectId={Number(projectId)} groupId={groupDetail.id} />
         </div>
       </div>
     </>
