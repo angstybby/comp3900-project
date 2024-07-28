@@ -173,7 +173,7 @@ export default function Profile() {
   const connectToLinkedIn = async () => {
     window.location.href = 'http://localhost:3000/api/auth/proxy/linkedin';
   }
-  
+
   return (
     <div className="h-screen flex items-center justify-start flex-col">
       <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
@@ -224,6 +224,10 @@ export default function Profile() {
             </div>
           )
       }
+
+      {/* <ButtonUtility text={"Test"} onClick={() => 
+        await axiosInstanceWithAuth.get("auth/proxy/linkedin/temp");
+      }/> */}
       
 
       <ToastContainer />

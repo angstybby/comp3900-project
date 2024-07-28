@@ -256,4 +256,22 @@ router.get('/proxy/linkedin/details', async (req, res) => {
     }
 });
 
+// Temporary route for testing
+router.get('/proxy/linkedin/temp', async (req, res) => {
+    try {
+        console.log("HELLO")
+        const cookie = req.headers.cookie;
+        const accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
+        const response = await axios.get("https://api.linkedin.com/v2/me", {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
+        })
+        console.log(response.data);
+    } catch (error) {
+        console.error(error);
+        
+    }
+});
+
 export default router;
