@@ -75,35 +75,30 @@ export default function SkillsGapAnalysis({
     <div>
       <div className="flex">
       </div>
-      {groupId == -1 ? (
-        <></>
-      ) : (
-        <div>
-          <div className="flex md:flex-row flex-col md:items-center items-start gap-5">
-            <div className="flex flex-row w-full lg:w-1/3 md:w-1/2">
-              <div className=" md:h-60 w-full">
-                <canvas ref={chartRef} />
-              </div>
-            </div>
-            <div className="flex flex-col gap-4 mt-2">
-              <div className="mr-4 flex flex-row gap-1 items-center">
-                <CheckCircleIcon className="text-green-400 w-5 h-5" />
-                <h2 className="font-normal">{studentSkills.length} {studentSkills.length === 1 ? "Skill" : "Skills"} on the group:</h2>
-                {/* comma seperated */}
-                <h2 className="font-semibold">
-                  {studentSkills.map((skill) => skill).join(", ")}
-                </h2>
-              </div>
-              <div className="mr-4 flex flex-row gap-1 items-center">
-                <ExclamationCircleIcon className="text-black w-5 h-5" />
-                <h2 className="font-normal">{skillsGap.length} {skillsGap.length === 1 ? "Skill" : "Skills"} missing from the group: <span className="font-semibold">{skillsGap.map((skill) => skill).join(", ")}</span></h2>
-              </div>
+
+      <div>
+        <div className="flex lg:flex-row flex-col lg:items-center items-start gap-5">
+          <div className="flex flex-row w-full lg:w-1/2">
+            <div className=" md:h-full w-full">
+              <canvas ref={chartRef} />
             </div>
           </div>
-
+          <div className="flex flex-col gap-4 mt-2">
+            <div className="mr-4 flex flex-row gap-1 items-center">
+              <CheckCircleIcon className="text-green-400 w-5 h-5" />
+              <h2 className="font-normal">{studentSkills.length} {studentSkills.length === 1 ? "Skill" : "Skills"} on the group:</h2>
+              {/* comma seperated */}
+              <h2 className="font-semibold">
+                {studentSkills.map((skill) => skill).join(", ")}
+              </h2>
+            </div>
+            <div className="mr-4 flex flex-row gap-1 items-center">
+              <ExclamationCircleIcon className="text-black w-5 h-5" />
+              <h2 className="font-normal">{skillsGap.length} {skillsGap.length === 1 ? "Skill" : "Skills"} missing from the group: <span className="font-semibold">{skillsGap.map((skill) => skill).join(", ")}</span></h2>
+            </div>
+          </div>
         </div>
-      )
-      }
+      </div>
     </div >
   );
 }

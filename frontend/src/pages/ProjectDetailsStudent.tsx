@@ -125,7 +125,7 @@ const ProjectDetailsStudent = () => {
           <h2 className="text-xl font-normal">Skills: <span className="font-bold">{projectDetail?.skills.map(skill => skill.skillName).join(", ")}</span></h2>
         </div>
         <div className="mt-8">
-          <h2 className="text-2xl font-medium">Skills Gap Analysis</h2>
+          <h2 className="text-2xl font-medium">Skills Gap Analysis for {groupDetail.groupName}</h2>
           <SkillsGapAnalysis projectId={Number(projectId)} groupId={groupDetail.id} />
         </div>
       </div>
