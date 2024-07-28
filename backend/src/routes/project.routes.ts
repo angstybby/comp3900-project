@@ -507,8 +507,6 @@ const createUserSkillsString = async (zid: string) => {
  */
 router.post("/get-career-reco", authMiddleWare, async (req, res) => {
 
-  console.log("project recco by careers", req.body);
-
   const customReq = req as CustomRequest;
   if (!customReq.token || typeof customReq.token === "string") {
     return res.status(401).send("Unauthorized");
@@ -564,9 +562,9 @@ router.post("/get-career-reco", authMiddleWare, async (req, res) => {
       const promptForAi = getProjectReccsContextByCareer(userSkills, stringProjects, activeStringProjects, user.CareerPath);
 
       const chat = model.startChat();
-      console.log("prompt for AI: ", promptForAi);
+      // console.log("prompt for AI: ", promptForAi);
       const result = await chat.sendMessage(promptForAi);
-      console.log("AI Output: ", result.response.text());
+      // console.log("AI Output: ", result.response.text());
 
       const projectIds = result.response
           .text()
