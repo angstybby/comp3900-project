@@ -13,6 +13,7 @@ import leaderboard from "./src/routes/leaderboard.routes";
 // Create an Express application
 const app = express();
 const cookieParser = require("cookie-parser");
+const dotenv = require('dotenv');
 
 app.use((req, res, next) => {
     console.log(`Received request: ${req.method} ${req.url}`);
@@ -21,6 +22,8 @@ app.use((req, res, next) => {
 
 // Define the port to run the server on
 const PORT = 3000;
+
+dotenv.config();
 
 const corsOptions = {
     origin:
