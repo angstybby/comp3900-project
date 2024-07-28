@@ -1,3 +1,5 @@
+import ButtonSubmit from '@/components/Buttons/ButtonSubmit';
+import TextArea from '@/components/Inputs/TextArea';
 import { Carousel, CarouselContent } from '@/components/ui/carousel';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 
@@ -27,19 +29,38 @@ const tabOptions = [
 
   return (
     <div className="h-screen flex overflow-hidden">
-      <div className="w-2/3 flex flex-wrap p-2 rounded-md mx-auto my-auto">
-        <div className="w-full text-center my-2">You Have Reached the Home (Dashboard) Page</div>
+      <div className="w-full lg:w-2/3 pl-16 lg:pl-8 py-6 pr-8 rounded-md box-border">
+        <div className='bg-gray-200 shadow-lg p-4 rounded-lg mb-8'>
+          <div className="w-full mb-4 text-2xl font-bold">
+            Share What's On Your Mind!
+          </div>
+          <div className="rounded-md">
+            <TextArea id={'LinkedIn Share Input'} name={'LinkedIn Share'} autoComplete={'none'} placeholder={'Share your thoughts!'} />
+            <div className='h-1/3 w-[10%] mt-4'>
+              <ButtonSubmit text={'Post'} />
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full mb-4 text-2xl font-bold">
+          Your Projects!
+        </div>
+
+        <div className="w-full mb-4 text-2xl font-bold">
+          Your Courses!
+        </div>
+
       </div>
       <div className="w-1/3 pt-2 shadow-xl hidden lg:flex h-screen flex-col box-border">
         <p className='w-full p-2 ml-4 my-2 text-xl font-semibold'>
-          Keep in the Loop with the latest leaders!
+          Get the Latest Updates from Industry Leaders!
         </p>
         <TabGroup className='flex flex-col h-full flex-grow'>
           <div className='w-full bg-gray flex-grow-0 '>
             <TabList className="flex gap-4"> 
               <Carousel className="w-[90%] ml-2" opts={{
-                    align: "start",
-                  }}>
+                align: "start",
+              }}>
                 <CarouselContent className='mx-1'>
                 {
                   tabOptions.map(option => (
