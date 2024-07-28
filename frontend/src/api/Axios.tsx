@@ -37,6 +37,6 @@ const axiosNoAuth = axios.create({
 /**
  * To allow passing of tokens through cookies via requests
  */
-// axiosNoAuth.defaults.withCredentials = true;
+axiosNoAuth.defaults.withCredentials = true;
 
 export { axiosInstanceWithAuth, axiosNoAuth, getToken }

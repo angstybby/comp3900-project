@@ -17,6 +17,7 @@ import {
     validateZid,
 } from "../utils/auth.utils";
 import { dbAddProfile } from "../models/profile.models";
+import axios from "axios";
 
 const request = require('request-promise');
 
@@ -178,7 +179,7 @@ router.get('/proxy/linkedin', async (req, res) => {
     try {
         const clientId = process.env.LINKEDIN_CLIENT_ID;
         const redicectUri = process.env.REDIRECT_URL;
-        const state = 'COMP3900_W09B_Brown';
+        const state = process.env.LINKEDIN_STATE;
         const scope = 'openid%20profile';
 
         const connectToLinkedIn = async () => {
@@ -221,14 +222,38 @@ router.get('/proxy/linkedin/callback', async (req, res) => {
         
         try {
             const tokenResponse = await request.post({ url: tokenBaseUrl, form: data, json: true });
-            console.log(tokenResponse);
-            res.redirect(frontendUrl);
+            res.cookie("linkedIn_AccessToken", tokenResponse.access_token);
+            res.redirect(`${frontendUrl}?update=true`);
         } catch (error) {
             console.error(error);
             return res.status(500).send('An error occurred obtaining access token');
         }
     }
+});
 
+router.get('/proxy/linkedin/details', async (req, res) => {
+    const cookie = req.headers.cookie;
+    const accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
+    if (!accessToken) return res.status(400).send('No LinkedId access token found');
+
+    try {
+        const response = await axios.get("https://api.linkedin.com/v2/userinfo", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        })
+
+        const pictureResponse = await axios.get(response.data.picture, {responseType: 'arraybuffer'});
+        const buffer = Buffer.from(pictureResponse.data, 'binary');
+        const dataURL = `data:${pictureResponse.headers['content-type']};base64,${buffer.toString('base64')}`;
+
+        const payload = response.data;
+        payload.picture = dataURL;
+        res.status(200).send(payload);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred while fetching LinkedIn data');
+    }
 });
 
 export default router;

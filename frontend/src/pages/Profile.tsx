@@ -10,6 +10,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import EditProfileModal from "@/components/Modals/EditProfileModal";
 import ChangeProfilePicModal from "@/components/Modals/ChangeProfilePicModal";
+import { useLocation, useNavigate } from "react-router-dom";
+import ParseLinkedInInfoModal from "@/components/Modals/ParseLinkedInInfoModal";
+import Cookies from "js-cookie";
 
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
@@ -24,12 +27,38 @@ export default function Profile() {
 
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
+  const [showLinkedInModal, setShowLinkedInModal] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const removeUpdateParam = () => {
+    const params = new URLSearchParams(location.search);
+    params.delete('update');
+    const newSearch = params.toString();
+    const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+    navigate(newPath);
+  };
+
+  const getQueryParam = (param: string): string | null => {
+    const urlParams = new URLSearchParams(location.search);
+    return urlParams.get(param);
+  };
+
+  const updateValue = getQueryParam('update');
+  const fetchLinkedInData = async () => {
+    const response = await axiosInstanceWithAuth.get("/auth/proxy/linkedin/details");
+    return response.data;
+  }
 
   useEffect(() => {
     fetchProfileData();
+    if (updateValue) {
+      setShowLinkedInModal(true);
+    }
   }, []);
-
+  
   useEffect(() => {
     if (profileData) {
       setEditProfileInfo({
@@ -41,6 +70,23 @@ export default function Profile() {
       });
     }
   }, [profileData]);
+
+  const syncLinkedInData = async () => {
+    try {
+      const linkedInData = await fetchLinkedInData();
+      await axiosInstanceWithAuth.put('/profile/update-profile', {
+        zid: profileData.zid,
+        profilePicture: linkedInData.picture,
+        fullname: linkedInData.given_name + ' ' + linkedInData.family_name,
+        description: profileData.description,
+        resume: profileData.resume,
+      });
+      updateProfileContext();
+      removeUpdateParam();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleEditProfileChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -110,29 +156,23 @@ export default function Profile() {
 
   const profileLink = `${window.location.origin}/profile/${profileData.zid}`;
 
-const copyLinkToClipboard = () => {
-  navigator.clipboard.writeText(profileLink).then(() => {
-    toast.success("Link copied to clipboard!", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
+  const copyLinkToClipboard = () => {
+    navigator.clipboard.writeText(profileLink).then(() => {
+      toast.success("Link copied to clipboard!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     });
-  });
-};
+  };
 
-const connectToLinkedIn = async () => {
-  window.location.href = 'http://localhost:3000/api/auth/proxy/linkedin';
-  // try {
-  //   const response = await axiosInstanceWithAuth.get("auth/proxy/linkedin");
-  //   console.log(response.data);
-  // } catch (error) {
-  //   console.log(error);
-  // }
-}
+  const connectToLinkedIn = async () => {
+    window.location.href = 'http://localhost:3000/api/auth/proxy/linkedin';
+  }
   
   return (
     <div className="h-screen flex items-center justify-start flex-col">
@@ -171,9 +211,20 @@ const connectToLinkedIn = async () => {
         <ButtonUtility text={"Share"} onClick={copyLinkToClipboard} bg={"bg-blue-500"} />
       </div>
 
-      <div className="mt-4">
-        <ButtonUtility text={"Connect to LinkedIn"} onClick={connectToLinkedIn} />
-      </div>
+      {
+        Cookies.get('linkedIn_AccessToken') 
+        ? 
+          (
+            <></>
+          ) 
+        : 
+          (
+            <div className="mt-4">
+              <ButtonUtility text={"Connect to LinkedIn"} onClick={connectToLinkedIn} />
+            </div>
+          )
+      }
+      
 
       <ToastContainer />
 
@@ -192,6 +243,12 @@ const connectToLinkedIn = async () => {
         onClose={() => setShowChangeProfPicModal(false)}
         handleFileChange={handleFileChange}
         handleSaveProfilePic={handleSaveProfilePic}
+      />
+
+      <ParseLinkedInInfoModal
+        open={showLinkedInModal}
+        close={() => setShowLinkedInModal(false)}
+        sync={syncLinkedInData}
       />
     </div>
   );
