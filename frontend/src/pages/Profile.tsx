@@ -124,8 +124,14 @@ const copyLinkToClipboard = () => {
   });
 };
 
-const connectToLinkedIn = () => {
-  console.log("STUB");
+const connectToLinkedIn = async () => {
+  window.location.href = 'http://localhost:3000/api/auth/proxy/linkedin';
+  // try {
+  //   const response = await axiosInstanceWithAuth.get("auth/proxy/linkedin");
+  //   console.log(response.data);
+  // } catch (error) {
+  //   console.log(error);
+  // }
 }
   
   return (

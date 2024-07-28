@@ -12,6 +12,7 @@ import projects from "./src/routes/project.routes";
 // Create an Express application
 const app = express();
 const cookieParser = require("cookie-parser");
+const dotenv = require('dotenv');
 
 app.use((req, res, next) => {
   console.log(`Received request: ${req.method} ${req.url}`);
@@ -21,9 +22,13 @@ app.use((req, res, next) => {
 // Define the port to run the server on
 const PORT = 3000;
 
+dotenv.config();
+
 const corsOptions = {
   origin: process.env.NODE_ENV == "production" ? "http://localhost:80" : "http://localhost:5173",
   credentials: true, 
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Content-Type,Authorization',
 };
 
 app.use(cors(corsOptions));

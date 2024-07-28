@@ -18,6 +18,8 @@ import {
 } from "../utils/auth.utils";
 import { dbAddProfile } from "../models/profile.models";
 
+const request = require('request-promise');
+
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
@@ -170,6 +172,63 @@ router.post("/change-password", async (req, res) => {
         return res.status(500).send("Server error");
     }
     res.status(200).send("Password changed");
+});
+
+router.get('/proxy/linkedin', async (req, res) => {
+    try {
+        const clientId = process.env.LINKEDIN_CLIENT_ID;
+        const redicectUri = process.env.REDIRECT_URL;
+        const state = 'COMP3900_W09B_Brown';
+        const scope = 'openid%20profile';
+
+        const connectToLinkedIn = async () => {
+            try {
+                const url = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redicectUri}&state=${state}&scope=${scope}`;
+                console.log('Redirecting to LinkedIn:', url);
+                res.redirect(url);
+            } catch (error) {
+                console.log(error);
+                return res.status(500).send('An error occurred while processing');
+            }
+        }
+        connectToLinkedIn();
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('An error occurred while processing');
+    }
+});
+
+router.get('/proxy/linkedin/callback', async (req, res) => {
+    const authCode = req.query.code as string;
+
+    ///////////////////////////////////////
+    // May need to edit once deployed!!! //
+    ///////////////////////////////////////
+    let frontendUrl = process.env.FRONTEND_URL;
+    if (!frontendUrl) frontendUrl = 'http://localhost:5173';
+
+    if (!authCode) {
+        res.redirect(frontendUrl);
+    } else {
+        const tokenBaseUrl = "https://www.linkedin.com/oauth/v2/accessToken";
+        const data = {
+            grant_type: 'authorization_code',
+            code: authCode,
+            client_id: process.env.LINKEDIN_CLIENT_ID,
+            client_secret: process.env.LINKEDIN_SECRET,
+            redirect_uri: process.env.REDIRECT_URL,
+        };
+        
+        try {
+            const tokenResponse = await request.post({ url: tokenBaseUrl, form: data, json: true });
+            console.log(tokenResponse);
+            res.redirect(frontendUrl);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).send('An error occurred obtaining access token');
+        }
+    }
+
 });
 
 export default router;
