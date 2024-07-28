@@ -21,6 +21,7 @@ import PublicProfile from '@/pages/PublicProfile';
 import ProjectApplications from './pages/ProjectApplications'
 import ProjectDetailsStudent from './pages/ProjectDetailsStudent'
 import ProjectDetailsOther from './pages/ProjectDetailsOther'
+import UpdateCareerPath from './pages/CareerPath'
 
 
 
@@ -49,6 +50,7 @@ function App() {
             <Route path={`/upload`} element={<Upload />} />
             <Route path={`/reset-password`} element={<ResetPassword />} />
             <Route path={`/courseRecommendations`} element={<CourseReco />} />
+            <Route path={`/careerPath`} element={<UpdateCareerPath />} />
             <Route path={`/`} element={<Landing />} />
           </Routes>
         </BrowserRouter >
