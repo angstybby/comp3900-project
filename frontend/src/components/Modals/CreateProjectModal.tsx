@@ -49,8 +49,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, re
   };
 
   const validateInputs = () => {
-    if (!form.title) return 'Group name is required';
-    if (!form.description) return 'Group description is required';
+    if (!form.title) return 'Project name is required';
+    if (!form.description) return 'Project description is required';
     if (selectedSkills.length === 0) return 'Please select at least one skill';
     return '';
   };
@@ -132,8 +132,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, re
           >
             <form onSubmit={handleSubmit}>
               <DialogTitle className='mb-5'>
-                <p className='font-bold text-2xl'>Create Project</p>
-                <p className='font-thin text-sm opacity-90 mt-1'>Academics can create projects</p>
+                <p className='font-bold text-2xl'>Create a project!</p>
               </DialogTitle>
               <p className="my-2 font-bold">Project Name (Required)</p>
               <Textbox
@@ -200,7 +199,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, re
                 {loading ? (
                   <ButtonLoading />
                 ) : (
-                  <ButtonSubmit text='Create Group' />
+                  <ButtonSubmit text='Create Project' />
                 )}
               </div>
             </form>

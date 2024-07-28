@@ -14,9 +14,10 @@ import {
     dbGetProjectsOwnedByUser,
     dbUpdateProject,
     dbGetAllProjectsWithSkills,
+    dbGetUserInProject,
 } from "../models/project.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
-import { isProjectOwner } from "../utils/project.utils";
+import { CombinedProject, isProjectOwner } from "../utils/project.utils";
 import { dbGetProfile, dbGetUserSkills, getUserType } from "../models/profile.models";
 import { UserType } from "@prisma/client";
 import { getProjectReccsContext, getProjectReccsContextByCareer, model } from "../utils/ai";
@@ -147,7 +148,7 @@ router.get("/all", async (req: Request, res: Response) => {
     try {
         const skip = parseInt(req.query.skip as string);
 
-        if (!skip && skip !== 0) {
+        if (isNaN(skip)) {
             return res.status(400).send("Invalid skip value");
         }
 
@@ -160,11 +161,33 @@ router.get("/all", async (req: Request, res: Response) => {
             // Get projects of groups they are in
             const projects = await dbGetUserJoinedProjects(zid, skip);
 
-            // Filter out groups with no projects and flatten the project array
-            const projectReturn = projects
-                .map((group) => group.group.Project)
-                .filter((projectArray) => projectArray.length > 0)
-                .flat();
+            // Map and combine projects, including group information
+            const projectMap = new Map();
+            projects.forEach((group) => {
+                group.group.Project.forEach((project) => {
+                    if (!projectMap.has(project.id)) {
+                        projectMap.set(project.id, {
+                            ...project,
+                            groups: [
+                                {
+                                    groupName: group.group.groupName,
+                                    groupId: group.group.id,
+                                },
+                            ],
+                        });
+                    } else {
+                        const existingProject = projectMap.get(project.id);
+                        existingProject.groups.push({
+                            groupName: group.group.groupName,
+                            groupId: group.group.id,
+                        });
+                        projectMap.set(project.id, existingProject);
+                    }
+                });
+            });
+
+            // Convert the map to an array
+            const projectReturn = Array.from(projectMap.values());
 
             return res.status(200).send(projectReturn);
         } else if (userType.userType === UserType.academic) {
@@ -475,7 +498,7 @@ const createUserSkillsString = async (zid: string) => {
 };
 
 /**
- * @route POST /projects/get-recommended
+ * @route POST /projects/get-career-reco
  * @desc Get recommended projects based on career and skills
  * @access Private
  * @returns {Array} List of recommended projects
@@ -500,9 +523,23 @@ router.post("/get-career-reco", authMiddleWare, async (req, res) => {
     return res.status(200).send([]);
   }
 
+  const groups = req.body.groups;
+  const activeProjects = req.body.project;
+
   try {
-      const allProjects = await dbGetAllProjectsWithSkills();
-      const stringProjects = allProjects
+      const allProjects: CombinedProject[] = [];
+
+      for (const group of groups) {
+          const projects = await dbGetAllProjectsWithSkills(parseInt(group.id));
+          allProjects.push(...projects);
+      }
+
+      // Filter out duplicate projects
+      const uniqueProjects = Array.from(new Set(allProjects.map(p => p.id)))
+                                  .map(id => allProjects.find(p => p.id === id));
+
+      const stringProjects = uniqueProjects
+          .filter((project): project is CombinedProject => project !== undefined)
           .map(
               (project) => `
               Details for Project: ${project.id}
@@ -513,12 +550,23 @@ router.post("/get-career-reco", authMiddleWare, async (req, res) => {
           )
           .join("\n");
 
-      const promptForAi = getProjectReccsContextByCareer(userSkills, stringProjects, user.CareerPath);
+      // format projects that are taken by user
+      const activeStringProjects = activeProjects
+          .map(
+              (project: { id: any; title: any; description: any; }) => `
+          Details for Project: ${project.id}
+          Title: ${project.title}
+          Description: ${project.description}
+          `,
+          )
+          .join("\n");
+
+      const promptForAi = getProjectReccsContextByCareer(userSkills, stringProjects, activeStringProjects, user.CareerPath);
 
       const chat = model.startChat();
-      // console.log("prompt for AI: ", promptForAi);
+      console.log("prompt for AI: ", promptForAi);
       const result = await chat.sendMessage(promptForAi);
-      // console.log("AI Output: ", result.response.text());
+      console.log("AI Output: ", result.response.text());
 
       const projectIds = result.response
           .text()
@@ -540,5 +588,22 @@ router.post("/get-career-reco", authMiddleWare, async (req, res) => {
       return res.status(500).send("Failed to get recommendations");
   }
 });
+router.get(
+    "/user-in-group/:userId/:projectId",
+    authMiddleWare,
+    async (req: Request, res: Response) => {
+        const { userId, projectId } = req.params;
+        try {
+            const response = await dbGetUserInProject(
+                parseInt(projectId),
+                userId,
+            );
+            res.status(200).send(response);
+        } catch (error) {
+            console.error("Failed to fetch user in group:", error);
+            res.status(500).send("Failed to fetch user in group");
+        }
+    },
+);
 
 export default router;
