@@ -2,24 +2,12 @@ import { PrismaClient, UserType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const dbGetRankingBySkip = async (skip: number, search: string) => {
+export const dbGetAllRankings = async () => {
     return await prisma.profile.findMany({
         where: {
             profileOwner: {
                 userType: UserType.student,
             },
-            OR: [
-                {
-                    zid: {
-                        contains: search,
-                    },
-                },
-                {
-                    fullname: {
-                        contains: search,
-                    },
-                },
-            ],
         },
         select: {
             zid: true,
@@ -35,8 +23,6 @@ export const dbGetRankingBySkip = async (skip: number, search: string) => {
                 _count: "desc",
             },
         },
-        skip: skip,
-        take: 10,
     });
 };
 

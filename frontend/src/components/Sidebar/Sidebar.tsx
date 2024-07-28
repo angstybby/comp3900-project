@@ -9,7 +9,8 @@ import {
   CalculatorIcon,
   UsersIcon,
   XMarkIcon,
-  Bars3Icon
+  Bars3Icon,
+  NumberedListIcon
 } from '@heroicons/react/24/outline';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
@@ -57,6 +58,7 @@ const Sidebar = () => {
             <SidebarButton href='/groups' text='Groups' Icon={<UserGroupIcon />} />
           }
           <SidebarButton href='/projects' text='Projects' Icon={<CalculatorIcon />} />
+          <SidebarButton href='/leaderboard' text='Leaderboard' Icon={<NumberedListIcon />} />
           <SidebarButton href='/profile' text='Profile' Icon={<UserIcon />} />
           {Cookies.get('userType') == 'admin' &&
             <SidebarButton href='/manage-users' text='Manage Users' Icon={<UsersIcon />} />
