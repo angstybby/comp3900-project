@@ -34,7 +34,7 @@ export const dbGenerateGapAnalysis = async (
         throw new Error("Group not found");
     }
 
-    const groupSkills = group.CombinedSkills.map((skill) => skill);
+    const groupSkills = group.CombinedSkills.map((skill) => skill.skillName);
 
     const project = await prisma.project.findUnique({
         where: {
@@ -48,11 +48,13 @@ export const dbGenerateGapAnalysis = async (
     if (!project) {
         throw new Error("Project not found");
     }
-    const projectSkills = project.skills.map((skill) => skill);
+
+    const projectSkills = project.skills.map((skill) => skill.skillName);
 
     const matchingSkills = projectSkills.filter((skill) =>
         groupSkills.includes(skill),
     );
+
     const unmatchedSkills = projectSkills.filter(
         (skill) => !groupSkills.includes(skill),
     );

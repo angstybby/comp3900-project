@@ -7,12 +7,10 @@ import {
 
 import {
     ChevronDownIcon,
-    PencilIcon,
     ViewColumnsIcon,
-    UserGroupIcon
 } from '@heroicons/react/16/solid'
 
-export default function GroupOwnerOptions({ openEditModal, openInviteUserModal, openMembersDetailsModal }: { openEditModal: () => void, openInviteUserModal: () => void, openMembersDetailsModal: () => void }) {
+export default function GroupMemberOptions({ openMembersDetailsModal }: { openMembersDetailsModal: () => void }) {
     return (
         <>
             <DropdownMenu>
@@ -27,19 +25,6 @@ export default function GroupOwnerOptions({ openEditModal, openInviteUserModal, 
                             <ViewColumnsIcon className="size-4 fill-black/30" />
                             View Members
                             <kbd className="ml-auto hidden font-sans text-xs text-black/50 group-data-[focus]:inline">⌘A</kbd>
-                        </button>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <button onClick={openEditModal} className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-black/10">
-                            <PencilIcon className="size-4 fill-black/30" />
-                            Edit Details
-                        </button>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <button onClick={openInviteUserModal} className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-black/10">
-                            <UserGroupIcon className="size-4 fill-black/30" />
-                            Invite Users
-                            <kbd className="ml-auto hidden font-sans text-xs text-black/50 group-data-[focus]:inline">⌘D</kbd>
                         </button>
                     </DropdownMenuItem>
 

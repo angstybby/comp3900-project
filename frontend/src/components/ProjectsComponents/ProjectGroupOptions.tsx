@@ -41,13 +41,13 @@ export default function ProjectGroupOptions({
 
   return (
     <Select onValueChange={handleChooseOptions}>
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-48 mt-2">
         <SelectValue placeholder="Select a group" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
           {groups.map((group) => (
-            <SelectItem key={group.id} value={group.id.toString()}>
+            <SelectItem className="cursor-pointer" key={group.id} value={group.id.toString()}>
               {group.groupName}
             </SelectItem>
           ))}

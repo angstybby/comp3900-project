@@ -14,6 +14,7 @@ import {
     dbLeaveGroup,
     dbUpdateGroup,
     dbUserExpressInterest,
+    dbGetGroupMembers
 } from "../models/group.models";
 import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
@@ -584,13 +585,17 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
         return res.status(401).send("Unauthorized");
     }
 
-    const { groupSkills } = req.body;
+    const { groupSkills, groupId } = req.body;
     if (!groupSkills) {
         return res.status(400).send("Bad Request: Prompt is required");
     }
 
+    if (!groupId) {
+        return res.status(400).send("Group ID is required");
+    }
+
     try {
-        const allProjects = await dbGetAllProjectsWithSkills();
+        const allProjects = await dbGetAllProjectsWithSkills(parseInt(groupId));
         const stringProjects = allProjects
             .map(
                 (project) => `
@@ -623,6 +628,23 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
     } catch (error) {
         console.error("Error getting recommendations:", error);
         return res.status(500).send("Failed to get recommendations");
+    }
+});
+
+router.get("/members/:groupId", async (req, res) => {
+    const { groupId } = req.params;
+    const groupIdInt = parseInt(groupId);
+
+    try {
+        const groupMembers = await dbGetGroupMembers(
+            groupIdInt,
+        );
+        return res.status(200).send(groupMembers);
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .send("An error occured while fetching members in group");
     }
 });
 

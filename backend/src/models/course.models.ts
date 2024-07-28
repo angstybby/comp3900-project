@@ -87,6 +87,17 @@ export const dbFindCourseById = async (id: string) => {
                 select: {
                     skillName: true,
                 },
+                orderBy: {
+                    id: "asc",
+                },
+            },
+            CourseSkill: {
+                select: {
+                    rating: true,
+                },
+                orderBy: {
+                    skillId: "asc",
+                },
             },
         },
     });
@@ -415,6 +426,6 @@ export const dbGetCourse = async (courseId: string) => {
         },
         include: {
             skills: true,
-        }
+        },
     });
 };
