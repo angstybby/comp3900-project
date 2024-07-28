@@ -182,7 +182,8 @@ export default function Profile() {
 
   return (
     <div className="h-screen flex flex-row">
-      <div className="flex-2 m-10">
+
+      <div className="m-10 flex-1">
         <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
         <div className="m-2">
           <div className="flex flex-col items-center justify-center relative group">
@@ -214,17 +215,29 @@ export default function Profile() {
 
           <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
             <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
-            <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Share
-            </button>
           </div>
+
+          <div className="mt-4 w-80 mx-auto flex space-x-4 items-center" title="Share Profile Button">
+            <ButtonUtility text={"Share"} onClick={copyLinkToClipboard} bg={"bg-blue-500"} />
+          </div>
+
+          {
+            Cookies.get('linkedIn_AccessToken') 
+            ? 
+              (
+                <></>
+              ) 
+            : 
+              (
+                <div className="mt-4 w-80 mx-auto flex space-x-4 items-center" title="Link to LinkedIn Button">
+                  <ButtonUtility text={"Connect to LinkedIn"} onClick={connectToLinkedIn} bg={"bg-lime-400 hover:bg-lime-600"} />
+                </div>
+              )
+          }
+
         </div>
       </div>  
 
-      <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
-        <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
-      </div>
-      
       <div className="flex-1 m-10">
         <div className="mt-10 mx-auto">
           <h1 className="text-3xl font-semibold text-center mt-10">Your Feedback</h1>
@@ -247,24 +260,6 @@ export default function Profile() {
           </div>
         </div>
       </div>
-
-      <div className="mt-4">
-        <ButtonUtility text={"Share"} onClick={copyLinkToClipboard} bg={"bg-blue-500"} />
-      </div>
-
-      {
-        Cookies.get('linkedIn_AccessToken') 
-        ? 
-          (
-            <></>
-          ) 
-        : 
-          (
-            <div className="mt-4">
-              <ButtonUtility text={"Connect to LinkedIn"} onClick={connectToLinkedIn} />
-            </div>
-          )
-      }
 
       {/* <ButtonUtility text={"Test"} onClick={() => 
         await axiosInstanceWithAuth.get("auth/proxy/linkedin/temp");
