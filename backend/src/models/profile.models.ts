@@ -64,3 +64,21 @@ export const getUserType = async (zid: string) => {
         }
     })
 }
+
+export const dbGetStudentProfiles = async () => {
+    return await prisma.profile.findMany({
+        where: {
+            profileOwner: {
+                userType: "student",
+            }
+        },
+        select: {
+            zid: true,
+            Skills: {
+                select: {
+                    skillName: true,
+                },
+            },
+        },
+    });
+}

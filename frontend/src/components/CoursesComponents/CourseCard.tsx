@@ -7,13 +7,14 @@ import { Carousel, CarouselContent } from "../ui/carousel";
 interface CourseCardProps {
   id: string;
   courseName: string;
+  inCarousel?: boolean;
 }
 
 interface Skill {
   skillName: string;
 }
 
-export default function CourseCard({ id, courseName }: CourseCardProps) {
+export default function CourseCard({ id, courseName, inCarousel }: CourseCardProps) {
   const navigate = useNavigate();
   const onClick = () => {
     navigate(`/course/${id}`)
@@ -29,7 +30,6 @@ export default function CourseCard({ id, courseName }: CourseCardProps) {
         );
         if (response.data.skills.length > 0) {
           setSkills(response.data.skills);
-          console.log(skills)
         }
       } catch (error) {
         console.error("Failed to fetch course details:", error);
@@ -39,7 +39,7 @@ export default function CourseCard({ id, courseName }: CourseCardProps) {
   },[])
 
   return (
-    <div className="h-40 bg-gray-100 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-full hover:cursor-pointer transition duration-150 shadow-lg"
+    <div className="select-none h-40 bg-gray-100 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-full hover:cursor-pointer transition duration-150 shadow-lg"
       onClick={onClick}
     >
       <div className="text-start flex flex-col gap-1 h-full justify-between">
@@ -48,15 +48,23 @@ export default function CourseCard({ id, courseName }: CourseCardProps) {
           <h2 className="text-sm font-light line-clamp-2">{courseName}</h2>
         </div>
 
-        <Carousel className="w-full max-w-[100%] mx-auto" opts={{
-          align: "start"
-        }}>
-          <CarouselContent className="ml-1">
-            {skills.map(skill => (
-              <CourseMainSkillBubble skill={skill.skillName} key={skill.skillName} />
-            ))}
-          </CarouselContent>
-        </Carousel>
+        {
+          inCarousel 
+          ? 
+            (
+              <CourseMainSkillBubble skill={`Number of skills: ${skills.length}`} key={`${id} skills`} />
+            )
+          : 
+            <Carousel className="w-full max-w-[100%] mx-auto" opts={{
+              align: "start"
+            }}>
+              <CarouselContent className="ml-1">
+                {skills.map(skill => (
+                  <CourseMainSkillBubble skill={skill.skillName} key={skill.skillName} />
+                ))}
+              </CarouselContent>
+            </Carousel>
+          }
       </div>
     </div>
   );
