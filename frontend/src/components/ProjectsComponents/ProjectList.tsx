@@ -41,11 +41,16 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
         try {
             setProjectLoading(true);
             const response = await axiosInstanceWithAuth.post('/projects/get-career-reco'); // Replace with real skills data
-            console.log("Recommended Projects:",response.data);
-            response.data.forEach((project: any) => {
+            if (response.data.length === 0) {
+              // Handle the case where no recommended projects are returned
+              console.log('No recommended projects found');
+              setRecommendedProjects([]);
+            } else {
+              response.data.forEach((project: any) => {
                 project.id = parseInt(project.id);
-            });
-            setRecommendedProjects(response.data);
+              });
+              setRecommendedProjects(response.data);
+            }
             setProjectLoading(false);
         } catch (error) {
             console.error('Failed to fetch recommended projects:', error);
@@ -124,16 +129,24 @@ export default function ProjectList({ searchTerm }: { searchTerm: string }) {
               ) : (
                 <div className="mt-10">
                   <h2 className="text-3xl font-semibold mb-5">Recommended Projects</h2>
-                  <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12 ">
-                    {recommendedProjects.map((project) => (
-                      <Link key={project.id} to={`/project/${project.id}`}>
-                        <ProjectCard key={project.id} project={project} />
-                      </Link>
-                    ))}
-                  </div>
+                  {recommendedProjects.length === 0 ? (
+                    <div className="text-center text-lg text-gray-600">
+                      Please update your skills to get project recommendations.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-12">
+                      {recommendedProjects.map((project) => (
+                        <Link key={project.id} to={`/project/${project.id}`}>
+                          <ProjectCard key={project.id} project={project} />
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )
             )}
+
+            
         </div>
     );
 }

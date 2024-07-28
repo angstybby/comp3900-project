@@ -497,7 +497,7 @@ router.post("/get-career-reco", authMiddleWare, async (req, res) => {
   console.log("User Skills:", userSkills);
 
   if (!userSkills || !user.CareerPath) {
-      return res.status(400).send("Bad Request: User skills / Career Path are required");
+    return res.status(200).send([]);
   }
 
   try {
