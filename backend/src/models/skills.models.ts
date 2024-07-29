@@ -13,7 +13,7 @@ export const dbSearchSkillByName = async (skillName: string) => {
             id: true,
             skillName: true,
         },
-        take: 10,
+        take: 20,
     });
 };
 
