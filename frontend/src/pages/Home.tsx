@@ -9,6 +9,7 @@ import { SuccessAlert } from '@/components/SuccessAlert';
 import { Carousel, CarouselContent, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { DEFAULT_ERROR_MSSG } from '@/utils/constants';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import Cookies from 'js-cookie';
 import { useEffect, useState } from 'react';
 
 interface Course {
@@ -120,30 +121,38 @@ const Home = () => {
             <SuccessAlert successMessage={'Post shared successfully!'} link={shareLink} />
           </div>
         }
-
-        <div className="w-full mb-4 text-2xl font-bold">
-          Your Completed Courses
-        </div>
-        <div className='mb-10'>
-          <Carousel className="h-full mt-5 w-full max-w-[90%] mx-auto" opts={{
-            align: "start"
-          }}>
-            <CarouselContent className='ml-1'>
-              {courses.map((course) => (
-                <div className='lg:w-1/3 mr-4'>
-                  <CourseCard key={course.id} id={course.id} courseName={course.courseName} inCarousel={true} />
-                </div>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-        </div>
-        <div className='flex justify-center'>
-          <SkillsLeaderBoard/>
-        </div>
-
+        
+        {
+          Cookies.get('userType') === 'student' &&
+          (
+            <>
+              <div className="w-full mb-4 text-2xl font-bold">
+                Your Completed Courses
+              </div>
+              <div className='mb-10'>
+                <Carousel className="h-full mt-5 w-full max-w-[90%] mx-auto" opts={{
+                  align: "start"
+                }}>
+                  <CarouselContent className='ml-1'>
+                    {courses.map((course) => (
+                      <div className='lg:w-1/3 mr-4'>
+                        <CourseCard key={course.id} id={course.id} courseName={course.courseName} inCarousel={true} />
+                      </div>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
+              </div>
+              <div className='flex justify-center'>
+                <SkillsLeaderBoard/>
+              </div>
+            </>
+          )
+        }
+      
       </div>
+
       <div className="w-1/3 pt-2 shadow-xl hidden lg:flex h-screen flex-col box-border">
         <p className='w-full p-2 ml-4 my-2 text-xl font-semibold'>
           Get the Latest Updates from Industry Leaders!
