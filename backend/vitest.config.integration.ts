@@ -6,9 +6,4 @@ export default defineConfig({
     include: ['src/tests/**/*.test.ts'],
     setupFiles: ['src/tests/helpers/setup.ts'],
   },
-  resolve: {
-    alias: {
-      auth: '/src/routes/auth',
-    }
-  }
 })
