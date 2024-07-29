@@ -18,6 +18,7 @@ import {
 } from "../utils/auth.utils";
 import { dbAddProfile } from "../models/profile.models";
 import axios from "axios";
+import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 
 const request = require('request-promise');
 
@@ -233,14 +234,18 @@ router.get('/proxy/linkedin/callback', async (req, res) => {
 
 router.get('/proxy/linkedin/details', async (req, res) => {
     const cookie = req.headers.cookie;
-    const accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
-    if (!accessToken) return res.status(400).send('No LinkedId access token found');
+    let accessToken;
+    try {
+        accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
+    } catch (error) {
+        return res.status(400).send('No LinkedIn access token found');
+    }
 
     try {
         const response = await axios.get("https://api.linkedin.com/v2/userinfo", {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          }
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
         })
 
         const pictureResponse = await axios.get(response.data.picture, {responseType: 'arraybuffer'});
@@ -250,9 +255,59 @@ router.get('/proxy/linkedin/details', async (req, res) => {
         const payload = response.data;
         payload.picture = dataURL;
         res.status(200).send(payload);
+
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred while fetching LinkedIn data');
+    }
+});
+
+router.post('/proxy/linkedin/share', authMiddleWare, async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const cookie = req.headers.cookie;
+    let accessToken;
+    try {
+        accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
+    } catch (error) {
+        return res.status(400).send('No LinkedIn access token found');
+    }
+
+    try {
+        const userInfo = await axios.get("https://api.linkedin.com/v2/userinfo", {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
+        })
+        const { shareText } = req.body;
+        const shareResponse = await axios.post("https://api.linkedin.com/v2/ugcPosts", 
+            {
+                "author": `urn:li:person:${userInfo.data.sub}`,
+                "lifecycleState": "PUBLISHED",
+                "specificContent": {
+                    "com.linkedin.ugc.ShareContent": {
+                        "shareCommentary": {
+                            "text": `${shareText}`
+                        },
+                        "shareMediaCategory": "NONE"
+                    }
+                },
+                "visibility": {
+                    "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+                }
+            }, 
+            {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
+        })
+        res.status(200).send(`https://www.linkedin.com/feed/update/${shareResponse.data.id}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred while sharing post');
     }
 });
 
