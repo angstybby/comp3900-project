@@ -10,6 +10,16 @@ import imageCompression from "browser-image-compression";
 import { useProfile } from "@/contexts/ProfileContext";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Cookies from "js-cookie";
+
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  status: string;
+  editMode?: boolean;
+  newStatus?: string;
+}
 
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
@@ -25,6 +35,26 @@ export default function Profile() {
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([
+    {
+      id: 1,
+      title: "Project Name 1",
+      description: "Description for Project Name 1",
+      status: "In Progress",
+    },
+    {
+      id: 2,
+      title: "Project Name 2",
+      description: "Description for Project Name 2",
+      status: "Completed",
+    },
+    {
+      id: 3,
+      title: "Project Name 3",
+      description: "Description for Project Name 3",
+      status: "Pending",
+    },
+  ]);
 
   useEffect(() => {
     fetchProfileData();
@@ -39,8 +69,23 @@ export default function Profile() {
         description: profileData.description || '',
         resume: profileData.resume || '',
       });
+      if (profileData.userType === 'student') {
+        fetchProjects(profileData.zid);
+      } else {
+        // Uncomment line to get actual projects when implemented
+        //setProjects([]);
+      }
     }
   }, [profileData]);
+
+  const fetchProjects = async (zid: string) => {
+    try {
+      const response = await axiosInstanceWithAuth.get(`/projects/user/${zid}`);
+      setProjects(response.data);
+    } catch (error) {
+      console.error("Error fetching projects", error);
+    }
+  };
 
   const handleEditProfileChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -108,22 +153,61 @@ export default function Profile() {
     return;
   }
 
+  const handleEditProjectStatus = (projectId: number) => {
+    setProjects((prevProjects) =>
+      prevProjects.map((project) =>
+        project.id === projectId
+          ? { ...project, editMode: true, newStatus: project.status }
+          : project
+      )
+    );
+  };
+
+  const handleProjectStatusChange = (e: ChangeEvent<HTMLInputElement>, projectId: number) => {
+    const { value } = e.target;
+    setProjects((prevProjects) =>
+      prevProjects.map((project) =>
+        project.id === projectId ? { ...project, newStatus: value } : project
+      )
+    );
+  };
+
+  const handleSaveProjectStatus = async (projectId: number) => {
+    const project = projects.find((project) => project.id === projectId);
+    if (!project) return;
+
+    try {
+      setLoading(true);
+      await axiosInstanceWithAuth.put(`/projects/${projectId}/update-status`, {
+        status: project.newStatus || "",
+      });
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.id === projectId ? { ...project, status: project.newStatus || "", editMode: false } : project
+        )
+      );
+    } catch (error) {
+      console.error("Error updating project status", error);
+    }
+    setLoading(false);
+  };
+
   const profileLink = `${window.location.origin}/profile/${profileData.zid}`;
 
-const copyLinkToClipboard = () => {
-  navigator.clipboard.writeText(profileLink).then(() => {
-    toast.success("Link copied to clipboard!", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
+  const copyLinkToClipboard = () => {
+    navigator.clipboard.writeText(profileLink).then(() => {
+      toast.success("Link copied to clipboard!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     });
-  });
-};
-  
+  };
+
   return (
     <div className="h-screen flex items-center justify-start flex-col">
       <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
@@ -159,6 +243,47 @@ const copyLinkToClipboard = () => {
           Share
         </button>
       </div>
+
+      {Cookies.get('userType') === 'student' && (
+      <div className="mt-10 w-full px-8">
+        <h2 className="text-2xl font-semibold mb-4">Your Projects</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <div key={project.id} className="p-4 border rounded-lg shadow">
+              <h3 className="text-xl font-semibold">{project.title}</h3>
+              <p className="mt-2 text-gray-600">{project.description}</p>
+              <p className="mt-2 text-gray-500">
+                Status: {project.editMode ? (
+                  <input
+                    type="text"
+                    value={project.newStatus || ""}
+                    onChange={(e) => handleProjectStatusChange(e, project.id)}
+                    className="border p-1 rounded"
+                  />
+                ) : (
+                  project.status
+                )}
+              </p>
+              {project.editMode ? (
+                <button
+                  onClick={() => handleSaveProjectStatus(project.id)}
+                  className="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
+                >
+                  Save
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleEditProjectStatus(project.id)}
+                  className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                >
+                  Edit
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      )}
 
       <ToastContainer />
 

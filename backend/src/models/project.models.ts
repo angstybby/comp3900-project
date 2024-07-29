@@ -348,3 +348,14 @@ export const dbUpdateProject = async (
     await dbAddProjectSkills(projectId, skillsToAdd);
     await dbDeleteProjectSkills(projectId, skillsToRemove);
 };
+
+export const dbUpdateProjectStatus = async (projectId: number, status: string) => {
+    await prisma.project.update({
+        where: {
+            id: projectId,
+        },
+        data: {
+            status: status,
+        },
+    });
+};

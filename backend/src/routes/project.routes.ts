@@ -13,11 +13,13 @@ import {
     dbGetUserJoinedProjects,
     dbGetProjectsOwnedByUser,
     dbUpdateProject,
+    dbUpdateProjectStatus
 } from "../models/project.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { isProjectOwner } from "../utils/project.utils";
 import { getUserType } from "../models/profile.models";
 import { UserType } from "@prisma/client";
+import { dbFindUserByZid } from "../models/auth.models";
 
 const router = express.Router();
 
@@ -450,6 +452,55 @@ router.put("/update", async (req: Request, res: Response) => {
     } catch (error) {
         console.error(error);
         res.status(500).send("Failed updating project");
+    }
+});
+
+/**
+ * @route PUT /projects/:id/update-status
+ * @desc Updates the status of a project. User needs to be the owner of the project
+ * @access Private
+ * @returns {String} Success message
+ * @returns {String} Error message
+ * @throws {400} If project ID or status is invalid
+ * @throws {401} If permissions are invalid
+ * @throws {500} If an error occurs while updating project status
+ */
+router.put("/:id/update-status", async (req: Request, res: Response) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const zid = customReq.token.zid;
+    const projectId = parseInt(req.params.id);
+    const { status } = req.body;
+
+    if (!projectId || !status) {
+        return res.status(400).send("Missing fields");
+    }
+
+    if (!(await isProjectOwner(zid, projectId))) {
+        return res.status(401).send("You are not the owner of this project");
+    }
+
+    try {
+        await dbUpdateProjectStatus(projectId, status);
+        res.status(200).send("Project status updated");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Failed updating project status");
+    }
+});
+
+router.get("/user/:zid", async (req: Request, res: Response) => {
+    const { zid } = req.params;
+    try {
+        const profile = await dbFindUserByZid(zid);
+        const user = await getUserType(zid);
+        res.status(200).json({ ...profile });
+    } catch (error) {
+        console.error("Error fetching user projects", error);
+        res.status(500).send("Failed fetching projects");
     }
 });
 
