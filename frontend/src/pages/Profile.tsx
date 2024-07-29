@@ -8,7 +8,6 @@ import imageCompression from "browser-image-compression";
 import { useProfile } from "@/contexts/ProfileContext";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Cookies from "js-cookie";
 
 interface Project {
   id: number;
@@ -267,19 +266,6 @@ export default function Profile() {
     window.location.href = 'http://localhost:3000/api/auth/proxy/linkedin';
   }
 
-  const copyLinkToClipboard = () => {
-    navigator.clipboard.writeText(profileLink).then(() => {
-      toast.success("Link copied to clipboard!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    });
-  };
 
   return (
     <div className="h-screen flex flex-row">
