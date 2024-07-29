@@ -61,21 +61,31 @@ export default function Courses() {
       />
       <div className="w-full flex flex-col p-14">
         <div className="h-2/3">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between mb-4">
             <h1 className="text-4xl font-medium pb-8">Courses</h1>
-            {userType === 'student' && (
-              <div className="flex items-center space-x-4" title="Add Course Button">
-                <ButtonUtility text={"Upload Courses Taken"} onClick={() => setShowUploadModal(true)} />
-                <ButtonUtility text={"Add Courses Taken"} onClick={() => setShowAddCourseModal(true)} />
-              </div>
-            )}
-            {/* subject to change, not sure how admin/acadmics are done */}
-            {userType === 'admin' && (
-              <div className="flex items-center space-x-4" title="Add Course Button">
-                <ButtonUtility text={"admin Scrape Course"} onClick={() => null} />
-                <ButtonUtility text={"admin Add Course"} onClick={() => null} />
-              </div>
-            )}
+            <div>
+              {userType === 'student' && (
+                <div className="flex flex-wrap lg:flex-nowrap lg:gap-4 items-center" title="Add Course Button">
+                  <div className="w-full my-2 lg:my-0">
+                    <ButtonUtility text={"Upload Courses Taken"} onClick={() => setShowUploadModal(true)} />
+                  </div>
+                  <div className="w-full">
+                    <ButtonUtility text={"Add Courses Taken"} onClick={() => setShowAddCourseModal(true)} />
+                  </div>
+                </div>
+              )}
+              {/* subject to change, not sure how admin/acadmics are done */}
+              {userType === 'admin' && (
+                <div className="flex flex-wrap lg:flex-nowrap lg:gap-4 items-center" title="Add Course Button">
+                  <div className="w-full my-2 lg:my-0">
+                    <ButtonUtility text={"admin Scrape Course"} onClick={() => null} />
+                  </div>
+                  <div className="w-full">
+                    <ButtonUtility text={"admin Add Course"} onClick={() => null} />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           {userType === 'student' &&
             <div className="mt-8">
