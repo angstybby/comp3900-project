@@ -1,6 +1,8 @@
 // src/tests/auth.test.ts
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, test } from 'vitest'
 import prisma from './helpers/prisma'
+import request from 'supertest'
+import app from 'lib/createServer'
 
 describe('/auth', async () => {
   describe('[POST] /auth/signup', () => {
@@ -24,5 +26,13 @@ describe('/auth', async () => {
     //     id: newUser?.id
     //  })
     // })
+
+    it("should respond with a `200` status code and user details", async () => {
+      const { status, body } = await request(app).post("/auth/signup").send({
+        email: "student@gmail.com",
+        password: "P@ssw0rd",
+        fullname: "Student",
+      })
+    })
   })
 })
