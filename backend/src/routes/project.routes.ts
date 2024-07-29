@@ -13,7 +13,7 @@ import {
     dbGetUserJoinedProjects,
     dbGetProjectsOwnedByUser,
     dbUpdateProject,
-    dbUpdateProjectStatus
+    dbUpdateProjectStatus,
     dbGetAllProjectsWithSkills,
     dbGetUserInProject,
 } from "../models/project.models";
