@@ -393,8 +393,7 @@ export const dbUpdateCourse = async (
         },
     });
 
-    // Check if the skills is in the database, if not skip
-    console.log(skills);
+    // Find the skills in the database or create them if they don't exist
     const SkillFound = await prisma.skills.findMany({
         where: {
             skillName: {
@@ -403,20 +402,43 @@ export const dbUpdateCourse = async (
         },
     });
 
-    if (SkillFound.length > 0) {
-        await prisma.course.update({
+    // Find the skills that were not found
+    const skillsNotFound = skills.filter(
+        (skill) =>
+            !SkillFound.some((skillFound) => skillFound.skillName === skill),
+    );
+
+    // Create the skills that were not found
+    if (skillsNotFound.length > 0) {
+        await prisma.skills.createMany({
+            data: skillsNotFound.map((skill) => ({
+                skillName: skill,
+            })),
+        });
+
+        // Fetch the newly created skills
+        const newlyCreatedSkills = await prisma.skills.findMany({
             where: {
-                id: id,
-            },
-            data: {
-                skills: {
-                    set: SkillFound,
+                skillName: {
+                    in: skillsNotFound,
                 },
             },
         });
+
+        SkillFound.push(...newlyCreatedSkills);
     }
 
-    //TODO: Update all groups that have this course
+    // Add the skills to the course
+    await prisma.course.update({
+        where: {
+            id: id,
+        },
+        data: {
+            skills: {
+                connect: SkillFound,
+            },
+        },
+    });
 };
 
 export const dbGetCourse = async (courseId: string) => {

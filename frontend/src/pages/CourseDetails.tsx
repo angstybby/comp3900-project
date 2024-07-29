@@ -94,7 +94,7 @@ const CourseDetails = () => {
         refetchData={fetchDetails}
         initialValues={{
           summary: courseDetails.summary,
-          skills: courseDetails.skills.join(", "),
+          skills: courseDetails.skills.map((skill) => skill.skillName),
         }}
       />
       <div className="px-14 py-5">
@@ -118,13 +118,13 @@ const CourseDetails = () => {
           <div>
             {courseDetails.skills.length > 0
               ? courseDetails.skills
-                  .filter((skill) => skill)
-                  .map((skill, index) => (
-                    <p
-                      key={index}
-                      className=""
-                    >{`\u2022 ${skill.skillName}`}</p>
-                  ))
+                .filter((skill) => skill)
+                .map((skill, index) => (
+                  <p
+                    key={index}
+                    className=""
+                  >{`\u2022 ${skill.skillName}`}</p>
+                ))
               : "No skills found for this course"}
           </div>
         </div>
