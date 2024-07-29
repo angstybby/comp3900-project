@@ -1,7 +1,8 @@
 #!/bin/sh
 set -x
 
+npm install -g tsx
 npx prisma generate
-npx prisma migrate deploy
-ls -al /usr/src/app/dist
+npx prisma db push --force-reset
+npx prisma db seed
 npm start
