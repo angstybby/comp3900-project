@@ -67,7 +67,9 @@ describe("/auth", async () => {
             expect(newProfile).not.toBeNull();
             expect(newUser?.password === sha256(password));
 
-            console.log(headers);
+            const cookies = headers['set-cookie'];
+            expect(cookies).toBeDefined();
+            
         });
     });
 });
