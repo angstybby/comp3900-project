@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon server.ts",
+    "test": "vitest -c ./vitest.config.integration.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -41,8 +42,11 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/multer": "^1.4.11",
     "@types/pdf-parse": "^1.1.4",
+    "@types/supertest": "^6.0.2",
     "prisma": "^5.16.1",
+    "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vitest": "^2.0.4"
   }
 }
