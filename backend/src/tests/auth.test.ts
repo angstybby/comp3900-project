@@ -1,10 +1,11 @@
 // src/tests/auth.test.ts
-import { describe, expect, it, test } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, test } from "vitest";
 import prisma from "./helpers/prisma";
 import request from "supertest";
 import app from "../../app";
 import { UserType } from "@prisma/client";
 import { sha256 } from "js-sha256";
+import { verify } from "jsonwebtoken";
 
 describe("/auth", async () => {
     const studentOneZid = "z1111111";
@@ -59,6 +60,16 @@ describe("/auth", async () => {
 
             const cookies = headers["set-cookie"];
             expect(cookies).toBeDefined();
+
+            const jwt = cookies[0].split(";")[0].split("=")[1];
+            expect(jwt).toBeDefined();
+
+            if (!process.env.JWT_HASH) {
+                throw new Error("JWT_HASH not set");
+            }
+
+            const token = verify(jwt, process.env.JWT_HASH);
+            expect(token).toBeDefined();
         });
 
         it("should respons with `200` status code and JWT token for academic", async () => {
@@ -95,6 +106,17 @@ describe("/auth", async () => {
 
             const cookies = headers["set-cookie"];
             expect(cookies).toBeDefined();
+
+            const jwt = cookies[0].split(";")[0].split("=")[1];
+            expect(jwt).toBeDefined();
+
+            if (!process.env.JWT_HASH) {
+                throw new Error("JWT_HASH not set");
+            }
+
+            const token = verify(jwt, process.env.JWT_HASH);
+
+            expect(token).toBeDefined();
         });
 
         it("should respond with a `409` status code if email or zid is already in use", async () => {
@@ -157,6 +179,117 @@ describe("/auth", async () => {
                 });
 
             expect(responseTwo.status).toBe(400);
+        });
+    });
+
+    describe("/auth/login", () => {
+        // Assuming dbAddUser is a function that adds a user to your mock database
+        beforeEach(async () => {
+            await request(app).post("/api/auth/register").send({
+                zid: studentOneZid,
+                email: studentOneEmail,
+                password: studentOnePassword,
+                fullname: studentOneFullname,
+                userType: studentUserType,
+            });
+
+            await request(app).post("/api/auth/register").send({
+                zid: academicOneZid,
+                email: academicOneEmail,
+                password: academicOnePassword,
+                fullname: academicOneFullname,
+                userType: academicUserType,
+            });
+        });
+
+        it("should log in student successfully with correct credentials", async () => {
+            const response = await request(app).post("/api/auth/login").send({
+                email: studentOneEmail,
+                password: studentOnePassword,
+            });
+
+            expect(response.status).toBe(200);
+            expect(response.headers["set-cookie"]).toBeDefined();
+
+            const cookies = response.headers["set-cookie"];
+            expect(cookies).toBeDefined();
+
+            const jwt = cookies[0].split(";")[0].split("=")[1];
+            expect(jwt).toBeDefined();
+
+            if (!process.env.JWT_HASH) {
+                throw new Error("JWT_HASH not set");
+            }
+
+            const token = verify(jwt, process.env.JWT_HASH);
+            expect(token).toBeDefined();
+        });
+
+        it("should log in academic successfully with correct credentials", async () => {
+            const response = await request(app).post("/api/auth/login").send({
+                email: academicOneEmail,
+                password: academicOnePassword,
+            });
+
+            expect(response.status).toBe(200);
+            expect(response.headers["set-cookie"]).toBeDefined();
+
+            const cookies = response.headers["set-cookie"];
+            expect(cookies).toBeDefined();
+
+            const jwt = cookies[0].split(";")[0].split("=")[1];
+            expect(jwt).toBeDefined();
+
+            if (!process.env.JWT_HASH) {
+                throw new Error("JWT_HASH not set");
+            }
+
+            const token = verify(jwt, process.env.JWT_HASH);
+            expect(token).toBeDefined();
+        });
+
+        it("should fail login with incorrect password", async () => {
+            const response = await request(app).post("/api/auth/login").send({
+                email: studentOneEmail,
+                password: "wrongpassword",
+            });
+
+            expect(response.status).toBe(400);
+            expect(response.text).toContain("Email or password is incorrect");
+        });
+
+        it("should fail login with incorrect email", async () => {
+            const response = await request(app).post("/api/auth/login").send({
+                email: "nonexistent@example.com",
+                password: studentOnePassword,
+            });
+
+            expect(response.status).toBe(400);
+        });
+
+        it("should return an error for missing email", async () => {
+            const response = await request(app).post("/api/auth/login").send({
+                password: studentOnePassword,
+            });
+
+            expect(response.status).toBe(400);
+        });
+
+        it("should return an error for missing password", async () => {
+            const response = await request(app).post("/api/auth/login").send({
+                email: studentOneEmail,
+            });
+
+            expect(response.status).toBe(400);
+        });
+
+        it("should handle invalid email format", async () => {
+            const response = await request(app).post("/api/auth/login").send({
+                email: "bademail",
+                password: studentOnePassword,
+            });
+
+            expect(response.status).toBe(400);
         });
     });
 });
