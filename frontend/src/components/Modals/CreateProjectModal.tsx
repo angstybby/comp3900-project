@@ -38,7 +38,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, re
   });
 
   const filteredSkills = query === ''
-    ? skills
+    ? [] // Avoid exploding your pc with a huge list
     : skills.filter(skill =>
       skill.skillName.includes(query)
     );
