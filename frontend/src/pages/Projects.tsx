@@ -81,7 +81,7 @@ export default function Project() {
             )}
           </div>
           <div className="w-full mx-auto my-5">
-            <SearchBar onSearchTermChange={setSearchTerm} />
+            <SearchBar onSearchTermChange={setSearchTerm} placeholder="Search for a project..." />
           </div>
           <ProjectList searchTerm={searchTerm} />
         </div>

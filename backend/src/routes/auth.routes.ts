@@ -180,7 +180,7 @@ router.get('/proxy/linkedin', async (req, res) => {
         const clientId = process.env.LINKEDIN_CLIENT_ID;
         const redicectUri = process.env.REDIRECT_URL;
         const state = process.env.LINKEDIN_STATE;
-        const scope = 'openid%20profile';
+        const scope = 'openid%20profile%20w_member_social';
 
         const connectToLinkedIn = async () => {
             try {

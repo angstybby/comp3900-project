@@ -3,8 +3,12 @@ import courseDataJson from "../src/data/courseCodesAndTitle.json";
 
 const prisma = new PrismaClient();
 const seedCourses = async () => {
-    const courseData = courseDataJson;
+    let courseData = courseDataJson;
     // Only do this when the database in completely reset
+    // For the sake of demostrations, we limit the scope of courses to include
+    // only COMP courses
+    const regex = /COMP[0-9]{4}/;
+    courseData = courseData.filter((course) => regex.test(course.Code));
     if (courseData.length > 0) {
         await prisma.course.createMany({
             data: courseData.map((course) => ({
