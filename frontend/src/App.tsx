@@ -21,8 +21,9 @@ import PublicProfile from '@/pages/PublicProfile';
 import ProjectApplications from './pages/ProjectApplications'
 import ProjectDetailsStudent from './pages/ProjectDetailsStudent'
 import ProjectDetailsOther from './pages/ProjectDetailsOther'
-
-
+import UpdateCareerPath from './pages/CareerPath'
+import Leaderboard from './pages/Leaderboard'
+import "./App.css";
 
 function App() {
   return (
@@ -39,22 +40,33 @@ function App() {
               <Route path={`/profile/:zId`} element={<PublicProfile />} />
               <Route path={`/notifications`} element={<Notification />} />
               <Route path={`/course/:courseId`} element={<CourseDetails />} />
-              <Route path={`/group/:groupId/project/:projectId`} element={<ProjectDetailsStudent />} />
-              <Route path='/project/:projectId/' element={<ProjectDetailsOther />} />
-              <Route path={`/project/:projectId/applications`} element={<ProjectApplications />} />
+              <Route
+                path={`/group/:groupId/project/:projectId`}
+                element={<ProjectDetailsStudent />}
+              />
+              <Route
+                path="/project/:projectId/"
+                element={<ProjectDetailsOther />}
+              />
+              <Route
+                path={`/project/:projectId/applications`}
+                element={<ProjectApplications />}
+              />
               <Route path={`/group/:groupId`} element={<GroupDetails />} />
               <Route path={`/manage-users`} element={<Admin />} />
+              <Route path={`/leaderboard`} element={<Leaderboard />} />
             </Route>
             <Route path={`/register`} element={<Register />} />
             <Route path={`/upload`} element={<Upload />} />
             <Route path={`/reset-password`} element={<ResetPassword />} />
             <Route path={`/courseRecommendations`} element={<CourseReco />} />
+            <Route path={`/careerPath`} element={<UpdateCareerPath />} />
             <Route path={`/`} element={<Landing />} />
           </Routes>
-        </BrowserRouter >
+        </BrowserRouter>
       </ProfileProvider>
     </ModalProvider>
-  )
+  );
 }
 
-export default App
+export default App;

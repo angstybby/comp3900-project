@@ -79,6 +79,7 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
         errorRef.current = false;
       } catch (error) {
         errorRef.current = true;
+        setErrorMessage('An error occured when parsing the file! Please try again.')
         setSelectedFile(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';

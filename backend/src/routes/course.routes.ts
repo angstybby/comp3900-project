@@ -11,7 +11,6 @@ import {
     dbUpdateCourse,
 } from "../models/course.models";
 import { CustomRequest } from "../middleware/auth.middleware";
-import PdfParse from "pdf-parse";
 import {
     model,
     getCourseSkillsContext,
@@ -21,6 +20,8 @@ import {
 } from "../utils/ai";
 import multer from "multer";
 import { dbUpdateSkillsRatings } from "../models/skills.models";
+import PDFParser from "pdf2json"; 
+import { parsePdfBuffer } from "../utils/pdf";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -179,18 +180,21 @@ router.post("/parse-outline", upload.single("pdfUpload"), async (req, res) => {
         if (file.mimetype !== "application/pdf") {
             throw new Error("File is not a pdf");
         }
-        const text = await PdfParse(file.buffer);
+
+        const text = await parsePdfBuffer(file.buffer);
+        console.log("text:", text);
+
         const chat = model.startChat({
             generationConfig,
         });
 
         const summaryResult = await chat.sendMessage(
-            `${summarizeCourseOutlineContext} Here is the text: ${text.text}`,
+            `${summarizeCourseOutlineContext} Here is the text: ${text}`,
         );
         const courseSummary = summaryResult.response.text();
 
         const skillsResult = await chat.sendMessage(
-            `${getCourseSkillsContext} Here is the text: ${text.text}`,
+            `${getCourseSkillsContext} Here is the text: ${text}`,
         );
         const courseSkills = skillsResult.response.text();
 
@@ -278,6 +282,14 @@ router.post("/update-details", async (req, res) => {
     }
 });
 
+/**
+ * Route for generating course skills rating context
+ * @name POST /generate-skill-rating/:id
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the course is not found.
+ * @returns {Response} Success message or error message
+ */
 router.post("/generate-skill-rating/:id", async (req, res) => {
     const courseId = req.params.id;
 

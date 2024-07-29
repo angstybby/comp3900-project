@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
 
-const SearchBar = ({ onSearchTermChange }: { onSearchTermChange: (searchTerm: string) => void}) => {
+const SearchBar = ({ onSearchTermChange, placeholder }: { onSearchTermChange: (searchTerm: string) => void, placeholder?: string}) => {
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     onSearchTermChange(e.target.value);
   }
@@ -11,7 +11,7 @@ const SearchBar = ({ onSearchTermChange }: { onSearchTermChange: (searchTerm: st
         type='text'
         name='query'
         className='block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-md sm:leading-6 duration-150'
-        placeholder='Search for a course e.g. COMP1511'
+        placeholder={`${placeholder ? placeholder : "Search for a course e.g. COMP1511"}`}
         autoComplete='off'
         onChange={handleOnChange}
         disabled={false}

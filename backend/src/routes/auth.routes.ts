@@ -17,6 +17,9 @@ import {
     validateZid,
 } from "../utils/auth.utils";
 import { dbAddProfile } from "../models/profile.models";
+import axios from "axios";
+
+const request = require('request-promise');
 
 const router = express.Router();
 
@@ -170,6 +173,105 @@ router.post("/change-password", async (req, res) => {
         return res.status(500).send("Server error");
     }
     res.status(200).send("Password changed");
+});
+
+router.get('/proxy/linkedin', async (req, res) => {
+    try {
+        const clientId = process.env.LINKEDIN_CLIENT_ID;
+        const redicectUri = process.env.REDIRECT_URL;
+        const state = process.env.LINKEDIN_STATE;
+        const scope = 'openid%20profile%20w_member_social';
+
+        const connectToLinkedIn = async () => {
+            try {
+                const url = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${redicectUri}&state=${state}&scope=${scope}`;
+                console.log('Redirecting to LinkedIn:', url);
+                res.redirect(url);
+            } catch (error) {
+                console.log(error);
+                return res.status(500).send('An error occurred while processing');
+            }
+        }
+        connectToLinkedIn();
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('An error occurred while processing');
+    }
+});
+
+router.get('/proxy/linkedin/callback', async (req, res) => {
+    const authCode = req.query.code as string;
+
+    ///////////////////////////////////////
+    // May need to edit once deployed!!! //
+    ///////////////////////////////////////
+    let frontendUrl = process.env.FRONTEND_URL;
+    if (!frontendUrl) frontendUrl = 'http://localhost:5173';
+
+    if (!authCode) {
+        res.redirect(frontendUrl);
+    } else {
+        const tokenBaseUrl = "https://www.linkedin.com/oauth/v2/accessToken";
+        const data = {
+            grant_type: 'authorization_code',
+            code: authCode,
+            client_id: process.env.LINKEDIN_CLIENT_ID,
+            client_secret: process.env.LINKEDIN_SECRET,
+            redirect_uri: process.env.REDIRECT_URL,
+        };
+        
+        try {
+            const tokenResponse = await request.post({ url: tokenBaseUrl, form: data, json: true });
+            res.cookie("linkedIn_AccessToken", tokenResponse.access_token);
+            res.redirect(`${frontendUrl}?update=true`);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).send('An error occurred obtaining access token');
+        }
+    }
+});
+
+router.get('/proxy/linkedin/details', async (req, res) => {
+    const cookie = req.headers.cookie;
+    const accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
+    if (!accessToken) return res.status(400).send('No LinkedId access token found');
+
+    try {
+        const response = await axios.get("https://api.linkedin.com/v2/userinfo", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        })
+
+        const pictureResponse = await axios.get(response.data.picture, {responseType: 'arraybuffer'});
+        const buffer = Buffer.from(pictureResponse.data, 'binary');
+        const dataURL = `data:${pictureResponse.headers['content-type']};base64,${buffer.toString('base64')}`;
+
+        const payload = response.data;
+        payload.picture = dataURL;
+        res.status(200).send(payload);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred while fetching LinkedIn data');
+    }
+});
+
+// Temporary route for testing
+router.get('/proxy/linkedin/temp', async (req, res) => {
+    try {
+        console.log("HELLO")
+        const cookie = req.headers.cookie;
+        const accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
+        const response = await axios.get("https://api.linkedin.com/v2/me", {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
+        })
+        console.log(response.data);
+    } catch (error) {
+        console.error(error);
+        
+    }
 });
 
 export default router;

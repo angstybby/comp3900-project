@@ -13,12 +13,14 @@ import {
     dbGetUserJoinedProjects,
     dbGetProjectsOwnedByUser,
     dbUpdateProject,
+    dbGetAllProjectsWithSkills,
     dbGetUserInProject,
 } from "../models/project.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
-import { isProjectOwner } from "../utils/project.utils";
-import { getUserType } from "../models/profile.models";
+import { CombinedProject, isProjectOwner } from "../utils/project.utils";
+import { dbGetProfile, dbGetUserSkills, getUserType } from "../models/profile.models";
 import { UserType } from "@prisma/client";
+import { getProjectReccsContext, getProjectReccsContextByCareer, model } from "../utils/ai";
 
 const router = express.Router();
 
@@ -476,6 +478,114 @@ router.put("/update", async (req: Request, res: Response) => {
     }
 });
 
+
+// Function to fetch user skills and create a string of joined skills
+const createUserSkillsString = async (zid: string) => {
+  try {
+      const user = await dbGetUserSkills(zid);
+      let joinedSkills = "";
+      if (user && user.Skills) {
+          for (const skill of user.Skills) {
+              joinedSkills += skill.skillName + ", ";
+          }
+          joinedSkills = joinedSkills.slice(0, -2);
+      }
+      return joinedSkills;
+  } catch (error) {
+      console.error("Error creating user skills string:", error);
+      throw error;
+  }
+};
+
+/**
+ * @route POST /projects/get-career-reco
+ * @desc Get recommended projects based on career and skills
+ * @access Private
+ * @returns {Array} List of recommended projects
+ * @throws {500} If an error occurs while fetching recommended projects
+ *
+ */
+router.post("/get-career-reco", authMiddleWare, async (req, res) => {
+
+  const customReq = req as CustomRequest;
+  if (!customReq.token || typeof customReq.token === "string") {
+    return res.status(401).send("Unauthorized");
+  }
+  
+  const userSkills = await createUserSkillsString(customReq.token.zid);
+  const user = await dbGetUserSkills(customReq.token.zid);
+
+  console.log("User Skills:", userSkills);
+
+  if (!userSkills || !user.CareerPath) {
+    return res.status(200).send([]);
+  }
+
+  const groups = req.body.groups;
+  const activeProjects = req.body.project;
+
+  try {
+      const allProjects: CombinedProject[] = [];
+
+      for (const group of groups) {
+          const projects = await dbGetAllProjectsWithSkills(parseInt(group.id));
+          allProjects.push(...projects);
+      }
+
+      // Filter out duplicate projects
+      const uniqueProjects = Array.from(new Set(allProjects.map(p => p.id)))
+                                  .map(id => allProjects.find(p => p.id === id));
+
+      const stringProjects = uniqueProjects
+          .filter((project): project is CombinedProject => project !== undefined)
+          .map(
+              (project) => `
+              Details for Project: ${project.id}
+              Title: ${project.title}
+              Description: ${project.description}
+              Skills: ${project.skills}
+          `,
+          )
+          .join("\n");
+
+      // format projects that are taken by user
+      const activeStringProjects = activeProjects
+          .map(
+              (project: { id: any; title: any; description: any; }) => `
+          Details for Project: ${project.id}
+          Title: ${project.title}
+          Description: ${project.description}
+          `,
+          )
+          .join("\n");
+
+      const promptForAi = getProjectReccsContextByCareer(userSkills, stringProjects, activeStringProjects, user.CareerPath);
+
+      const chat = model.startChat();
+      // console.log("prompt for AI: ", promptForAi);
+      const result = await chat.sendMessage(promptForAi);
+      // console.log("AI Output: ", result.response.text());
+
+      const projectIds = result.response
+          .text()
+          .trim()
+          .split(",")
+          .map((id) => id.trim());
+
+      console.log("project ids: \n", projectIds);
+      const projectPromises = projectIds.map(dbGetProjectByName);
+      const projects = await Promise.all(projectPromises);
+
+      const filteredProjects = projects.filter(
+          (project) => project !== null && project !== undefined,
+      );
+
+      return res.status(200).send(filteredProjects);
+  } catch (error) {
+      console.error("Error getting recommendations:", error);
+      return res.status(500).send("Failed to get recommendations");
+  }
+});
 router.get(
     "/user-in-group/:userId/:projectId",
     authMiddleWare,
