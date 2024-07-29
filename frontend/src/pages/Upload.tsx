@@ -123,7 +123,7 @@ export default function Upload() {
       }
       setLoading(false);
       setSelectedCourses([]);
-      navigate('/courseRecommendations');
+      navigate('/careerPath');
     } catch (error) {
       console.error("Error adding courses", error);
       setLoading(false);
@@ -151,7 +151,7 @@ export default function Upload() {
       });
       if (response.status === 200) {
         console.log('File uploaded successfully');
-        navigate('/courseRecommendations');
+        navigate('/careerPath');
       } else {
         console.error('Error uploading file');
       }
@@ -166,7 +166,7 @@ export default function Upload() {
     await handleAddCourse();
     await handleUpload();
     setLoading(false);
-    navigate('/courseRecommendations');
+    navigate('/careerPath');
   };
 
   return (

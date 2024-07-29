@@ -45,6 +45,7 @@ export const dbUpdateProfile = async (profile: Profile): Promise<Profile> => {
                 fullname: profile.fullname,
                 description: profile.description,
                 resume: profile.resume,
+                CareerPath: profile.CareerPath,
             },
         });
         return user;
@@ -82,3 +83,38 @@ export const dbGetStudentProfiles = async () => {
         },
     });
 }
+
+/**
+ * @function dbGetUserSkills
+ * @desc Retrieve a user's skills and career from the database
+ * @param {string} zid - The user's ID
+ * @returns {Object} The user's skills and career
+ * @throws {Error} If an error occurs while retrieving the user's skills
+ */
+export const dbGetUserSkills = async (zid: string) => {
+  try {
+      const user = await prisma.profile.findUnique({
+          where: {
+              zid: zid,
+          },
+          select: {
+              zid: true,
+              CareerPath: true,
+              Skills: {
+                  select: {
+                      skillName: true,
+                  },
+              },
+          },
+      });
+
+      if (!user) {
+          throw new Error("User does not exist");
+      }
+
+      return user;
+  } catch (error) {
+      console.error("Error getting user skills:", error);
+      throw error;
+  }
+};

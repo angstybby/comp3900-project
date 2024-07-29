@@ -61,6 +61,7 @@ model Profile {
   Skills         Skills[]
   GroupJoined    GroupJoined[]
   GroupInterest  GroupInterest[]
+  CareerPath     String?         @db.Text
 }
 
 model Course {

@@ -8,6 +8,7 @@ interface ProfileData {
   fullname: string;
   description: string;
   resume: string;
+  CareerPath: string;
 }
 
 interface ProfileContextType {
