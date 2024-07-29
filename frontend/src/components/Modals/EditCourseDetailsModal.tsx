@@ -40,6 +40,8 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
   const [skills, setSkills] = useState<Skill[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<Skill[]>([]);
   const [query, setQuery] = useState<string>('');
+  const [showNewSkillOption, setShowNewSkillOption] = useState<boolean>(false);
+
 
   useEffect(() => {
     setSummary(initialValues.summary);
@@ -47,7 +49,7 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
   }, [open, initialValues]);
 
   const filteredSkills = query === ''
-    ? skills
+    ? []
     : skills.filter(skill =>
       skill.skillName.toLowerCase().includes(query.toLowerCase())
     );
@@ -164,30 +166,42 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
               disabled={loading}
             />
             <p className="my-2 font-bold">Course Skills</p>
-            <Combobox disabled={loading} multiple value={selectedSkills} onChange={setSelectedSkills} onClose={() => setQuery('')}>
-              {
-                selectedSkills.length > 0 && (
-                  <div className='mb-5'>
-                    <p className='text-lg text-black'>
-                      Selected Skills:
-                    </p>
-                    {/* Make into bubbles and if clicked remove the skills */}
-                    <div className='flex flex-wrap gap-2'>
-                      {selectedSkills.map(skill => (
-                        <button key={skill.id} className='bg-green-200 p-1.5 rounded-lg hover:bg-red-200' onClick={() => {
+            <Combobox
+              disabled={loading}
+              multiple
+              value={selectedSkills}
+              onChange={setSelectedSkills}
+              onClose={() => setQuery('')}
+            >
+              {selectedSkills.length > 0 && (
+                <div className='mb-5'>
+                  <p className='text-lg text-black'>
+                    Selected Skills:
+                  </p>
+                  <div className='flex flex-wrap gap-2'>
+                    {selectedSkills.map(skill => (
+                      <button
+                        key={skill.id}
+                        className='bg-green-200 p-1.5 rounded-lg hover:bg-red-200'
+                        onClick={() => {
                           setSelectedSkills(selectedSkills.filter(s => s !== skill));
-                        }}>{skill.skillName}</button>
-                      ))}
-                    </div>
+                        }}
+                      >
+                        {skill.skillName}
+                      </button>
+                    ))}
                   </div>
-                )
-              }
+                </div>
+              )}
               <ComboboxInput
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setShowNewSkillOption(!skills.some(skill => skill.skillName.toLowerCase() === event.target.value.toLowerCase()));
+                }}
                 className="block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-md sm:leading-6"
                 placeholder="Search for skills and select all that is in this course..."
               />
-              {query.length > 0 && (
+              {(query.length > 0 || showNewSkillOption) && (
                 <ComboboxOptions
                   transition
                   className='w-full max-h-48 overflow-scroll rounded-xl border border-gray-800/5 bg-gray-800/5 p-1 [--anchor-gap:var(--spacing-1)] empty:invisible transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0'
@@ -196,10 +210,19 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
                     <ComboboxOption
                       key={skill.id}
                       value={skill}
-                      className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-indigo-500/30">
+                      className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-indigo-500/30"
+                    >
                       {skill.skillName}
                     </ComboboxOption>
                   ))}
+                  {showNewSkillOption && query !== '' && (
+                    <ComboboxOption
+                      value={{ id: skills.length + 1, skillName: query }}
+                      className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-green-500/30"
+                    >
+                      Add "{query}" as a new skill
+                    </ComboboxOption>
+                  )}
                 </ComboboxOptions>
               )}
             </Combobox>
