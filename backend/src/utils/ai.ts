@@ -73,3 +73,7 @@ export const getProjectReccsContext = (skills: string, projects: string) => {
 export const getStudentReccsContext = (skills: string, students: string) => {
     return `This group currently has these skills: ${skills}. Here are the current existing users: ${students}. Based on this set of users, recommend the three most suitable users for this group. Format the response as a comma-separated list of zid for example: <zid1>, <zid2>, <zid3> and do not include explanations.`;
 };
+
+export const getProjectReccsContextByCareer = (skills: string, projects: string, activeProjects: string, career: string) => {
+  return `This student currently has these skills: ${skills} and wants to follow this career path: ${career}. Here are the current existing projects: ${projects} and here are the active projects being worked on ${activeProjects}. Based on this set of projects, recommend the three most suitable projects for this student. However if they are already active projects you must not recommended them, and in the worst case leave it blank. You must format the response as a comma-separated list of project titles only, for example: FrontEnd Development, Full-Stack Web Application, Mobile App Development. If there are projects not related at all, please do not recommend them. Also do not include any additional text or explanations.`;
+};

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { request } from "express";
 import {
     dbAcceptUserToGroup,
     dbCreateGroup,
@@ -402,7 +402,6 @@ router.get("/groups", authMiddleWare, async (req, res) => {
     }
 
     const zid = customReq.token.zid;
-
     try {
         const groups = await dbGetUserInGroup(zid);
         return res.status(200).send(groups);
@@ -610,6 +609,8 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
         const promptForAi = getProjectReccsContext(groupSkills, stringProjects);
         const chat = model.startChat();
         const result = await chat.sendMessage(promptForAi);
+
+        console.log(result.response.text());
 
         const projectIds = result.response
             .text()
