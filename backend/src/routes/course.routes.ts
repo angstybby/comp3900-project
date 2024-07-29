@@ -278,6 +278,14 @@ router.post("/update-details", async (req, res) => {
     }
 });
 
+/**
+ * Route for generating course skills rating context
+ * @name POST /generate-skill-rating/:id
+ * @param {Request} req - The request object.
+ * @param {Response} res - The response object.
+ * @throws {Error} If the course is not found.
+ * @returns {Response} Success message or error message
+ */
 router.post("/generate-skill-rating/:id", async (req, res) => {
     const courseId = req.params.id;
 
