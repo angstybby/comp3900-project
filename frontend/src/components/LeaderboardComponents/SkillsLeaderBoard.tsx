@@ -28,6 +28,14 @@ const SkillsLeaderBoard = () => {
     console.log(data);
   },[])
 
+  const generateColours: () => string[] = (): string[] => {
+    const rawData = Object.keys(data);
+    const bg = rawData.map((key) => {
+      return key === userSkillsCount.toString() ? "#178443" : "#01af57";
+    });
+    return bg;
+  };
+
   return (
       <div className="w-[95%]">
         <p className="font-bold mb-4">{`You currently have ${userSkillsCount} skills. You posses more skills than ${percentage}% of all users!`}</p>
@@ -38,11 +46,11 @@ const SkillsLeaderBoard = () => {
               {
                 label: "Users",
                 data: Object.values(data),
-                backgroundColor: "#808080",
-                borderColor: "#808080",
+                backgroundColor: generateColours(),
+                borderColor: generateColours(),
                 borderWidth: 1,
                 borderRadius: 10,
-                barThickness: 4,
+                barThickness: 4.5,
               }
             ]
           }}

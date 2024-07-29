@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import CourseMainSkillBubble from "./CourseMainSkillBubble";
+import CourseSkillBubble from "./CourseSkillBubble";
 import { useEffect, useState } from "react";
 import { axiosInstanceWithAuth } from "@/api/Axios";
 import { Carousel, CarouselContent } from "../ui/carousel";
@@ -52,7 +52,7 @@ export default function CourseCard({ id, courseName, inCarousel }: CourseCardPro
           inCarousel 
           ? 
             (
-              <CourseMainSkillBubble skill={`Number of skills: ${skills.length}`} key={`${id} skills`} />
+              <CourseSkillBubble skill={`Number of skills: ${skills.length}`} key={`${id} skills`} />
             )
           : 
             <Carousel className="w-full max-w-[100%] mx-auto" opts={{
@@ -60,7 +60,7 @@ export default function CourseCard({ id, courseName, inCarousel }: CourseCardPro
             }}>
               <CarouselContent className="ml-1">
                 {skills.map(skill => (
-                  <CourseMainSkillBubble skill={skill.skillName} key={skill.skillName} />
+                  <CourseSkillBubble skill={skill.skillName} key={skill.skillName} />
                 ))}
               </CarouselContent>
             </Carousel>
