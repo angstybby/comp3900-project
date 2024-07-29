@@ -39,7 +39,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, re
   const [showNewSkillOption, setShowNewSkillOption] = useState<boolean>(false);
 
   const filteredSkills = query === ''
-    ? [] // Avoid exploding your pc with a huge list
+    ? []
     : skills.filter(skill =>
       skill.skillName.includes(query)
     );
@@ -165,9 +165,6 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, re
               >
                 {selectedSkills.length > 0 && (
                   <div className='mb-5'>
-                    <p className='text-lg text-black'>
-                      Selected Skills:
-                    </p>
                     <div className='flex flex-wrap gap-2'>
                       {selectedSkills.map(skill => (
                         <button
@@ -205,7 +202,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, re
                         {skill.skillName}
                       </ComboboxOption>
                     ))}
-                    {showNewSkillOption && (
+                    {(showNewSkillOption && query !== '') && (
                       <ComboboxOption
                         value={{ id: skills.length + 1, skillName: query }}
                         className="group flex cursor-default items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-green-500/30"

@@ -171,9 +171,7 @@ const EditProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, refe
               >
                 {selectedSkills.length > 0 && (
                   <div className='mb-5'>
-                    <p className='text-lg text-black'>
-                      Selected Skills:
-                    </p>
+
                     <div className='flex flex-wrap gap-2'>
                       {selectedSkills.map(skill => (
                         <button
@@ -195,7 +193,7 @@ const EditProjectModal: React.FC<CreateProjectModalProps> = ({ open, close, refe
                     setShowNewSkillOption(!skills.some(skill => skill.skillName.toLowerCase() === event.target.value.toLowerCase()));
                   }}
                   className="block w-full px-3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-md sm:leading-6"
-                  placeholder="Search for skills and select all that is in this course..."
+                  placeholder="Search for skills and select all ..."
                 />
                 {(query.length > 0 || showNewSkillOption) && (
                   <ComboboxOptions

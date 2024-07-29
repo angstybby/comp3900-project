@@ -176,9 +176,6 @@ const EditCourseDetailsModal: React.FC<EditCourseDetailsModalProps> = ({ open, c
             >
               {selectedSkills.length > 0 && (
                 <div className='mb-5'>
-                  <p className='text-lg text-black'>
-                    Selected Skills:
-                  </p>
                   <div className='flex flex-wrap gap-2'>
                     {selectedSkills.map(skill => (
                       <button
