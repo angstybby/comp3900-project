@@ -1,10 +1,8 @@
 import { FormEvent, ChangeEvent, useState, useEffect } from "react";
 import "flowbite/dist/flowbite.min.css";
 import { axiosInstanceWithAuth } from "@/api/Axios";
-import ButtonLoading from "@/components/Buttons/ButtonLoading";
 import 'flowbite/dist/flowbite.min.css';
 import ButtonUtility from "@/components/Buttons/ButtonUtility";
-import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
 import { Options } from "browser-image-compression";
 import imageCompression from "browser-image-compression";
 import { useProfile } from "@/contexts/ProfileContext";
@@ -20,6 +18,11 @@ interface Project {
   editMode?: boolean;
   newStatus?: string;
 }
+import EditProfileModal from "@/components/Modals/EditProfileModal";
+import ChangeProfilePicModal from "@/components/Modals/ChangeProfilePicModal";
+import { useLocation, useNavigate } from "react-router-dom";
+import ParseLinkedInInfoModal from "@/components/Modals/ParseLinkedInInfoModal";
+import Cookies from "js-cookie";
 
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
@@ -30,10 +33,12 @@ export default function Profile() {
     fullname: "",
     description: "",
     resume: "",
+    CareerPath: "",
   });
 
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
+  const [showLinkedInModal, setShowLinkedInModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState<Project[]>([
     {
@@ -56,10 +61,41 @@ export default function Profile() {
     },
   ]);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const removeUpdateParam = () => {
+    const params = new URLSearchParams(location.search);
+    params.delete('update');
+    const newSearch = params.toString();
+    const newPath = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+    navigate(newPath);
+  };
+
+  const getQueryParam = (param: string): string | null => {
+    const urlParams = new URLSearchParams(location.search);
+    return urlParams.get(param);
+  };
+
+  const updateValue = getQueryParam('update');
+  const fetchLinkedInData = async () => {
+    const response = await axiosInstanceWithAuth.get("/auth/proxy/linkedin/details");
+    return response.data;
+  }
+  //STUB FEEDBACK DATA
+  const [feedbacks, setFeedbacks] = useState([
+    { id: 1, rating: 4, comment: "Great work on the project!" },
+    { id: 2, rating: 5, comment: "Excellent contribution and teamwork!" },
+    { id: 3, rating: 3, comment: "Good effort, but could improve in communication." },
+  ]);
+
   useEffect(() => {
     fetchProfileData();
+    if (updateValue) {
+      setShowLinkedInModal(true);
+    }
   }, []);
-
+  
   useEffect(() => {
     if (profileData) {
       setEditProfileInfo({
@@ -68,6 +104,7 @@ export default function Profile() {
         fullname: profileData.fullname || '',
         description: profileData.description || '',
         resume: profileData.resume || '',
+        CareerPath: profileData.CareerPath || '',
       });
       if (profileData.userType === 'student') {
         fetchProjects(profileData.zid);
@@ -84,6 +121,23 @@ export default function Profile() {
       setProjects(response.data);
     } catch (error) {
       console.error("Error fetching projects", error);
+    }
+  };
+
+  const syncLinkedInData = async () => {
+    try {
+      const linkedInData = await fetchLinkedInData();
+      await axiosInstanceWithAuth.put('/profile/update-profile', {
+        zid: profileData.zid,
+        profilePicture: linkedInData.picture,
+        fullname: linkedInData.given_name + ' ' + linkedInData.family_name,
+        description: profileData.description,
+        resume: profileData.resume,
+      });
+      updateProfileContext();
+      removeUpdateParam();
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -143,6 +197,7 @@ export default function Profile() {
         fullname: profileData.fullname,
         description: profileData.description,
         resume: profileData.resume,
+        CareerPath: profileData.CareerPath,
       });
       updateProfileContext();
     } catch (error) {
@@ -208,35 +263,61 @@ export default function Profile() {
     });
   };
 
-  return (
-    <div className="h-screen flex items-center justify-start flex-col">
-      <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
-      <div className="flex flex-col items-center justify-center mt-10 relative group">
-        <div className="relative w-32 h-32">
-          <img
-            src={profileData.profilePicture}
-            alt="Profile Picture"
-            className="w-full h-full rounded-full cursor-pointer"
-            onClick={() => setShowChangeProfPicModal(true)}
-          />
-          <div
-            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-80 bg-black bg-opacity-50 rounded-full transition-opacity duration-300"
-            onClick={() => setShowChangeProfPicModal(true)}
-          >
-            <svg
-              className="w-8 h-8 text-white"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M4 13V16H7L16 7L13 4L4 13Z" />
-            </svg>
-          </div>
-        </div>
-        <h2 className="text-2xl font-semibold mt-4">{profileData.fullname}</h2>
-        <p className="text-xl text-gray-600 mt-2">{profileData.description}</p>
-        <h3 className="text-sm text-gray-500 mt-2">{profileData.zid}</h3>
-      </div>
+  const connectToLinkedIn = async () => {
+    window.location.href = 'http://localhost:3000/api/auth/proxy/linkedin';
+  }
 
+  const copyLinkToClipboard = () => {
+    navigator.clipboard.writeText(profileLink).then(() => {
+      toast.success("Link copied to clipboard!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    });
+  };
+
+  return (
+    <div className="h-screen flex flex-row">
+
+      <div className="m-10 flex-1">
+        <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
+        <div className="m-2">
+          <div className="flex flex-col items-center justify-center relative group">
+            <div className="relative w-32 h-32">
+              <img
+                src={profileData.profilePicture}
+                alt="Profile Picture"
+                className="w-full h-full rounded-full cursor-pointer"
+                onClick={() => setShowChangeProfPicModal(true)}
+              />
+              <div
+                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-80 bg-black bg-opacity-50 rounded-full transition-opacity duration-300"
+                onClick={() => setShowChangeProfPicModal(true)}
+              >
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M4 13V16H7L16 7L13 4L4 13Z" />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-2xl font-semibold mt-4">{profileData.fullname}</h2>
+            <p className="text-xl text-gray-600 mt-2">{profileData.description}</p>
+            <h3 className="text-sm text-gray-500 mt-2">{profileData.zid}</h3>
+            <h4 className="text-sm text-gray-500 mt-1"> Career Path: {profileData.CareerPath}</h4>
+          </div>
+
+
+          <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
+            <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
+          </div>
       <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
         <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
         <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -285,152 +366,79 @@ export default function Profile() {
       </div>
       )}
 
+          <div className="mt-4 w-80 mx-auto flex space-x-4 items-center" title="Share Profile Button">
+            <ButtonUtility text={"Share"} onClick={copyLinkToClipboard} bg={"bg-blue-500"} />
+          </div>
+
+          {
+            Cookies.get('linkedIn_AccessToken') 
+            ? 
+              (
+                <></>
+              ) 
+            : 
+              (
+                <div className="mt-4 w-80 mx-auto flex space-x-4 items-center" title="Link to LinkedIn Button">
+                  <ButtonUtility text={"Connect to LinkedIn"} onClick={connectToLinkedIn} bg={"bg-lime-400 hover:bg-lime-600"} />
+                </div>
+              )
+          }
+
+        </div>
+      </div>  
+
+      <div className="flex-1 m-10">
+        <div className="mt-10 mx-auto">
+          <h1 className="text-3xl font-semibold text-center mt-10">Your Feedback</h1>
+          <div className="mt-4 space-y-4">
+            {feedbacks.map(feedback => (
+              <div key={feedback.id} className="border p-4 rounded-md w-240">
+                <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span 
+                      key={star}
+                      className={`text-2xl ${feedback.rating >= star ? "text-yellow-500" : "text-gray-400"}`}
+                    >
+                      ⭐️
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-2">{feedback.comment}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* <ButtonUtility text={"Test"} onClick={() => 
+        await axiosInstanceWithAuth.get("auth/proxy/linkedin/temp");
+      }/> */}
+      
+
       <ToastContainer />
 
-      {/* Edit profile details modal */}
-      {showEditProfileModal && (
-        <div
-          id="edit-profile-modal"
-          className="fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full h-full bg-gray-800 bg-opacity-75"
-        >
-          <div className="relative w-full max-w-3xl bg-white rounded-lg shadow dark:bg-gray-700">
-            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Edit Profile
-              </h3>
-              <button
-                type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={() => setShowEditProfileModal(false)}
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-            <div className="p-4 md:p-5">
-              <form className="space-y-4" onSubmit={handleSaveEditProfile}>
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="fullname"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    value={editProfileInfo.fullname}
-                    onChange={handleEditProfileChange}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="description"
-                    className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
-                  >
-                    Description
-                  </label>
-                  <textarea
-                    id="description"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    value={editProfileInfo.description}
-                    onChange={handleEditProfileChange}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="zid"
-                    className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
-                  >
-                    zID
-                  </label>
-                  <input
-                    type="zid"
-                    id="zid"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    value={editProfileInfo.zid}
-                    onChange={handleEditProfileChange}
-                  />
-                </div>
-                {loading ? (
-                  <ButtonLoading />
-                ) : (
-                  <ButtonSubmit text={"Save"} />
-                )}
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditProfileModal
+        show={showEditProfileModal}
+        loading={loading}
+        editProfileInfo={editProfileInfo}
+        onClose={() => setShowEditProfileModal(false)}
+        handleEditProfileChange={handleEditProfileChange}
+        handleSaveEditProfile={handleSaveEditProfile}
+      />
 
-      {/* Change profile picture modal */}
-      {showChangeProfPicModal && (
-        <div
-          id="change-profile-pic-modal"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75"
-        >
-          <div className="relative w-80 max-w-3xl bg-white rounded-lg shadow dark:bg-gray-700">
-            <div className="flex items-center justify-between p-6 border-b rounded-t dark:border-gray-600">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Change Profile Picture
-              </h3>
-              <button
-                type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={() => setShowChangeProfPicModal(false)}
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-            <div className="p-4 space-y-4">
-              <form onSubmit={handleSaveProfilePic}>
-                <div className="mb-3">
-                  <label
-                    htmlFor="profilePic"
-                    className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
-                  >
-                    Upload Image
-                  </label>
-                  <input
-                    type="file"
-                    id="profilePic"
-                    className="bg-gray-50 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                  />
-                </div>
-                {loading ? <ButtonLoading /> : <ButtonSubmit text={"Save"} />}
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      <ChangeProfilePicModal
+        show={showChangeProfPicModal}
+        loading={loading}
+        onClose={() => setShowChangeProfPicModal(false)}
+        handleFileChange={handleFileChange}
+        handleSaveProfilePic={handleSaveProfilePic}
+      />
+
+      <ParseLinkedInInfoModal
+        open={showLinkedInModal}
+        close={() => setShowLinkedInModal(false)}
+        sync={syncLinkedInData}
+      />
     </div>
   );
 }

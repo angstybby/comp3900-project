@@ -125,7 +125,8 @@ export const dbGetProjectOwnerById = async (projectId: number) => {
 };
 
 export const dbGetProject = async (projectId: number) => {
-    return await prisma.project.findUnique({
+    // Fetch the project details along with the related entities
+    const response = await prisma.project.findUnique({
         where: {
             id: projectId,
         },
@@ -137,8 +138,36 @@ export const dbGetProject = async (projectId: number) => {
                     skillName: true,
                 },
             },
+            Group: {
+                include: {
+                    GroupMembers: true,
+                },
+            },
         },
     });
+
+    if (!response) {
+        throw new Error("Project not found");
+    }
+
+    const groupsWithMemberCount = response.Group.map((group) => {
+        const membersCount = group.GroupMembers.length;
+        return {
+            ...group,
+            members: membersCount,
+        };
+    });
+
+    const cleanedGroups = groupsWithMemberCount.map(
+        ({ GroupMembers, ...rest }) => ({
+            ...rest,
+        }),
+    );
+
+    return {
+        ...response,
+        Group: cleanedGroups,
+    };
 };
 
 // Get all projects with a limit of 25 and a skip value
@@ -171,18 +200,11 @@ export const dbGetUserJoinedProjects = async (
             group: {
                 select: {
                     Project: {
-                        include: {
-                            ProjectOwner: true,
-                            skills: {
-                                select: {
-                                    id: true,
-                                    skillName: true,
-                                },
-                            },
-                        },
                         skip: skip,
                         take: 25,
                     },
+                    groupName: true,
+                    id: true,
                 },
             },
         },
@@ -233,26 +255,13 @@ export const dbAcceptGroupToProject = async (
             id: projectId,
         },
         data: {
-            assignedGroup: {
+            Group: {
                 connect: {
                     id: groupId,
                 },
             },
         },
     });
-
-    // update all other applications
-    // await prisma.projectInterest.updateMany({
-    //     where: {
-    //         projectId,
-    //         groupId: {
-    //             not: groupId,
-    //         },
-    //     },
-    //     data: {
-    //         status: InterestStatus.DENIED,
-    //     },
-    // });
 };
 
 export const dbRejectGroupToProject = async (
@@ -285,7 +294,7 @@ export const dbGetProjectByName = async (name: string) => {
     });
 };
 
-export const dbGetAllProjectsWithSkills = async () => {
+export const dbGetAllProjectsWithSkills = async (groupId: number) => {
     const returnProjects: CombinedProject[] = [];
     const projects = await prisma.project.findMany({
         select: {
@@ -295,7 +304,29 @@ export const dbGetAllProjectsWithSkills = async () => {
             projectOwnerId: true,
         },
     });
-    for (const project of projects) {
+
+    const groupProjects = await prisma.group.findFirst({
+        where: {
+            id: groupId,
+        },
+        select: {
+            Project: {
+                select: {
+                    id: true,
+                },
+            },
+        },
+    });
+
+    // Filter out projects that are already in the group
+    const filteredProjects = projects.filter(
+        (project) =>
+            !groupProjects?.Project.some(
+                (groupProject) => groupProject.id === project.id,
+            ),
+    );
+
+    for (const project of filteredProjects) {
         const tempProject: CombinedProject = project;
         const skills = await prisma.skills.findMany({
             where: {
@@ -358,4 +389,54 @@ export const dbUpdateProjectStatus = async (projectId: number, status: string) =
             status: status,
         },
     });
+};
+
+export const dbGetUserInProject = async (projectId: number, zid: string) => {
+    // Check the user's groups and return the groupName if they are in the project
+    const groups = await prisma.groupJoined.findMany({
+        where: {
+            zid: zid,
+        },
+        select: {
+            group: {
+                select: {
+                    id: true,
+                    groupName: true,
+                    description: true,
+                    GroupMembers: {
+                        select: {
+                            zid: true,
+                        },
+                    },
+                    MaxMembers: true,
+                    groupOwnerId: true,
+                    Project: {
+                        select: {
+                            id: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+
+    // Filter out groups that are in the project and add group member count
+    const userGroups = groups
+        .filter((group) => {
+            return group.group.Project.some(
+                (project) => project.id === projectId,
+            );
+        })
+        .map((group) => {
+            return {
+                id: group.group.id,
+                groupName: group.group.groupName,
+                description: group.group.description,
+                members: group.group.GroupMembers.length,
+                MaxMembers: group.group.MaxMembers,
+                groupOwnerId: group.group.groupOwnerId,
+            };
+        });
+
+    return userGroups;
 };

@@ -107,23 +107,23 @@ export default function Groups() {
                 <ButtonUtility text="Create Group" classname="h-10" onClick={handleOpen} />
               </div>
             </div>
-            {yourGroups.length === 0 
+            {yourGroups.length === 0
               ? (
-              <div className="flex justify-center items-center h-full">
-                {(loading ? <LoadingCircle /> :
-                  <p className="text-lg text-center">You are not in any groups
-                    <br />
-                    <span className="text-sm">Create a group or join one</span>
-                  </p>
-                )}
+                <div className="flex justify-center items-center h-full">
+                  {(loading ? <LoadingCircle /> :
+                    <p className="text-lg text-center">You are not in any groups
+                      <br />
+                      <span className="text-sm">Create a group or join one</span>
+                    </p>
+                  )}
 
-              </div>
+                </div>
 
               ) : (
                 <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{
                   align: "start"
                 }}>
-                  <CarouselContent>
+                  <CarouselContent >
                     {yourGroups.map((group) => (
                       <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} profile={profileData} />
                     ))}

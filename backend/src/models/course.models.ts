@@ -87,6 +87,17 @@ export const dbFindCourseById = async (id: string) => {
                 select: {
                     skillName: true,
                 },
+                orderBy: {
+                    id: "asc",
+                },
+            },
+            CourseSkill: {
+                select: {
+                    rating: true,
+                },
+                orderBy: {
+                    skillId: "asc",
+                },
             },
         },
     });
@@ -406,4 +417,15 @@ export const dbUpdateCourse = async (
     }
 
     //TODO: Update all groups that have this course
+};
+
+export const dbGetCourse = async (courseId: string) => {
+    return await prisma.course.findFirst({
+        where: {
+            id: courseId,
+        },
+        include: {
+            skills: true,
+        },
+    });
 };

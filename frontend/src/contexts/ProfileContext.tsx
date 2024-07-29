@@ -9,6 +9,7 @@ interface ProfileData {
   description: string;
   resume: string;
   userType: 'student' | 'admin'| 'academic'; 
+  CareerPath: string;
 }
 
 interface ProfileContextType {

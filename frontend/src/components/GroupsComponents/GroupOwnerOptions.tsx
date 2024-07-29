@@ -12,7 +12,7 @@ import {
     UserGroupIcon
 } from '@heroicons/react/16/solid'
 
-export default function GroupOwnerOptions({ openEditModal, openInviteUserModal }: { openEditModal: () => void, openInviteUserModal: () => void }) {
+export default function GroupOwnerOptions({ openEditModal, openInviteUserModal, openMembersDetailsModal }: { openEditModal: () => void, openInviteUserModal: () => void, openMembersDetailsModal: () => void }) {
     return (
         <>
             <DropdownMenu>
@@ -23,7 +23,7 @@ export default function GroupOwnerOptions({ openEditModal, openInviteUserModal }
 
                 <DropdownMenuContent className="w-52" align="end">
                     <DropdownMenuItem>
-                        <button className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-black/10">
+                        <button onClick={openMembersDetailsModal} className="group flex w-full items-center gap-2 rounded-lg py-1.5 px-3 data-[focus]:bg-black/10">
                             <ViewColumnsIcon className="size-4 fill-black/30" />
                             View Members
                             <kbd className="ml-auto hidden font-sans text-xs text-black/50 group-data-[focus]:inline">⌘A</kbd>

@@ -671,6 +671,28 @@ export const dbGetGroup = async (groupId: number) => {
             throw new Error("Group does not exist");
         }
 
+        // Add details to projectInterest just name and description
+        const projectInterest = await Promise.all(
+            group.ProjectInterest.map(async (project) => {
+                const projectDetails = await prisma.project.findFirst({
+                    where: {
+                        id: project.projectId,
+                    },
+                    select: {
+                        title: true,
+                        description: true,
+                    },
+                });
+
+                return {
+                    projectId: project.projectId,
+                    groupId: project.groupId,
+                    status: project.status,
+                    ...projectDetails,
+                };
+            }),
+        );
+
         // get the group owner details
         const groupOwnerName = await prisma.profile.findFirst({
             where: {
@@ -682,12 +704,13 @@ export const dbGetGroup = async (groupId: number) => {
         });
 
         // Fetch the member count for the group
-        let members = await prisma.groupJoined.count({
+        const members = await prisma.groupJoined.count({
             where: { groupId },
         });
 
         return {
             ...group,
+            ProjectInterest: projectInterest,
             members,
             groupOwnerName: groupOwnerName?.fullname,
         };
@@ -720,14 +743,25 @@ export const dbGetUsersNotInGroup = async (groupId: number) => {
 
         const groupMemberIds = groupMembers.map((member) => member.zid);
 
+        
         const usersNotInGroup = await prisma.profile.findMany({
             where: {
                 zid: {
                     notIn: groupMemberIds,
                 },
+                profileOwner: {
+                    userType: "student",
+                },
             },
             select: {
                 zid: true,
+                fullname: true,
+                profilePicture: true,
+                Skills: {
+                    select: {
+                        skillName: true,
+                    },
+                },
             },
         });
 
@@ -749,6 +783,43 @@ export const dbIsUserJoinedGroup = async (groupId: number, zId: string) => {
         return !!groupMember;
     } catch (error) {
         console.error("Error checking if user joined group:", error);
+        throw error;
+    }
+};
+
+export const dbGetGroupMembers = async (groupId: number) => {
+    try {
+        const groupMembers = await prisma.groupJoined.findMany({
+            where: {
+                groupId,
+            },
+            select: {
+                zid: true,
+            },
+        });
+
+        if (!groupMembers) {
+            throw new Error("Group members does not exist");
+        }
+
+        const groupMemberIds = groupMembers.map((member) => member.zid);
+
+        const memberDetails = await prisma.profile.findMany({
+            where: {
+                zid: {
+                    in: groupMemberIds,
+                },
+            },
+                select: {
+                    zid: true,
+                    fullname: true,
+            },
+        });
+
+        return memberDetails;
+
+    } catch (error) {
+        console.error("error getting group members.", error);
         throw error;
     }
 };
