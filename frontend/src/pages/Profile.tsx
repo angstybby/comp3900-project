@@ -273,7 +273,7 @@ export default function Profile() {
                       key={star}
                       className={`text-2xl ${feedback.rating >= star ? "text-yellow-500" : "text-gray-400"}`}
                     >
-                      ⭐️
+                    ★
                     </span>
                   ))}
                 </div>
