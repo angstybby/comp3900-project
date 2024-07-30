@@ -54,13 +54,13 @@ const Sidebar = () => {
         <div className='flex flex-col w-full gap-10 mt-14 mb-10'>
           <SidebarButton href='/dashboard' Icon={<HomeIcon />} text='Dashboard' />
           <SidebarButton href='/courses' text='Courses' Icon={<BookOpenIcon />} />
-          {Cookies.get('userType') !== 'academic' &&
+          {Cookies.get('userType') === 'student' &&
             <SidebarButton href='/groups' text='Groups' Icon={<UserGroupIcon />} />
           }
           <SidebarButton href='/projects' text='Projects' Icon={<CalculatorIcon />} />
           <SidebarButton href='/leaderboard' text='Leaderboard' Icon={<NumberedListIcon />} />
           <SidebarButton href='/profile' text='Profile' Icon={<UserIcon />} />
-          {Cookies.get('userType') == 'admin' &&
+          {Cookies.get('userType') === 'admin' &&
             <SidebarButton href='/manage-users' text='Manage Users' Icon={<UsersIcon />} />
           }
         </div>

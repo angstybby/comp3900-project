@@ -49,7 +49,7 @@ const CourseCharts: React.FC<{
   };
 
   return (
-    <div className="flex">
+    <div className="flex justify-center">
       <Radar data={radarData} options={radarOptions}></Radar>
     </div>
   );

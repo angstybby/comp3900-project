@@ -102,7 +102,7 @@ export default function Profile() {
       setShowLinkedInModal(true);
     }
   }, []);
-  
+
   useEffect(() => {
     if (profileData) {
       setEditProfileInfo({
@@ -307,20 +307,20 @@ export default function Profile() {
             <h4 className="text-sm text-gray-500 mt-1"> Career Path: {profileData.CareerPath}</h4>
           </div>
 
-          <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
+          <div className="mt-8 w-80 mx-auto flex space-x-2 items-center" title="Edit Profile Button">
             <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
-            <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Share
-            </button>
+            <div className="w-28">
+              <ButtonUtility onClick={copyLinkToClipboard} text="Share" bg="bg-blue-500 hover:bg-blue-400" />
+            </div>
           </div>
 
           {
-            Cookies.get('linkedIn_AccessToken') 
-            ? 
+            Cookies.get('linkedIn_AccessToken')
+              ?
               (
                 <></>
-              ) 
-            : 
+              )
+              :
               (
                 <div className="mt-4 w-80 mx-auto flex space-x-4 items-center" title="Link to LinkedIn Button">
                   <ButtonUtility text={"Connect to LinkedIn"} onClick={connectToLinkedIn} bg={"bg-lime-400 hover:bg-lime-600"} />
@@ -329,70 +329,71 @@ export default function Profile() {
           }
         </div>
       </div>
-
-      <div className="m-10 flex flex-col md:flex-row space-y-10 md:space-y-0 md:space-x-10">
-        <div className="w-full md:w-1/2">
-        <h2 className="text-2xl font-semibold text-center">Your Projects</h2>
-          <div className="max-h-96 overflow-y-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
-              {projects.map((project) => (
-                <div key={project.id} className="p-4 border rounded-lg shadow space-y-4">
-                  <h3 className="text-xl font-semibold">{project.title}</h3>
-                  <p className="mt-2 text-gray-600">{project.description}</p>
-                  <p className="mt-2 text-gray-500">
-                    Status: {project.editMode ? (
-                      <input
-                        type="text"
-                        value={project.newStatus || ""}
-                        onChange={(e) => handleProjectStatusChange(e, project.id)}
-                        className="border p-1 rounded w-full"
-                      />
+      {Cookies.get('userType') === 'student' && (
+        <div className="m-10 flex flex-col md:flex-row space-y-10 md:space-y-0 md:space-x-10">
+          <div className="w-full md:w-1/2">
+            <h2 className="text-2xl font-semibold text-center mb-4">Your Projects</h2>
+            <div className="max-h-96 overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+                {projects.map((project) => (
+                  <div key={project.id} className="p-4 border rounded-lg shadow space-y-4">
+                    <h3 className="text-xl font-semibold">{project.title}</h3>
+                    <p className="mt-2 text-gray-600">{project.description}</p>
+                    <p className="mt-2 text-gray-500">
+                      Status: {project.editMode ? (
+                        <input
+                          type="text"
+                          value={project.newStatus || ""}
+                          onChange={(e) => handleProjectStatusChange(e, project.id)}
+                          className="border p-1 rounded w-full"
+                        />
+                      ) : (
+                        project.status
+                      )}
+                    </p>
+                    {project.editMode ? (
+                      <button
+                        onClick={() => handleSaveProjectStatus(project.id)}
+                        className="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded w-full"
+                      >
+                        Save
+                      </button>
                     ) : (
-                      project.status
+                      <button
+                        onClick={() => handleEditProjectStatus(project.id)}
+                        className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded w-full"
+                      >
+                        Edit
+                      </button>
                     )}
-                  </p>
-                  {project.editMode ? (
-                    <button
-                      onClick={() => handleSaveProjectStatus(project.id)}
-                      className="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded w-full"
-                    >
-                      Save
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleEditProjectStatus(project.id)}
-                      className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded w-full"
-                    >
-                      Edit
-                    </button>
-                  )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full md:w-1/2">
+            <h2 className="text-2xl font-semibold text-center">Your Feedback</h2>
+            <div className="max-h-96 overflow-y-auto mt-4 space-y-4">
+              {feedbacks.map(feedback => (
+                <div key={feedback.id} className="border p-4 rounded-md">
+                  <div className="flex items-center">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span
+                        key={star}
+                        className={`text-2xl ${feedback.rating >= star ? "text-yellow-500" : "text-gray-400"}`}
+                      >
+                        ⭐️
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-2">{feedback.comment}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
-
-        <div className="w-full md:w-1/2">
-          <h2 className="text-2xl font-semibold text-center">Your Feedback</h2>
-          <div className="max-h-96 overflow-y-auto mt-4 space-y-4">
-            {feedbacks.map(feedback => (
-              <div key={feedback.id} className="border p-4 rounded-md">
-                <div className="flex items-center">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <span 
-                      key={star}
-                      className={`text-2xl ${feedback.rating >= star ? "text-yellow-500" : "text-gray-400"}`}
-                    >
-                      ⭐️
-                    </span>
-                  ))}
-                </div>
-                <p className="mt-2">{feedback.comment}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
 
       <ToastContainer />
 
