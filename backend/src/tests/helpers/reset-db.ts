@@ -12,6 +12,11 @@ export default async () => {
         prisma.group.deleteMany(),
         prisma.courseTaken.deleteMany(),
         prisma.courseSkill.deleteMany(),
+        prisma.course.updateMany({
+            data: {
+                summary: null,
+            }
+        }),
         prisma.profile.deleteMany({
             where: {
                 zid: {

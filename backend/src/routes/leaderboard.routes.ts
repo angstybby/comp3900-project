@@ -1,14 +1,24 @@
 import express from "express";
 import {
     dbGetAllRankings,
-    dbGetRankingByZid,
 } from "../models/leaderboard.models";
-import { CustomRequest } from "../middleware/auth.middleware";
+import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+/**
+ * Route to get all rankings.
+ * @route POST /
+ * @returns {Object[]} An array of ranking objects.
+ * @throws {Error} If there is an error retrieving the rankings.
+ */
+router.post("/", authMiddleWare, async (req, res) => {
     try {
+        const customReq = req as CustomRequest;
+        if (!customReq.token || typeof customReq.token === "string") {
+            throw new Error("Token is not valid");
+        }
+        
         const response = await dbGetAllRankings();
         // format response
         const formattedResponse = response.map((profile, index) => {
