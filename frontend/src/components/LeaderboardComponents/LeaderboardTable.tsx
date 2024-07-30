@@ -15,7 +15,6 @@ import {
   getPaginationRowModel,
   ColumnFiltersState,
   getFilteredRowModel,
-  GlobalFiltering,
 } from "@tanstack/react-table";
 
 import { MoreHorizontal } from "lucide-react";
