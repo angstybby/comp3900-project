@@ -48,6 +48,7 @@ describe("/course", async () => {
 
         jwt_token = sign(jwtUser, process.env.JWT_HASH, { expiresIn: "1h" });
     });
+
     describe("[POST] /course/search", () => {
         it("should return 200 and an array of courses", async () => {
             const response = await request(app)
@@ -72,6 +73,39 @@ describe("/course", async () => {
             expect(response.body).toBeInstanceOf(Array);
             expect(response.body.length).toBe(1);
             expect(response.body[0].id).toBe("COMP6771");
+        });
+    });
+
+    describe("[POST] /course/add", () => {
+        it("should return 200 and a success message", async () => {
+            const response = await request(app)
+                .post("/api/course/add")
+                .set("Authorization", `Bearer ${jwt_token}`)
+                .send({
+                    id: "COMP6771",
+                });
+            expect(response.status).toBe(200);
+            
+            // Checks the db
+            const course = await prisma.courseTaken.findUnique({
+                where: {
+                    zid_courseId: {
+                        zid: studentOneZid,
+                        courseId: "COMP6771",
+                    },
+                },
+            });
+            expect(course).not.toBeNull();
+        });
+
+        it("should return 500 and an error message", async () => {
+            const response = await request(app)
+                .post("/api/course/add")
+                .set("Authorization", `Bearer ${jwt_token}`)
+                .send({
+                    id: "COMP6772",
+                });
+            expect(response.status).toBe(500);
         });
     });
 });
