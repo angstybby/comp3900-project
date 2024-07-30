@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// find a course by its name
 export const dbFindCourseByString = async (name: string, skip: number) => {
     return await prisma.course.findMany({
         where: {
@@ -27,6 +28,7 @@ export const dbFindCourseByString = async (name: string, skip: number) => {
     });
 };
 
+// find courses that are not taken by the user
 export const dbFindCourseByStringExcTaken = async (
     name: string,
     zid: string,
@@ -74,6 +76,7 @@ export const dbFindCourseByStringExcTaken = async (
     });
 };
 
+// find a course by its id
 export const dbFindCourseById = async (id: string) => {
     return await prisma.course.findUnique({
         where: {
@@ -103,6 +106,7 @@ export const dbFindCourseById = async (id: string) => {
     });
 };
 
+// add a course to the database
 export const dbAddCourse = async (courseId: string, zid: string) => {
     try {
         await prisma.courseTaken.create({
@@ -192,6 +196,7 @@ export const dbAddCourse = async (courseId: string, zid: string) => {
     }
 };
 
+// delete a course from the database
 export const dbDeleteCourse = async (courseId: string, zid: string) => {
     // Step 1: Delete the course taken entry
     await prisma.courseTaken.delete({
@@ -357,6 +362,7 @@ export const dbDeleteCourse = async (courseId: string, zid: string) => {
     return;
 };
 
+// get all courses taken by a user
 export const dbGetUserCourses = async (zid: string) => {
     return await prisma.courseTaken.findMany({
         where: {
@@ -368,6 +374,7 @@ export const dbGetUserCourses = async (zid: string) => {
     });
 };
 
+// get all courses in the database
 export const dbGetAllCourses = async (skip: number) => {
     return await prisma.course.findMany({
         skip,
@@ -379,6 +386,7 @@ export const dbGetAllCourses = async (skip: number) => {
     });
 };
 
+// update course details
 export const dbUpdateCourse = async (
     id: string,
     summary: string,
@@ -441,6 +449,7 @@ export const dbUpdateCourse = async (
     });
 };
 
+// get a course by its id
 export const dbGetCourse = async (courseId: string) => {
     return await prisma.course.findFirst({
         where: {

@@ -9,7 +9,7 @@ export interface JwtUser {
     userType: UserType;
 }
 
-
+// add notification to database
 export const dbAddNotification = async (
     zid: string,
     action: string
@@ -28,6 +28,7 @@ export const dbAddNotification = async (
     }
 };
 
+// add user to database
 export const dbAddUser = async (
     zid: string,
     email: string,
@@ -50,6 +51,7 @@ export const dbAddUser = async (
     }
 };
 
+// find user by email in database
 export const dbFindUserByEmail = async (email: string) => {
     return await prisma.user.findFirst({
         where: {
@@ -58,6 +60,7 @@ export const dbFindUserByEmail = async (email: string) => {
     });
 };
 
+// find user by zid in database
 export const dbFindUserByZid = async (zid: string) => {
     return await prisma.user.findFirst({
         where: {
@@ -66,6 +69,7 @@ export const dbFindUserByZid = async (zid: string) => {
     });
 };
 
+// find jwt user by zid in database
 export const dbFindJwtUserByZid = async (zid: string): Promise<JwtUser> => {
     const jwtUser = await prisma.user.findFirst({
         where: {
@@ -99,6 +103,7 @@ export const dbFindJwtUserByZid = async (zid: string): Promise<JwtUser> => {
     };
 };
 
+// set a reset token in database
 export const dbSetResetToken = async (email: string, resetToken: string) => {
     try {
         await prisma.user.update({
@@ -115,6 +120,7 @@ export const dbSetResetToken = async (email: string, resetToken: string) => {
     }
 };
 
+// set new password in database
 export const dbSetNewPassword = async (
     resetToken: string,
     newPassword: string,
