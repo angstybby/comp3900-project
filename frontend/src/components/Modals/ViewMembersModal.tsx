@@ -8,6 +8,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import FeedbackModal from './FeedbackModal';
+import { useProfile } from '@/contexts/ProfileContext';
 
 interface ViewMembersModalProps {
   open: boolean;
@@ -25,6 +26,7 @@ const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
   const { groupId } = useParams<{ groupId: string }>();
   const [feedbackOpen, setFeedbackOpen] = useState<boolean>(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const { profileData, fetchProfileData } = useProfile();
   
   const fetchMemberDetails = useCallback(async () => {
     try {
@@ -38,6 +40,7 @@ const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
 
   useEffect(() => {
     fetchMemberDetails();
+    fetchProfileData();
   }, [fetchMemberDetails]);
 
   
@@ -72,15 +75,19 @@ const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
                                   <p className="text-sm text-gray-600">{member.zid}</p>
                                 </div>
                               </div>
-                              <button
-                                onClick={() => {
-                                  setSelectedMember(member);
-                                  setFeedbackOpen(true);
-                                }}
-                                className="ml-10 px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                              >
-                                Give Feedback
-                              </button>
+                              {profileData.zid === member.zid ? (
+                                <span className="ml-10 px-3 py-1.5 bg-gray-200 text-gray-700 rounded-md">You</span>
+                                ) : (
+                                  <button
+                                    onClick={() => {
+                                      setSelectedMember(member);
+                                      setFeedbackOpen(true);
+                                    }}
+                                    className="ml-10 px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                  >
+                                    Give Feedback
+                                  </button>
+                              )}
                             </div>
                           </>
                         ))
