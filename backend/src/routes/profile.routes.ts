@@ -149,6 +149,10 @@ router.post(
             // TODO: Finish this! Prompt still needs some work.
             // 1. Parse the pdf to obtain the text within
             const text = await parsePdfBuffer(file.buffer);
+            console.log("=============================");
+            console.log("TEXT: \n", text);
+            console.log("=============================");
+
             // 2. Start a chat with the AI model
             const chat = model.startChat();
             // 3. Send the prompt to the AI model
@@ -156,8 +160,8 @@ router.post(
                 `${getCompletedCourseContext} Here is the text: ${text}`,
             );
             // 4. Print their response
-            console.log("--------------------");
-            console.log(result.response.text());
+            // console.log("--------------------");
+            // console.log(result.response.text());
 
             // Extract the course codes from the AI response
             const responseText = result.response.text();

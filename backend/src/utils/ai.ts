@@ -81,3 +81,7 @@ export const getStudentReccsContext = (skills: string, students: string) => {
 export const getProjectReccsContextByCareer = (skills: string, projects: string, activeProjects: string, career: string) => {
   return `This student currently has these skills: ${skills} and wants to follow this career path: ${career}. Here are the current existing projects: ${projects} and here are the active projects being worked on ${activeProjects}. Based on this set of projects, recommend the three most suitable projects for this student. However if they are already active projects you must not recommended them, and in the worst case leave it blank. You must format the response as a comma-separated list of project titles only, for example: FrontEnd Development, Full-Stack Web Application, Mobile App Development. If there are projects not related at all, please do not recommend them. Also do not include any additional text or explanations.`;
 };
+
+export const getGroupsReccsContext = (skills: string, groups: string, joinedGroups: string, CareerPath: string) => {
+  return `A student currently has these skills: ${skills} and has chosen a career path of ${CareerPath}. Here are the current existing groups: ${groups} and these are groups the user is already in ${joinedGroups}. Based on the set of groups which the user is NOT in , recommend the three most suitable groups for the student. Format the response as a comma-separated list of ids for example: <id1>, <id2>, <id3> and do not include explanations.`;
+};
