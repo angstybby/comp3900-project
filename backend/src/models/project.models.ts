@@ -392,7 +392,17 @@ export const dbUpdateProject = async (
     await dbDeleteProjectSkills(projectId, skillsToRemove);
 };
 
-// get all projects the user is a part of
+export const dbUpdateProjectStatus = async (projectId: number, status: string) => {
+    await prisma.project.update({
+        where: {
+            id: projectId,
+        },
+        data: {
+            status: status,
+        },
+    });
+};
+
 export const dbGetUserInProject = async (projectId: number, zid: string) => {
     // Check the user's groups and return the groupName if they are in the project
     const groups = await prisma.groupJoined.findMany({
