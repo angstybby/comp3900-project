@@ -20,7 +20,7 @@ import {
 } from "../utils/ai";
 import multer from "multer";
 import { dbUpdateSkillsRatings } from "../models/skills.models";
-import PDFParser from "pdf2json"; 
+import PDFParser from "pdf2json";
 import { parsePdfBuffer } from "../utils/pdf";
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -68,6 +68,10 @@ router.post("/searchExc", async (req, res) => {
     const { name } = req.body;
 
     try {
+        if (!name) {
+            return res.status(400).send("No search string provided");
+        }
+
         const courses = await dbFindCourseByStringExcTaken(name, zid);
         res.status(200).send(courses);
     } catch (error) {
@@ -94,9 +98,9 @@ router.post("/add", async (req, res) => {
     const zid = customReq.token.zid;
 
     try {
-        if (!await dbFindCourseById(course)) {
+        if (!(await dbFindCourseById(course))) {
             return res.status(400).send("Course Doesnt Exist");
-        };
+        }
 
         await dbAddCourse(course, zid);
         res.status(200).send("Course added successfully");
@@ -126,9 +130,9 @@ router.delete("/delete", async (req, res) => {
     const zid = customReq.token.zid;
 
     try {
-        if (!await dbFindCourseById(course)) {
+        if (!(await dbFindCourseById(course))) {
             return res.status(400).send("Course Doesnt Exist");
-        };
+        }
 
         await dbDeleteCourse(course, zid);
         console.log("Course deleted");
@@ -259,7 +263,13 @@ router.get("/course-details/:courseId", async (req: Request, res: Response) => {
             throw new Error("Token is not valid");
         }
         const { courseId } = req.params;
-        res.status(200).send(await dbFindCourseById(courseId));
+        const course = await dbFindCourseById(courseId);
+
+        if (!course) {
+            return res.status(400).send("Course not found");
+        }
+
+        res.status(200).send(course);
     } catch (error) {
         console.log(error);
         res.status(500).send("An error occurred while fetching course details");
@@ -281,7 +291,12 @@ router.post("/update-details", async (req, res) => {
             throw new Error("Token is not valid");
         }
 
-        const { course, summary, skills } = req.body;
+        const { course = "", summary = "", skills = [] } = req.body;
+
+        if (!(await dbFindCourseById(course))) {
+            return res.status(400).send("Course Doesnt Exist");
+        }
+
         await dbUpdateCourse(course, summary, skills);
         res.status(200).send("Course details updated successfully");
     } catch (error) {
