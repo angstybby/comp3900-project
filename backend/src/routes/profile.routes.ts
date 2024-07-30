@@ -3,7 +3,7 @@ import multer from "multer";
 
 import { CustomRequest } from "../middleware/auth.middleware";
 import { Request, Response } from "express";
-import { dbGetFeedback, dbGetProfile, dbUpdateProfile } from "../models/profile.models";
+import { dbGetProfile, dbUpdateProfile } from "../models/profile.models";
 import { Profile } from "@prisma/client";
 
 import { S3Client } from "@aws-sdk/client-s3";
@@ -11,6 +11,7 @@ import { Upload } from "@aws-sdk/lib-storage";
 import PdfParse from "pdf-parse";
 import { model, getCompletedCourseContext } from "../utils/ai";
 import { dbAddCourse, dbFindCourseByString, dbFindCourseByStringExcTaken } from "../models/course.models";
+import { parsePdfBuffer } from "../utils/pdf";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
@@ -54,7 +55,7 @@ router.put("/update-profile", async (req, res) => {
     }
 
     // Check all the fields are present or correct
-    let { zid, profilePicture, fullname, description, resume } = req.body;
+    let { zid, profilePicture, fullname, description, resume, CareerPath } = req.body;
 
     // Checks if zid matches
     if (customReq.token.zid !== zid) {
@@ -72,7 +73,10 @@ router.put("/update-profile", async (req, res) => {
         fullname,
         description,
         resume,
+        CareerPath,
     };
+
+    console.log(CareerPath);
 
     try {
         // Update the user's profile in the database
@@ -107,12 +111,12 @@ router.post(
 
             // TODO: Finish this! Prompt still needs some work.
             // 1. Parse the pdf to obtain the text within
-            const text = await PdfParse(file.buffer);
+            const text = await parsePdfBuffer(file.buffer);
             // 2. Start a chat with the AI model
             const chat = model.startChat();
             // 3. Send the prompt to the AI model
             const result = await chat.sendMessage(
-                `${getCompletedCourseContext} Here is the text: ${text.text}`,
+                `${getCompletedCourseContext} Here is the text: ${text}`,
             );
             // 4. Print their response
             console.log("--------------------");
@@ -217,16 +221,16 @@ router.post('/add-courses-from-pdf', upload.single('pdfUpload'), async (req, res
   }
 });
 
-router.get('/feedbacks/:zid', async (req, res) => {
-    const { zid } = req.params;
+// router.get('/feedbacks/:zid', async (req, res) => {
+//     const { zid } = req.params;
 
-    try {
-        const feedbacks = await dbGetFeedback(zid);
-        res.status(200).send('Fetched feedbacks successfully.')
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('An error occured fetching feedbacks for profile.')
-    }
-});
+//     try {
+//         const feedbacks = await dbGetFeedback(zid);
+//         res.status(200).send('Fetched feedbacks successfully.')
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send('An error occured fetching feedbacks for profile.')
+//     }
+// });
 
 export default router;

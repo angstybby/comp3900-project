@@ -1,4 +1,4 @@
-export default function ButtonUtility({ text, onClick, classname, disabled }: { text: string, onClick?: () => void, classname?: string, disabled?: boolean }) {
+export default function ButtonSelect({ text, onClick, classname, disabled }: { text: string, onClick?: () => void, classname?: string, disabled?: boolean }) {
   return (
     <button
       type="button"

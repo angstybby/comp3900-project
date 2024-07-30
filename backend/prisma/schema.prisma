@@ -63,6 +63,7 @@ model Profile {
   GroupInterest  GroupInterest[]
   feedbackGiven  Feedback[]       @relation("FromProfile")
   feedbackReceived  Feedback[]    @relation("ToProfile")
+  CareerPath     String?         @db.Text
 }
 
 model Course {
