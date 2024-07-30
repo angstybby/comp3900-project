@@ -81,6 +81,7 @@ export default function Profile() {
     const response = await axiosInstanceWithAuth.get("/auth/proxy/linkedin/details");
     return response.data;
   }
+
   //STUB FEEDBACK DATA
   const [feedbacks, setFeedbacks] = useState([
     { id: 1, rating: 4, comment: "Great work on the project!" },
@@ -266,9 +267,8 @@ export default function Profile() {
     window.location.href = 'http://localhost:3000/api/auth/proxy/linkedin';
   }
 
-
   return (
-    <div className="h-screen flex flex-row">
+    <div className="h-screen flex flex-col lg:flex-row">
 
       <div className="m-10 flex-1">
         <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
@@ -300,60 +300,11 @@ export default function Profile() {
             <h4 className="text-sm text-gray-500 mt-1"> Career Path: {profileData.CareerPath}</h4>
           </div>
 
-
           <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
             <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
-          </div>
-      <div className="mt-8 w-80 mx-auto flex space-x-4 items-center" title="Edit Profile Button">
-        <ButtonUtility text={"Edit Profile"} onClick={() => setShowEditProfileModal(true)} />
-        <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Share
-        </button>
-      </div>
-
-      {Cookies.get('userType') === 'student' && (
-      <div className="mt-10 w-full px-8">
-        <h2 className="text-2xl font-semibold mb-4">Your Projects</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <div key={project.id} className="p-4 border rounded-lg shadow">
-              <h3 className="text-xl font-semibold">{project.title}</h3>
-              <p className="mt-2 text-gray-600">{project.description}</p>
-              <p className="mt-2 text-gray-500">
-                Status: {project.editMode ? (
-                  <input
-                    type="text"
-                    value={project.newStatus || ""}
-                    onChange={(e) => handleProjectStatusChange(e, project.id)}
-                    className="border p-1 rounded"
-                  />
-                ) : (
-                  project.status
-                )}
-              </p>
-              {project.editMode ? (
-                <button
-                  onClick={() => handleSaveProjectStatus(project.id)}
-                  className="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
-                >
-                  Save
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleEditProjectStatus(project.id)}
-                  className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-                >
-                  Edit
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-      )}
-
-          <div className="mt-4 w-80 mx-auto flex space-x-4 items-center" title="Share Profile Button">
-            <ButtonUtility text={"Share"} onClick={copyLinkToClipboard} bg={"bg-blue-500"} />
+            <button onClick={copyLinkToClipboard} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Share
+            </button>
           </div>
 
           {
@@ -370,15 +321,55 @@ export default function Profile() {
               )
           }
 
+          {Cookies.get('userType') === 'student' && (
+          <div className="mt-10 w-full px-8">
+            <h2 className="text-2xl font-semibold mb-4">Your Projects</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.map((project) => (
+                <div key={project.id} className="p-4 border rounded-lg shadow space-y-4">
+                  <h3 className="text-xl font-semibold">{project.title}</h3>
+                  <p className="mt-2 text-gray-600">{project.description}</p>
+                  <p className="mt-2 text-gray-500">
+                    Status: {project.editMode ? (
+                      <input
+                        type="text"
+                        value={project.newStatus || ""}
+                        onChange={(e) => handleProjectStatusChange(e, project.id)}
+                        className="border p-1 rounded w-full"
+                      />
+                    ) : (
+                      project.status
+                    )}
+                  </p>
+                  {project.editMode ? (
+                    <button
+                      onClick={() => handleSaveProjectStatus(project.id)}
+                      className="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded w-full"
+                    >
+                      Save
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleEditProjectStatus(project.id)}
+                      className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded w-full"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          )}
         </div>
       </div>  
 
       <div className="flex-1 m-10">
         <div className="mt-10 mx-auto">
           <h1 className="text-3xl font-semibold text-center mt-10">Your Feedback</h1>
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-4 max-h-96 overflow-y-auto">
             {feedbacks.map(feedback => (
-              <div key={feedback.id} className="border p-4 rounded-md w-240">
+              <div key={feedback.id} className="border p-4 rounded-md">
                 <div className="flex items-center">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span 
@@ -395,11 +386,6 @@ export default function Profile() {
           </div>
         </div>
       </div>
-
-      {/* <ButtonUtility text={"Test"} onClick={() => 
-        await axiosInstanceWithAuth.get("auth/proxy/linkedin/temp");
-      }/> */}
-      
 
       <ToastContainer />
 
