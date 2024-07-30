@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 
 export default function Leaderboard() {
   const [data, setData] = useState<LeaderboardTableProps[]>([]);
-  // TODO implement loading state
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

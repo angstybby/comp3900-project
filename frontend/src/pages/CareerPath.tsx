@@ -1,4 +1,3 @@
-// src/components/UpdateCareerPath.tsx
 import { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { useProfile } from "@/contexts/ProfileContext";
 import { axiosInstanceWithAuth } from "@/api/Axios";

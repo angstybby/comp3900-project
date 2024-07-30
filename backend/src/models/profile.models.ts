@@ -118,7 +118,7 @@ export const dbGetUserSkills = async (zid: string) => {
   }
 };
 
-
+// get feedbacks of a user from database
 export const dbGetFeedback = async (zid: string) => {
 
     try {

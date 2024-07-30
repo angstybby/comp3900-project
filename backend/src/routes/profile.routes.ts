@@ -281,6 +281,15 @@ router.post('/add-courses-from-pdf', upload.single('pdfUpload'), async (req, res
   }
 });
 
+/**
+ * Retrieve the feedbacks for the user with the specified zid.
+ * @route GET /profile/feedbacks/:zid
+ * @function
+ * @async
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<void>} - A Promise that resolves when the feedbacks are retrieved and sent as a JSON response.
+ */
 router.get('/feedbacks/:zid', async (req, res) => {
     const { zid } = req.params;
 
