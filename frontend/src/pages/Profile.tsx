@@ -16,6 +16,7 @@ import Cookies from "js-cookie";
 import { profile } from "console";
 
 interface Feedback {
+  fromProfile: any;
   id: number;
   rating: number;
   comment: string;
@@ -267,6 +268,7 @@ export default function Profile() {
           <div className="mt-4 space-y-4">
             {feedbacks.map(feedback => (
               <div key={feedback.id} className="border p-4 rounded-md w-240">
+                <h1 className="text-xl font-semibold">{feedback.fromProfile.fullname}</h1>
                 <div className="flex items-center">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span 

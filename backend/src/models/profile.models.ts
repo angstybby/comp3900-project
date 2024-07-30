@@ -130,7 +130,12 @@ export const dbGetFeedback = async (zid: string) => {
             include: {
                 feedbackReceived: {
                     orderBy: {createdAt: 'desc'},
+                    include: {
+                        fromProfile: true,
+                    },
                 },
+                
+
             },
         });
         console.log(feedbackReceived);
