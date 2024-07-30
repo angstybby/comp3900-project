@@ -25,7 +25,7 @@ describe("/auth", async () => {
     const academicOneFullname = "Academic";
     const academicUserType = UserType.academic;
 
-    describe("[POST] /auth/register", () => {
+    describe("[POST] /auth/register", async () => {
         it("should respond with a `200` status code and JWT token", async () => {
             const { status, headers } = await request(app)
                 .post("/api/auth/register")
@@ -44,6 +44,8 @@ describe("/auth", async () => {
                     userType: studentUserType,
                 },
             });
+
+            console.log("foo", await prisma.user.findMany({}));
 
             const newProfile = await prisma.profile.findFirst({
                 where: {
@@ -182,7 +184,7 @@ describe("/auth", async () => {
         });
     });
 
-    describe("[POST] /auth/login", () => {
+    describe("[POST] /auth/login", async () => {
         // Assuming dbAddUser is a function that adds a user to your mock database
         beforeEach(async () => {
             await request(app).post("/api/auth/register").send({
@@ -293,7 +295,5 @@ describe("/auth", async () => {
         });
     });
 
-    describe("[ALL] Auth Middleware", () => {
-        
-    });
+    describe("[ALL] Auth Middleware", () => {});
 });

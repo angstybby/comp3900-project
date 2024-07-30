@@ -94,6 +94,10 @@ router.post("/add", async (req, res) => {
     const zid = customReq.token.zid;
 
     try {
+        if (!await dbFindCourseById(course)) {
+            return res.status(400).send("Course Doesnt Exist");
+        };
+
         await dbAddCourse(course, zid);
         res.status(200).send("Course added successfully");
         console.log("Course added");
@@ -122,6 +126,10 @@ router.delete("/delete", async (req, res) => {
     const zid = customReq.token.zid;
 
     try {
+        if (!await dbFindCourseById(course)) {
+            return res.status(400).send("Course Doesnt Exist");
+        };
+
         await dbDeleteCourse(course, zid);
         console.log("Course deleted");
         res.status(200).send("Course deleted successfully");

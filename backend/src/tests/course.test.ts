@@ -49,7 +49,7 @@ describe("/course", async () => {
         jwt_token = sign(jwtUser, process.env.JWT_HASH, { expiresIn: "1h" });
     });
 
-    describe("[POST] /course/search", () => {
+    describe("[POST] /course/search", async () => {
         it("should return 200 and an array of courses", async () => {
             const response = await request(app)
                 .post("/api/course/search")
@@ -76,7 +76,7 @@ describe("/course", async () => {
         });
     });
 
-    describe("[POST] /course/add", () => {
+    describe("[POST] /course/add", async () => {
         it("should return 200 and a success message", async () => {
             const response = await request(app)
                 .post("/api/course/add")
@@ -85,7 +85,7 @@ describe("/course", async () => {
                     id: "COMP6771",
                 });
             expect(response.status).toBe(200);
-            
+
             // Checks the db
             const course = await prisma.courseTaken.findUnique({
                 where: {
@@ -98,14 +98,54 @@ describe("/course", async () => {
             expect(course).not.toBeNull();
         });
 
-        it("should return 500 and an error message", async () => {
+        it("should return 400 and an error message", async () => {
             const response = await request(app)
                 .post("/api/course/add")
                 .set("Authorization", `Bearer ${jwt_token}`)
                 .send({
                     id: "COMP6772",
                 });
-            expect(response.status).toBe(500);
+            expect(response.status).toBe(400);
+        });
+    });
+
+    describe("[POST] /course/delete", async () => {
+        it("should return 200 and a success message", async () => {
+            await prisma.courseTaken.create({
+                data: {
+                    zid: studentOneZid,
+                    courseId: "COMP6771",
+                },
+            });
+
+            const response = await request(app)
+                .delete("/api/course/delete")
+                .set("Authorization", `Bearer ${jwt_token}`)
+                .send({
+                    course: "COMP6771",
+                });
+            expect(response.status).toBe(200);
+
+            // Checks the db
+            const course = await prisma.courseTaken.findUnique({
+                where: {
+                    zid_courseId: {
+                        zid: studentOneZid,
+                        courseId: "COMP6771",
+                    },
+                },
+            });
+            expect(course).toBeNull();
+        });
+
+        it("should return 400 and an error message", async () => {
+            const response = await request(app)
+                .post("/api/course/delete")
+                .set("Authorization", `Bearer ${jwt_token}`)
+                .send({
+                    id: "COMP6772",
+                });
+            expect(response.status).toBe(400);
         });
     });
 });
