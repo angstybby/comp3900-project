@@ -9,6 +9,13 @@ import { dbGetProfile, dbGetStudentProfiles, getUserType } from "../models/profi
 
 const router = express.Router();
 
+interface ProfileSimple {
+    zid: string;
+    Skills: {
+        skillName: string;
+    }[];
+}
+
 /**
  * @route GET /skill
  * @desc Get all skills
@@ -70,13 +77,15 @@ router.post("/gap-analysis", async (req, res) => {
     }
 });
 
-interface ProfileSimple {
-    zid: string;
-    Skills: {
-        skillName: string;
-    }[];
-}
-
+/**
+ * @route GET /skill/leaderboard-data
+ * @desc Get data for the skill leaderboard
+ * @access Private
+ * @returns {Object} Data for the skill leaderboard
+ * @returns {String} Error message
+ * @throws {200} If data is successfully retrieved
+ * @throws {500} If an error occurs while getting data
+ */
 router.get("/leaderboard-data", async (req: Request, res: Response) => {
     const customReq = req as CustomRequest;
     if (!customReq.token || typeof customReq.token === "string") {

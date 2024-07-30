@@ -1,4 +1,4 @@
-import express, { request } from "express";
+import express from "express";
 import {
     dbAcceptUserToGroup,
     dbCreateGroup,
@@ -632,6 +632,14 @@ router.post("/get-reccs", authMiddleWare, async (req, res) => {
     }
 });
 
+/**
+ * @route GET /group/members/:groupId
+ * @desc Get all the members in a group
+ * @access Private
+ * @returns {User[]} - Array of users in the group
+ * @returns {Error} - If an error occurs while fetching members in group
+ * @throws {500} - If an error occurs while fetching members in group
+ */
 router.get("/members/:groupId", async (req, res) => {
     const { groupId } = req.params;
     const groupIdInt = parseInt(groupId);

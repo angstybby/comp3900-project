@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// get all users except specified one
 export const dbGetAllUsersExcept = async (toExclude: string): Promise<any> => {
   try {
     const users = await prisma.user.findMany({
@@ -31,6 +32,7 @@ export const dbGetAllUsersExcept = async (toExclude: string): Promise<any> => {
   }
 }
 
+// remove a user from the database
 export const dbRemoveUser = async (zid: string): Promise<any> => {
   try {
     await prisma.$transaction(async (prisma) => {

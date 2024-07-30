@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// create a group in the database
 export const dbCreateGroup = async (
     groupName: string,
     description: string,
@@ -53,6 +54,7 @@ export const dbCreateGroup = async (
     }
 };
 
+// invite a user to a group
 export const dbInviteUserToGroup = async (
     groupId: number,
     ownerZid: string,
@@ -120,6 +122,7 @@ export const dbInviteUserToGroup = async (
     }
 };
 
+// express interest in a group - from a user
 export const dbUserExpressInterest = async (groupId: number, zId: string) => {
     try {
         const group = await prisma.group.findUnique({
@@ -156,6 +159,7 @@ export const dbUserExpressInterest = async (groupId: number, zId: string) => {
     }
 };
 
+// leave a group
 export const dbLeaveGroup = async (groupId: number, zId: string) => {
     try {
         const group = await prisma.group.findUnique({
@@ -249,6 +253,7 @@ export const dbLeaveGroup = async (groupId: number, zId: string) => {
     }
 };
 
+// update group details
 export const dbUpdateGroup = async (
     groupId: number,
     groupName: string,
@@ -284,6 +289,7 @@ export const dbUpdateGroup = async (
     }
 };
 
+// kick a user from a group
 export const dbKickUserFromGroup = async (
     groupId: number,
     groupOwnerId: string,
@@ -383,6 +389,7 @@ export const dbKickUserFromGroup = async (
     }
 };
 
+// express interest in a project as a group
 export const dbGroupExpressInterstProject = async (
     groupId: number,
     zId: string,
@@ -447,6 +454,7 @@ export const dbGroupExpressInterstProject = async (
     }
 };
 
+// accept a user into a group
 export const dbAcceptUserToGroup = async (
     groupId: number,
     groupOwnerId: string,
@@ -515,6 +523,7 @@ export const dbAcceptUserToGroup = async (
     }
 };
 
+// decline a user from joining a group
 export const dbDeclineUserToGroup = async (
     groupId: number,
     groupOwnerId: string,
@@ -556,6 +565,7 @@ export const dbDeclineUserToGroup = async (
     }
 };
 
+// find a group by string
 export const dbFindGroupByString = async (name: string) => {
     return await prisma.group.findMany({
         where: {
@@ -566,6 +576,7 @@ export const dbFindGroupByString = async (name: string) => {
     });
 };
 
+// get all member applications of a group
 export const dbGetGroupApplications = async (
     groupId: number,
     groupOwnerId: string,
@@ -599,6 +610,7 @@ export const dbGetGroupApplications = async (
     }
 };
 
+// get the users in a group
 export const dbGetUserInGroup = async (zId: string) => {
     try {
         // Fetch the groups the user is a part of
@@ -645,6 +657,7 @@ export const dbGetUserInGroup = async (zId: string) => {
     }
 };
 
+// get a group based on its id
 export const dbGetGroup = async (groupId: number) => {
     try {
         const group = await prisma.group.findFirst({
@@ -720,6 +733,7 @@ export const dbGetGroup = async (groupId: number) => {
     }
 };
 
+// get all users that are not part of this group
 export const dbGetUsersNotInGroup = async (groupId: number) => {
     try {
         const group = await prisma.group.findUnique({
@@ -772,6 +786,7 @@ export const dbGetUsersNotInGroup = async (groupId: number) => {
     }
 };
 
+// check if the user has joined the group
 export const dbIsUserJoinedGroup = async (groupId: number, zId: string) => {
     try {
         const groupMember = await prisma.groupJoined.findUnique({
@@ -787,6 +802,7 @@ export const dbIsUserJoinedGroup = async (groupId: number, zId: string) => {
     }
 };
 
+// get all group members of a group
 export const dbGetGroupMembers = async (groupId: number) => {
     try {
         const groupMembers = await prisma.groupJoined.findMany({
