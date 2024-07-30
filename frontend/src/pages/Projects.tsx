@@ -11,6 +11,7 @@ interface Project {
   id: number;
   title: string;
   description: string;
+  status: string;
 }
 
 export default function Project() {

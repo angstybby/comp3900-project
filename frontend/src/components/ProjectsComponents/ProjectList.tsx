@@ -7,17 +7,6 @@ import LoadingCircle from "../LoadingCircle";
 import Cookies from "js-cookie";
 import ProjectCardStudent from "./ProjectCardStudent";
 
-interface Group {
-  members: number;
-  id: number;
-  groupName: string;
-  description: string | null;
-  groupOwnerId: string;
-  MaxMembers: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export default function ProjectList({ searchTerm }: { searchTerm: string }) {
     const [projects, setProjects] = useState<ProjectListInterface[]>([]);
     const indexRef = useRef(25);
