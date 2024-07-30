@@ -64,3 +64,23 @@ export const getUserType = async (zid: string) => {
         }
     })
 }
+
+export const dbGetFeedback = async (zid: string) => {
+
+    try {
+        const feedbackReceived = await prisma.profile.findUnique({
+            where: {
+                zid
+            },
+            include: {
+                feedbackReceived: {
+                    orderBy: {createdAt: 'desc'},
+                },
+            },
+        });
+        return feedbackReceived;
+    } catch (error) {
+        console.log(error);
+        throw new Error("error getting feedback for profile.")
+    }
+}

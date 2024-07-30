@@ -3,7 +3,7 @@ import multer from "multer";
 
 import { CustomRequest } from "../middleware/auth.middleware";
 import { Request, Response } from "express";
-import { dbGetProfile, dbUpdateProfile } from "../models/profile.models";
+import { dbGetFeedback, dbGetProfile, dbUpdateProfile } from "../models/profile.models";
 import { Profile } from "@prisma/client";
 
 import { S3Client } from "@aws-sdk/client-s3";
@@ -215,6 +215,18 @@ router.post('/add-courses-from-pdf', upload.single('pdfUpload'), async (req, res
       console.error(error);
       res.status(500).send('An error occurred while processing the file');
   }
+});
+
+router.get('/feedbacks/:zid', async (req, res) => {
+    const { zid } = req.params;
+
+    try {
+        const feedbacks = await dbGetFeedback(zid);
+        res.status(200).send('Fetched feedbacks successfully.')
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occured fetching feedbacks for profile.')
+    }
 });
 
 export default router;

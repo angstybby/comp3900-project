@@ -11,6 +11,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import EditProfileModal from "@/components/Modals/EditProfileModal";
 import ChangeProfilePicModal from "@/components/Modals/ChangeProfilePicModal";
 
+interface Feedback {
+  id: number;
+  rating: number;
+  comment: string;
+}
+
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -26,12 +32,7 @@ export default function Profile() {
   const [showChangeProfPicModal, setShowChangeProfPicModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  //STUB FEEDBACK DATA
-  const [feedbacks, setFeedbacks] = useState([
-    { id: 1, rating: 4, comment: "Great work on the project!" },
-    { id: 2, rating: 5, comment: "Excellent contribution and teamwork!" },
-    { id: 3, rating: 3, comment: "Good effort, but could improve in communication." },
-  ]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
 
   useEffect(() => {
     fetchProfileData();
@@ -46,8 +47,19 @@ export default function Profile() {
         description: profileData.description || '',
         resume: profileData.resume || '',
       });
+      fetchFeedbacks(profileData.zid);
     }
   }, [profileData]);
+
+  const fetchFeedbacks = async (zid: string) => {
+    try {
+      const response = await axiosInstanceWithAuth.get(`/profile/feedbacks/${zid}`);
+      console.log(response.data)
+      setFeedbacks(response.data);
+    } catch (error) {
+      console.error("Error fetching feedbacks for profile", error);
+    }
+  }
 
   const handleEditProfileChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
