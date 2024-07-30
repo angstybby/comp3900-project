@@ -34,7 +34,7 @@ const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
       console.error("Error getting group members:", error);
     }
 
-  }, [groupId]);
+  }, []);
 
   useEffect(() => {
     fetchMemberDetails();
@@ -102,7 +102,6 @@ const ViewMembersModal: React.FC<ViewMembersModalProps> = ({ open, close }) => {
         open={feedbackOpen}
         close={() => setFeedbackOpen(false)}
         member={selectedMember}
-        groupId={groupId!}
       />
     </>
   )

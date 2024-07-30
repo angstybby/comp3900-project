@@ -800,3 +800,29 @@ export const dbGetGroupMembers = async (groupId: number) => {
         throw error;
     }
 };
+
+export const dbCreateFeedback = async (
+    fromZid: string,
+    toZid: string,
+    comment: string,
+    rating: number,
+) => {
+    try {
+        const newFeedback = await prisma.feedback.create({
+            data: {
+                fromZid,
+                toZid,
+                comment,
+                rating,
+            },
+        });
+
+        return newFeedback;
+
+    } catch (error) {
+        console.error('Error creating feedback.', error);
+        throw error;
+    }
+    
+}
+
