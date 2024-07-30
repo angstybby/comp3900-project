@@ -7,7 +7,6 @@ import {
   LineElement,
   PointElement,
   Filler,
-  scales,
 } from "chart.js";
 import React from "react";
 
