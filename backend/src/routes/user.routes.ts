@@ -6,6 +6,12 @@ import { dbGetAllUsersExcept, dbRemoveUser } from "../models/user.models";
 
 const router = express.Router();
 
+/**
+ * Route to get all users.
+ * @route GET /all
+ * @returns {Object[]} An array of user objects.
+ * @throws {Error} If there is an error retrieving the users.
+ */
 router.get("/all", async (req: Request, res: Response) => {
   try {
     const customReq = req as CustomRequest;
@@ -24,6 +30,13 @@ router.get("/all", async (req: Request, res: Response) => {
   }
 })
 
+/**
+ * Route to remove a user.
+ * @route DELETE /remove/:zid
+ * @param {String} zid The zid of the user to remove.
+ * @returns {String} A success message.
+ * @throws {Error} If there is an error removing the user.
+ */
 router.delete("/remove/:zid", async (req: Request, res: Response) => {
   try {
     const customReq = req as CustomRequest;

@@ -9,6 +9,7 @@ export interface JwtUser {
     userType: UserType;
 }
 
+
 export const dbAddNotification = async (
     zid: string,
     action: string
