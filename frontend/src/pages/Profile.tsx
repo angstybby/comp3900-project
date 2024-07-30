@@ -23,6 +23,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ParseLinkedInInfoModal from "@/components/Modals/ParseLinkedInInfoModal";
 import Cookies from "js-cookie";
 
+interface Feedback {
+  fromProfile: any;
+  id: number;
+  rating: number;
+  comment: string;
+}
+
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
