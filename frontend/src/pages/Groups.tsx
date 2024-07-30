@@ -94,7 +94,7 @@ export default function Groups() {
                 <Carousel className="h-full mt-5 w-full max-w-[95%] mx-auto" opts={{
                   align: "start"
                 }}>
-                  <CarouselContent >
+                  <CarouselContent>
                     {yourGroups.map((group) => (
                       <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={true} profile={profileData} />
                     ))}
@@ -121,11 +121,11 @@ export default function Groups() {
                 </div>
 
               ) : (
-              <div className="w-[95%] mx-auto grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 grid-rows-2 mt-5 gap-y-14 gap-x-5">
-                {recoGroups.map((group) => (
-                  <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={false} profile={profileData} />
-                ))}
-              </div>
+                <div className="w-[95%] mx-auto grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 grid-rows-2 mt-5 gap-y-14 gap-x-5">
+                  {recoGroups.map((group) => (
+                    <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={false} profile={profileData} />
+                  ))}
+                </div>
               )
             }
           </div>

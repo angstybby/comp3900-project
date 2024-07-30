@@ -27,7 +27,10 @@ export default function Leaderboard() {
   }, []);
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto p-14">
+      <h1 className="text-4xl font-medium pb-8">
+        Leaderboard
+      </h1>
       {loading ? (
         <LoadingCircle />
       ) : (

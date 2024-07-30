@@ -22,7 +22,7 @@ import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
 import {
-  getGroupsReccsContext,
+    getGroupsReccsContext,
     getProjectReccsContext,
     getStudentReccsContext,
     model,
@@ -82,7 +82,7 @@ router.post("/create", async (req, res) => {
             groupName,
             description,
             groupOwnerId,
-            maxMembers,
+            parseInt(maxMembers),
         );
 
         console.log("Group Created");
@@ -649,9 +649,7 @@ router.get("/members/:groupId", async (req, res) => {
     const groupIdInt = parseInt(groupId);
 
     try {
-        const groupMembers = await dbGetGroupMembers(
-            groupIdInt,
-        );
+        const groupMembers = await dbGetGroupMembers(groupIdInt);
         return res.status(200).send(groupMembers);
     } catch (error) {
         console.error(error);
@@ -676,13 +674,13 @@ router.get("/members/:groupId", async (req, res) => {
  */
 // get all groups
 router.get("/allGroups", async (req, res) => {
-  try {
-      const groups = await dbGetAllGroups();
-      res.json(groups);
-  } catch (error) {
-      console.error("Error fetching groups:", error);
-      res.status(500).send("Internal Server Error");
-  }
+    try {
+        const groups = await dbGetAllGroups();
+        res.json(groups);
+    } catch (error) {
+        console.error("Error fetching groups:", error);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 /**
@@ -693,81 +691,87 @@ router.get("/allGroups", async (req, res) => {
  * @throws {500} If an error occurs while fetching recommended groups
  */
 router.post("/get-group-reco", authMiddleWare, async (req, res) => {
-  const customReq = req as CustomRequest;
-  if (!customReq.token || typeof customReq.token === "string") {
-      return res.status(401).send("Unauthorized");
-  }
-  
-  const userSkills = await createUserSkillsString(customReq.token.zid);
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        return res.status(401).send("Unauthorized");
+    }
 
-  console.log("User Skills:", userSkills);
+    const userSkills = await createUserSkillsString(customReq.token.zid);
 
-  if (!userSkills) {
-      return res.status(200).send([]);
-  }
+    console.log("User Skills:", userSkills);
 
-  try {
-      const allGroups = await dbGetAllGroups();
-      const joinedGroups = await dbGetUserInGroup(customReq.token.zid);
-      const user = await dbGetUserSkills(customReq.token.zid);
+    if (!userSkills) {
+        return res.status(200).send([]);
+    }
 
-      if (!user.CareerPath) {
-        user.CareerPath = 'Not Chosen';
-      }
+    try {
+        const allGroups = await dbGetAllGroups();
+        const joinedGroups = await dbGetUserInGroup(customReq.token.zid);
+        const user = await dbGetUserSkills(customReq.token.zid);
 
-      const detailedGroups = [];
+        if (!user.CareerPath) {
+            user.CareerPath = "Not Chosen";
+        }
 
-      for (const group of allGroups) {
-          const detailedGroup = await dbGetGroup(group.id);
-          detailedGroups.push(detailedGroup);
-      }
+        const detailedGroups = [];
 
-      const stringGroups = detailedGroups
-      .map(
-          (group) => `
+        for (const group of allGroups) {
+            const detailedGroup = await dbGetGroup(group.id);
+            detailedGroups.push(detailedGroup);
+        }
+
+        const stringGroups = detailedGroups
+            .map(
+                (group) => `
           Details for Group: ${group.id}
           Name: ${group.groupName}
           Description: ${group.description}
-          Skills: ${group.CombinedSkills.map(skill => skill.skillName).join(", ")}
+          Skills: ${group.CombinedSkills.map((skill) => skill.skillName).join(
+              ", ",
+          )}
       `,
-      )
-      .join("\n");
+            )
+            .join("\n");
 
-      const stringJoinedGroups = joinedGroups
-      .map(
-          (group) => `
+        const stringJoinedGroups = joinedGroups
+            .map(
+                (group) => `
           Details for Joined Group: ${group.id}
           Name: ${group.groupName}
           Description: ${group.description}
       `,
-      )
-      .join("\n");
+            )
+            .join("\n");
 
+        const promptForAi = getGroupsReccsContext(
+            userSkills,
+            stringGroups,
+            stringJoinedGroups,
+            user.CareerPath,
+        );
 
-      const promptForAi = getGroupsReccsContext(userSkills, stringGroups, stringJoinedGroups, user.CareerPath);
+        console.log(promptForAi);
 
-      console.log(promptForAi);
+        const chat = model.startChat();
+        const result = await chat.sendMessage(promptForAi);
 
-      const chat = model.startChat();
-      const result = await chat.sendMessage(promptForAi);
+        const groupIds = result.response
+            .text()
+            .trim()
+            .split(",")
+            .map((id) => id.trim());
 
-      const groupIds = result.response
-          .text()
-          .trim()
-          .split(",")
-          .map((id) => id.trim());
+        console.log("Group ids: \n", groupIds);
 
-      console.log("Group ids: \n", groupIds);
+        const recommendedGroups = detailedGroups.filter((group) =>
+            groupIds.includes(group.id.toString()),
+        );
 
-      const recommendedGroups = detailedGroups.filter(
-        (group) => groupIds.includes(group.id.toString())
-    );
-
-      return res.status(200).send(recommendedGroups);
-  } catch (error) {
-      console.error("Error getting recommendations:", error);
-      return res.status(500).send("Failed to get recommendations");
-  }
+        return res.status(200).send(recommendedGroups);
+    } catch (error) {
+        console.error("Error getting recommendations:", error);
+        return res.status(500).send("Failed to get recommendations");
+    }
 });
 
 /**
@@ -778,20 +782,20 @@ router.post("/get-group-reco", authMiddleWare, async (req, res) => {
  * @throws {500} If an error occurs while fetching recommended groups
  */
 const createUserSkillsString = async (zid: string) => {
-  try {
-      const user = await dbGetUserSkills(zid);
-      let joinedSkills = "";
-      if (user && user.Skills) {
-          for (const skill of user.Skills) {
-              joinedSkills += skill.skillName + ", ";
-          }
-          joinedSkills = joinedSkills.slice(0, -2);
-      }
-      return joinedSkills;
-  } catch (error) {
-      console.error("Error creating user skills string:", error);
-      throw error;
-  }
+    try {
+        const user = await dbGetUserSkills(zid);
+        let joinedSkills = "";
+        if (user && user.Skills) {
+            for (const skill of user.Skills) {
+                joinedSkills += skill.skillName + ", ";
+            }
+            joinedSkills = joinedSkills.slice(0, -2);
+        }
+        return joinedSkills;
+    } catch (error) {
+        console.error("Error creating user skills string:", error);
+        throw error;
+    }
 };
 
 /**
@@ -809,21 +813,24 @@ const createUserSkillsString = async (zid: string) => {
  */
 router.post("/feedback", async (req, res) => {
     const { fromZid, toZid, comment, rating } = req.body;
-    
+
     if (!fromZid || !toZid || !comment || !rating) {
         return res.status(400).send("Missing required fields");
     }
-    console.log('Received data:', {fromZid, toZid, comment, rating})
+    console.log("Received data:", { fromZid, toZid, comment, rating });
     try {
-        const newFeedback = await dbCreateFeedback(fromZid, toZid, comment, rating);
-        console.log("feedback created:", newFeedback)
+        const newFeedback = await dbCreateFeedback(
+            fromZid,
+            toZid,
+            comment,
+            rating,
+        );
+        console.log("feedback created:", newFeedback);
         return res.status(200).send(newFeedback);
     } catch (error) {
         console.error(error);
-        return res
-            .status(500)
-            .send("An error occured creating new feedback.")
+        return res.status(500).send("An error occured creating new feedback.");
     }
-})
+});
 
 export default router;

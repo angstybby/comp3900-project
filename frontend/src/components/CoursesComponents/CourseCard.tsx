@@ -36,7 +36,7 @@ export default function CourseCard({ id, courseName, inCarousel }: CourseCardPro
       }
     }
     fetchMainSkills();
-  },[])
+  }, [])
 
   return (
     <div className="select-none h-40 bg-gray-100 p-5 py-3 text-center rounded-lg hover:bg-gray-300 w-full hover:cursor-pointer transition duration-150 shadow-lg"
@@ -49,12 +49,12 @@ export default function CourseCard({ id, courseName, inCarousel }: CourseCardPro
         </div>
 
         {
-          inCarousel 
-          ? 
+          inCarousel
+            ?
             (
               <CourseSkillBubble skill={`Number of skills: ${skills.length}`} key={`${id} skills`} />
             )
-          : 
+            :
             <Carousel className="w-full max-w-[100%] mx-auto" opts={{
               align: "start"
             }}>
@@ -64,7 +64,7 @@ export default function CourseCard({ id, courseName, inCarousel }: CourseCardPro
                 ))}
               </CarouselContent>
             </Carousel>
-          }
+        }
       </div>
     </div>
   );

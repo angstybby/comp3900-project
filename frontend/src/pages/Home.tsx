@@ -6,7 +6,7 @@ import { ErrorAlert } from '@/components/ErrorAlert';
 import TextArea from '@/components/Inputs/TextArea';
 import SkillsLeaderBoard from '@/components/LeaderboardComponents/SkillsLeaderBoard';
 import { SuccessAlert } from '@/components/SuccessAlert';
-import { Carousel, CarouselContent, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { DEFAULT_ERROR_MSSG } from '@/utils/constants';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import Cookies from 'js-cookie';
@@ -47,8 +47,8 @@ const Home = () => {
   const [error, setError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>(DEFAULT_ERROR_MSSG);
   const [shareLink, setShareLink] = useState<string>('');
-  
-  useEffect(() => { console.log(shareText) },[shareText]);
+
+  useEffect(() => { console.log(shareText) }, [shareText]);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -56,9 +56,9 @@ const Home = () => {
       const userCourses = response.data.map((item: any) => item.course)
       setCourses(userCourses);
     }
-    
+
     fetchCourses();
-  },[])
+  }, [])
 
   const handleShare = async () => {
     if (!shareText || shareText.trim() === '') {
@@ -88,24 +88,27 @@ const Home = () => {
 
   return (
     <div className="h-screen flex overflow-y-hidden overflow-x-hidden">
-      <div className="w-full lg:w-2/3 pl-16 lg:pl-8 py-6 pr-8 rounded-md box-border overflow-y-scroll">
-        <div className='bg-gray-100 shadow-lg p-4 rounded-lg mb-8'>
-          <div className="w-full mb-4 text-2xl font-bold">
+      <div className="w-full lg:w-2/3 p-14 rounded-md box-border overflow-y-scroll">
+        <div className='bg-gray-100 shadow-lg p-5 rounded-lg mb-8'>
+          <div className="w-full mb-2 text-2xl font-bold">
             Share What's On Your Mind!
           </div>
           <div className="rounded-md">
-            <TextArea 
-              id={'LinkedIn Share Input'} 
-              name={'LinkedIn Share'} 
-              autoComplete={'none'} 
+            <TextArea
+              id={'LinkedIn Share Input'}
+              name={'LinkedIn Share'}
+              autoComplete={'none'}
               placeholder={'Share your thoughts!'}
+
               value={shareText}
-              valueChange={(value) => setShareText(value)} 
+              valueChange={(value) => setShareText(value)}
             />
-            <div className='h-1/3 lg:w-[10%] w-1/2 mt-4'>
-              {
-                loading ? <ButtonLoading /> : <ButtonUtility text={'Post'} onClick={handleShare} />
-              }
+            <div className='w-full flex justify-end'>
+              <div className='w-fit mt-3'>
+                {
+                  loading ? <ButtonLoading /> : <ButtonUtility classname='px-2 py-1' text={'Post to LinkedIn'} onClick={handleShare} />
+                }
+              </div>
             </div>
           </div>
         </div>
@@ -121,7 +124,7 @@ const Home = () => {
             <SuccessAlert successMessage={'Post shared successfully!'} link={shareLink} />
           </div>
         }
-        
+
         {
           Cookies.get('userType') === 'student' &&
           (
@@ -130,34 +133,34 @@ const Home = () => {
                 Your Completed Courses
               </div>
               <div className='mb-10'>
-                <Carousel className="h-full mt-5 w-full max-w-[90%] mx-auto" opts={{
+                <Carousel className="h-44 mt-5 w-full max-w-[90%] mx-auto" opts={{
                   align: "start"
                 }}>
-                  {courses.length > 0 ? 
-                  (
-                    <>
-                      <CarouselContent className='ml-1'>
-                        { courses.length > 0 &&
-                        courses.map((course) => (
-                          <div className='lg:w-1/3 mr-4'>
-                            <CourseCard key={course.id} id={course.id} courseName={course.courseName} inCarousel={true} />
-                          </div>
-                        ))}
-                      </CarouselContent>
-                      <CarouselPrevious />
-                      <CarouselNext />
-                    </>
-                  )
-                  : <p className='text-center'>No courses completed yet</p>}
+                  {courses.length > 0 ?
+                    (
+                      <>
+                        <CarouselContent className=''>
+                          {courses.length > 0 &&
+                            courses.map((course) => (
+                              <CarouselItem className='md:basis-1/2 '>
+                                <CourseCard key={course.id} id={course.id} courseName={course.courseName} inCarousel={true} />
+                              </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                        <CarouselPrevious />
+                        <CarouselNext />
+                      </>
+                    )
+                    : <p className='text-center'>No courses completed yet</p>}
                 </Carousel>
               </div>
               <div className='flex justify-center'>
-                <SkillsLeaderBoard/>
+                <SkillsLeaderBoard />
               </div>
             </>
           )
         }
-      
+
       </div>
 
       <div className="w-1/3 pt-2 shadow-xl hidden lg:flex h-screen flex-col box-border">
@@ -166,21 +169,21 @@ const Home = () => {
         </p>
         <TabGroup className='flex flex-col h-full flex-grow'>
           <div className='w-full bg-gray flex-grow-0 '>
-            <TabList className="flex gap-4"> 
+            <TabList className="flex gap-4">
               <Carousel className="w-[90%] ml-2" opts={{
                 align: "start",
               }}>
                 <CarouselContent className='mx-1'>
-                {
-                  tabOptions.map(option => (
-                    <Tab
-                    key={option.name}
-                    className="rounded-full ml-2 py-1 px-3 text-sm/6 font-semibold text-black focus:outline-none data-[selected]:bg-black/10 data-[hover]:bg-black/5 data-[selected]:data-[hover]:bg-black/10 data-[focus]:outline-1 data-[focus]:outline-white"
-                    >
-                      {option.name}
-                    </Tab>
-                  ))
-                }
+                  {
+                    tabOptions.map(option => (
+                      <Tab
+                        key={option.name}
+                        className="rounded-full ml-2 py-1 px-3 text-sm/6 font-semibold text-black focus:outline-none data-[selected]:bg-black/10 data-[hover]:bg-black/5 data-[selected]:data-[hover]:bg-black/10 data-[focus]:outline-1 data-[focus]:outline-white"
+                      >
+                        {option.name}
+                      </Tab>
+                    ))
+                  }
                 </CarouselContent>
               </Carousel>
             </TabList>

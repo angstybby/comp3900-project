@@ -62,14 +62,14 @@ export default function Courses() {
       <div className="w-full flex flex-col p-14">
         <div className="h-2/3">
           <div className="flex flex-wrap items-center justify-between mb-4">
-            <h1 className="text-4xl font-medium pb-8">Courses</h1>
+            <h1 className="text-4xl font-medium">Courses</h1>
             <div>
               {userType === 'student' && (
                 <div className="flex flex-wrap lg:flex-nowrap lg:gap-4 items-center" title="Add Course Button">
-                  <div className="w-full my-2 lg:my-0">
-                    <ButtonUtility text={"Upload Courses Taken"} onClick={() => setShowUploadModal(true)} />
+                  <div className="w-fit my-2 lg:my-0">
+                    <ButtonUtility bg="bg-orange-600 hover:bg-orange-500" text={"Upload Courses Taken"} onClick={() => setShowUploadModal(true)} />
                   </div>
-                  <div className="w-full">
+                  <div className="w-fit">
                     <ButtonUtility text={"Add Courses Taken"} onClick={() => setShowAddCourseModal(true)} />
                   </div>
                 </div>
