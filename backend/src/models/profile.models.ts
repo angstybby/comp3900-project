@@ -118,3 +118,25 @@ export const dbGetUserSkills = async (zid: string) => {
       throw error;
   }
 };
+
+
+export const dbGetFeedback = async (zid: string) => {
+
+    try {
+        const feedbackReceived = await prisma.profile.findMany({
+            where: {
+                zid
+            },
+            include: {
+                feedbackReceived: {
+                    orderBy: {createdAt: 'desc'},
+                },
+            },
+        });
+        console.log(feedbackReceived);
+        return feedbackReceived;
+    } catch (error) {
+        console.log(error);
+        throw new Error("error getting feedback for profile.")
+    }
+}
