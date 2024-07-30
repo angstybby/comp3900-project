@@ -30,24 +30,24 @@ describe("/auth", async () => {
             const { status, headers } = await request(app)
                 .post("/api/auth/register")
                 .send({
-                    zid: studentOneZid,
-                    email: studentOneEmail,
-                    password: studentOnePassword,
+                    zid: studentTwoZid,
+                    email: studentTwoEmail,
+                    password: studentTwoPassword,
                     fullname: studentOneFullname,
                     userType: studentUserType,
                 });
 
             const newUser = await prisma.user.findFirst({
                 where: {
-                    zid: studentOneZid,
-                    email: studentOneEmail,
+                    zid: studentTwoZid,
+                    email: studentTwoEmail,
                     userType: studentUserType,
                 },
             });
 
             const newProfile = await prisma.profile.findFirst({
                 where: {
-                    zid: studentOneZid,
+                    zid: studentTwoZid,
                     fullname: studentOneFullname,
                 },
             });
@@ -182,7 +182,7 @@ describe("/auth", async () => {
         });
     });
 
-    describe("/auth/login", () => {
+    describe("[POST] /auth/login", () => {
         // Assuming dbAddUser is a function that adds a user to your mock database
         beforeEach(async () => {
             await request(app).post("/api/auth/register").send({
@@ -291,5 +291,9 @@ describe("/auth", async () => {
 
             expect(response.status).toBe(400);
         });
+    });
+
+    describe("[ALL] Auth Middleware", () => {
+        
     });
 });
