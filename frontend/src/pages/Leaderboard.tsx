@@ -28,7 +28,7 @@ export default function Leaderboard() {
 
   return (
     <div className=" p-14">
-      <h1 className="text-4xl font-medium pb-8">
+      <h1 className="text-4xl font-medium">
         Leaderboard
       </h1>
       {loading ? (

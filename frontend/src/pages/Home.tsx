@@ -88,9 +88,9 @@ const Home = () => {
 
   return (
     <div className="h-screen flex overflow-y-hidden overflow-x-hidden">
-      <div className="w-full lg:w-2/3 p-14 rounded-md box-border overflow-y-scroll">
+      <div className="w-full lg:w-2/3 md:p-14 p-10 rounded-md box-border overflow-y-scroll">
         <div className='bg-gray-100 shadow-lg p-5 rounded-lg mb-8'>
-          <div className="w-full mb-2 text-2xl font-bold">
+          <div className="w-full mb-2 md:text-2xl text-lg font-bold">
             Share What's On Your Mind!
           </div>
           <div className="rounded-md">

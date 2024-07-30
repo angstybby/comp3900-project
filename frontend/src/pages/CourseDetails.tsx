@@ -133,7 +133,7 @@ const CourseDetails = () => {
             No skill ratings found for this course
           </p>
         ) : (
-          <div className="w-[500px] h-[500px] mx-auto">
+          <div className="mx-auto w-full">
             <CourseCharts
               skillLabels={courseDetails.skills.map((skill) => skill.skillName)}
               skillLevels={courseDetails.courseSkill.map((skill) =>

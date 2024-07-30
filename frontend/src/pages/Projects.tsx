@@ -34,7 +34,7 @@ export default function Project() {
       <div className="h-screen flex justify-center p-14">
         <div className="w-full flex flex-col">
           <div className="w-full mx-auto flex flex-row justify-between">
-            <h1 className="text-4xl font-medium pb-8">
+            <h1 className="text-4xl font-medium">
               {userType === 'student' ? 'Your Projects' : 'Manage Projects'}
             </h1>
             {userType !== 'student' && (

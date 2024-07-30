@@ -107,12 +107,12 @@ const GroupDetails = () => {
       <ViewMembersModal open={viewMembersModal} close={() => setViewMembersModal(false)} />
 
       <div className="p-14">
-        <div className="flex flex-row justify-between">
-          <div className="flex items-center gap-7">
-            <p className="text-4xl font-bold">{details.groupName}</p>
-            <div className="text-4xl font-semibold flex flex-row gap-2 items-center">
-              <UserGroupIcon className="w-10 h-10" />
-              <span className="font-normal">{`${details.members}/${details.MaxMembers}`}</span>
+        <div className="flex md:flex-row flex-col gap-4 justify-between">
+          <div className="flex items-center md:gap-7 gap-3">
+            <p className="md:text-4xl text-2xl font-bold">{details.groupName}</p>
+            <div className="text-4xl font-semibold flex flex-row md:gap-2 gap-1 items-center">
+              <UserGroupIcon className="md:w-10 md:h-10 w-5 h-5" />
+              <span className="font-normal md:text-4xl text-lg">{`${details.members}/${details.MaxMembers}`}</span>
             </div>
           </div>
           <div>
@@ -138,7 +138,7 @@ const GroupDetails = () => {
           </div>
         </div>
         <div className="mb-5">
-          <p className="font-light text-2xl mt-5 text-gray-500">Group Owner: <span className="font-normal">{details.groupOwnerName} ({details.groupOwnerId})</span></p>
+          <p className="font-light md:text-2xl text-lg mt-5 text-gray-500">Group Owner: <span className="font-normal">{details.groupOwnerName} ({details.groupOwnerId})</span></p>
           <div className="flex flex-col gap-1 mt-5">
             <p className="font-bold text-lg ">Group Description: <span className="text-black font-normal">{`${details.description}`}</span></p>
             <p className="font-bold text-lg">Group Skills: <span className="text-black font-normal">
