@@ -133,15 +133,22 @@ const Home = () => {
                 <Carousel className="h-full mt-5 w-full max-w-[90%] mx-auto" opts={{
                   align: "start"
                 }}>
-                  <CarouselContent className='ml-1'>
-                    {courses.map((course) => (
-                      <div className='lg:w-1/3 mr-4'>
-                        <CourseCard key={course.id} id={course.id} courseName={course.courseName} inCarousel={true} />
-                      </div>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious />
-                  <CarouselNext />
+                  {courses.length > 0 ? 
+                  (
+                    <>
+                      <CarouselContent className='ml-1'>
+                        { courses.length > 0 &&
+                        courses.map((course) => (
+                          <div className='lg:w-1/3 mr-4'>
+                            <CourseCard key={course.id} id={course.id} courseName={course.courseName} inCarousel={true} />
+                          </div>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious />
+                      <CarouselNext />
+                    </>
+                  )
+                  : <p className='text-center'>No courses completed yet</p>}
                 </Carousel>
               </div>
               <div className='flex justify-center'>

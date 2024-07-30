@@ -658,6 +658,19 @@ router.get("/members/:groupId", async (req, res) => {
     }
 });
 
+/**
+ * @route POST /group/feedback
+ * @desc Create a new feedback
+ * @access Private
+ * @type RequestHandler
+ * @param {string} fromZid - The zid of the user giving feedback
+ * @param {string} toZid - The zid of the user receiving feedback
+ * @param {string} comment - The comment of the feedback
+ * @param {number} rating - The rating of the feedback
+ * @returns {Feedback} - The newly created feedback
+ * @throws {Error} - If the request body is missing required fields
+ * @throws {500} - If an error occurs while creating new feedback
+ */
 router.post("/feedback", async (req, res) => {
     const { fromZid, toZid, comment, rating } = req.body;
     
