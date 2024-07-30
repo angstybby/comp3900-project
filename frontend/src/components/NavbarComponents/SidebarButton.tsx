@@ -1,5 +1,3 @@
-'use client';
-
 import React, { FC, ReactElement } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 

@@ -1,4 +1,3 @@
-// Local Imports
 import Textbox from "@/components/Inputs/Textbox";
 import ButtonSubmit from "@/components/Buttons/ButtonSubmit";
 import { registerSchema } from "@/utils/auth.schema";

@@ -6,11 +6,9 @@ import {
 } from "@/components/LeaderboardComponents/LeaderboardTable";
 import LoadingCircle from "@/components/LoadingCircle";
 import { useEffect, useState } from "react";
-import { set } from "zod";
 
 export default function Leaderboard() {
   const [data, setData] = useState<LeaderboardTableProps[]>([]);
-  // TODO implement loading state
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
