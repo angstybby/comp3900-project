@@ -107,11 +107,27 @@ export default function Groups() {
           </div>
           <div className="h-2/3">
             <h1 className="text-4xl font-medium mt-6">Groups for you</h1>
-            <div className="w-[95%] mx-auto grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 grid-rows-2 mt-5 gap-y-14 gap-x-5">
-              {recoGroups.map((group) => (
-                <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={false} profile={profileData} />
-              ))}
-            </div>
+
+            {recoGroups.length === 0
+              ? (
+                <div className="flex justify-center items-center h-full">
+                  {(loading ? <LoadingCircle /> :
+                    <p className="text-lg text-center"> No groups are recommended
+                      <br />
+                      <span className="text-sm">Create a group or add courses done</span>
+                    </p>
+                  )}
+
+                </div>
+
+              ) : (
+              <div className="w-[95%] mx-auto grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 grid-rows-2 mt-5 gap-y-14 gap-x-5">
+                {recoGroups.map((group) => (
+                  <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={false} profile={profileData} />
+                ))}
+              </div>
+              )
+            }
           </div>
         </div>
       </div>

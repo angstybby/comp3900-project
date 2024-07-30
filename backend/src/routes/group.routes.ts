@@ -696,6 +696,11 @@ router.post("/get-group-reco", authMiddleWare, async (req, res) => {
   try {
       const allGroups = await dbGetAllGroups();
       const joinedGroups = await dbGetUserInGroup(customReq.token.zid);
+      const user = await dbGetUserSkills(customReq.token.zid);
+
+      if (!user.CareerPath) {
+        user.CareerPath = 'Not Chosen';
+      }
 
       const detailedGroups = [];
 
@@ -726,7 +731,7 @@ router.post("/get-group-reco", authMiddleWare, async (req, res) => {
       .join("\n");
 
 
-      const promptForAi = getGroupsReccsContext(userSkills, stringGroups, stringJoinedGroups);
+      const promptForAi = getGroupsReccsContext(userSkills, stringGroups, stringJoinedGroups, user.CareerPath);
 
       console.log(promptForAi);
 
