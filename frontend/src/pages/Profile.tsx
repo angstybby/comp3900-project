@@ -23,13 +23,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ParseLinkedInInfoModal from "@/components/Modals/ParseLinkedInInfoModal";
 import Cookies from "js-cookie";
 
-interface Feedback {
-  fromProfile: any;
-  id: number;
-  rating: number;
-  comment: string;
-}
-
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -66,7 +59,6 @@ export default function Profile() {
       status: "Pending",
     },
   ]);
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -90,16 +82,19 @@ export default function Profile() {
     return response.data;
   }
 
-  
-
+  //STUB FEEDBACK DATA
+  const [feedbacks, setFeedbacks] = useState([
+    { id: 1, rating: 4, comment: "Great work on the project!" },
+    { id: 2, rating: 5, comment: "Excellent contribution and teamwork!" },
+    { id: 3, rating: 3, comment: "Good effort, but could improve in communication." },
+  ]);
 
   useEffect(() => {
     fetchProfileData();
-    fetchFeedbacks();
     if (updateValue) {
       setShowLinkedInModal(true);
     }
-  }, [profileData.zid]);
+  }, []);
   
   useEffect(() => {
     if (profileData) {
@@ -128,20 +123,6 @@ export default function Profile() {
       console.error("Error fetching projects", error);
     }
   };
-
-  const fetchFeedbacks = async () => {
-    try {
-      const response = await axiosInstanceWithAuth.get(`/profile/feedbacks/${profileData.zid}`);
-      // console.log(response.data.feedbackReceived);
-      // console.log(response.data)
-      const feedbacks = response.data.flatMap((item: any) => item.feedbackReceived);
-      console.log(feedbacks);
-      setFeedbacks(feedbacks);
-
-    } catch (error) {
-      console.error("couldn't fetch feedbacks")
-    }
-  }
 
   const syncLinkedInData = async () => {
     try {
@@ -287,9 +268,9 @@ export default function Profile() {
   }
 
   return (
-    <div className="h-screen flex flex-col lg:flex-row">
+    <div className="h-screen flex flex-col">
 
-      <div className="m-10 flex-1">
+      <div className="m-10">
         <h1 className="text-3xl font-semibold text-center mt-10">Your Profile</h1>
         <div className="m-2">
           <div className="flex flex-col items-center justify-center relative group">
@@ -339,11 +320,14 @@ export default function Profile() {
                 </div>
               )
           }
+        </div>
+      </div>
 
-          {Cookies.get('userType') === 'student' && (
-          <div className="mt-10 w-full px-8">
-            <h2 className="text-2xl font-semibold mb-4">Your Projects</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="m-10 flex flex-col md:flex-row space-y-10 md:space-y-0 md:space-x-10">
+        <div className="w-full md:w-1/2">
+          <h2 className="text-2xl font-semibold mb-4">Your Projects</h2>
+          <div className="max-h-96 overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
               {projects.map((project) => (
                 <div key={project.id} className="p-4 border rounded-lg shadow space-y-4">
                   <h3 className="text-xl font-semibold">{project.title}</h3>
@@ -379,24 +363,20 @@ export default function Profile() {
               ))}
             </div>
           </div>
-          )}
         </div>
-      </div>  
 
-      <div className="flex-1 m-10">
-        <div className="mt-10 mx-auto">
-          <h1 className="text-3xl font-semibold text-center mt-10">Your Feedback</h1>
-          <div className="mt-4 space-y-4 max-h-96 overflow-y-auto">
+        <div className="w-full md:w-1/2">
+          <h2 className="text-2xl font-semibold text-center">Your Feedback</h2>
+          <div className="max-h-96 overflow-y-auto mt-4 space-y-4">
             {feedbacks.map(feedback => (
-              <div key={feedback.id} className="border p-4 rounded-md w-240">
-                <h1 className="text-xl font-semibold">{feedback.fromProfile.fullname}</h1>
+              <div key={feedback.id} className="border p-4 rounded-md">
                 <div className="flex items-center">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span 
                       key={star}
                       className={`text-2xl ${feedback.rating >= star ? "text-yellow-500" : "text-gray-400"}`}
                     >
-                    ★
+                      ⭐️
                     </span>
                   ))}
                 </div>
