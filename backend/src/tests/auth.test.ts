@@ -25,29 +25,31 @@ describe("/auth", async () => {
     const academicOneFullname = "Academic";
     const academicUserType = UserType.academic;
 
-    describe("[POST] /auth/register", () => {
+    describe("[POST] /auth/register", async () => {
         it("should respond with a `200` status code and JWT token", async () => {
             const { status, headers } = await request(app)
                 .post("/api/auth/register")
                 .send({
-                    zid: studentOneZid,
-                    email: studentOneEmail,
-                    password: studentOnePassword,
+                    zid: studentTwoZid,
+                    email: studentTwoEmail,
+                    password: studentTwoPassword,
                     fullname: studentOneFullname,
                     userType: studentUserType,
                 });
 
             const newUser = await prisma.user.findFirst({
                 where: {
-                    zid: studentOneZid,
-                    email: studentOneEmail,
+                    zid: studentTwoZid,
+                    email: studentTwoEmail,
                     userType: studentUserType,
                 },
             });
 
+            console.log("foo", await prisma.user.findMany({}));
+
             const newProfile = await prisma.profile.findFirst({
                 where: {
-                    zid: studentOneZid,
+                    zid: studentTwoZid,
                     fullname: studentOneFullname,
                 },
             });
@@ -182,7 +184,7 @@ describe("/auth", async () => {
         });
     });
 
-    describe("/auth/login", () => {
+    describe("[POST] /auth/login", async () => {
         // Assuming dbAddUser is a function that adds a user to your mock database
         beforeEach(async () => {
             await request(app).post("/api/auth/register").send({
@@ -290,6 +292,43 @@ describe("/auth", async () => {
             });
 
             expect(response.status).toBe(400);
+        });
+    });
+
+    describe("[ALL] Auth Middleware", async () => {
+        it("should return a 401 status code if no token is provided", async () => {
+            const response = await request(app).get("/api/profile/");
+            expect(response.status).toBe(401);
+        });
+
+        it("should return a 401 status code if token is invalid", async () => {
+            const response = await request(app)
+                .get("/api/profile/")
+                .set("Authorization", "Bearer invalidtoken");
+
+            expect(response.status).toBe(401);
+        });
+
+        it("should return a 200 status code if token is valid", async () => {
+            const response = await request(app)
+                .post("/api/auth/register")
+                .send({
+                    zid: studentOneZid,
+                    email: studentOneEmail,
+                    password: studentOnePassword,
+                    fullname: studentOneFullname,
+                    userType: studentUserType,
+                });
+
+            const cookies = response.headers["set-cookie"];
+            console.log(response);
+            const jwt = cookies[0].split(";")[0].split("=")[1];
+
+            const meResponse = await request(app)
+                .get("/api/profile/")
+                .set("Authorization", `Bearer ${jwt}`);
+
+            expect(meResponse.status).toBe(200);
         });
     });
 });

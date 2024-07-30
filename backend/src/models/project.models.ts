@@ -3,6 +3,7 @@ import { CombinedProject } from "../utils/project.utils";
 
 const prisma = new PrismaClient();
 
+// add project to database
 export const dbAddProject = async (
     uid: string,
     title: string,
@@ -33,6 +34,7 @@ export const dbAddProject = async (
     }
 };
 
+// delete project from database
 export const dbDeleteProject = async (projectId: number) => {
     // delete project and skills connections aswell
     await prisma.project.delete({
@@ -43,6 +45,7 @@ export const dbDeleteProject = async (projectId: number) => {
 };
 
 // Connects gracefully and will not fail if skill is already connected
+// add skills to project
 export const dbAddProjectSkills = async (
     projectId: number,
     skills: number[],
@@ -63,6 +66,7 @@ export const dbAddProjectSkills = async (
     });
 };
 
+// delete skills from project
 export const dbDeleteProjectSkills = async (
     projectId: number,
     skills: number[],
@@ -83,7 +87,7 @@ export const dbDeleteProjectSkills = async (
     });
 };
 
-// Let me (koda) know if you need more from this
+// get all project applications
 export const dbGetAllProjectApplications = async (projectId: number) => {
     return await prisma.projectInterest.findMany({
         where: {
@@ -113,6 +117,7 @@ export const dbGetAllProjectApplications = async (projectId: number) => {
     });
 };
 
+// get project owner by projectid
 export const dbGetProjectOwnerById = async (projectId: number) => {
     return await prisma.project.findUnique({
         where: {
@@ -124,6 +129,7 @@ export const dbGetProjectOwnerById = async (projectId: number) => {
     });
 };
 
+// get project details by projectid
 export const dbGetProject = async (projectId: number) => {
     // Fetch the project details along with the related entities
     const response = await prisma.project.findUnique({
@@ -211,6 +217,7 @@ export const dbGetUserJoinedProjects = async (
     });
 };
 
+// get projects owned by a user
 export const dbGetProjectsOwnedByUser = async (zid: string, skip: number) => {
     return await prisma.project.findMany({
         skip,
@@ -230,6 +237,7 @@ export const dbGetProjectsOwnedByUser = async (zid: string, skip: number) => {
     });
 };
 
+// accept group to project
 export const dbAcceptGroupToProject = async (
     groupId: number,
     projectId: number,
@@ -264,6 +272,7 @@ export const dbAcceptGroupToProject = async (
     });
 };
 
+// reject group application to a project
 export const dbRejectGroupToProject = async (
     groupId: number,
     projectId: number,
@@ -281,6 +290,7 @@ export const dbRejectGroupToProject = async (
     });
 };
 
+// get projects by their name
 export const dbGetProjectByName = async (name: string) => {
     return await prisma.project.findUnique({
         where: {
@@ -294,6 +304,7 @@ export const dbGetProjectByName = async (name: string) => {
     });
 };
 
+// get all projects with skills
 export const dbGetAllProjectsWithSkills = async (groupId: number) => {
     const returnProjects: CombinedProject[] = [];
     const projects = await prisma.project.findMany({
@@ -344,6 +355,7 @@ export const dbGetAllProjectsWithSkills = async (groupId: number) => {
     return returnProjects;
 };
 
+// update project details
 export const dbUpdateProject = async (
     projectId: number,
     title: string,

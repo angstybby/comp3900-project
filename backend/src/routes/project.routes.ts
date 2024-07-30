@@ -19,12 +19,34 @@ import {
 } from "../models/project.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { CombinedProject, isProjectOwner } from "../utils/project.utils";
-import { dbGetProfile, dbGetUserSkills, getUserType } from "../models/profile.models";
+import { dbGetUserSkills, getUserType } from "../models/profile.models";
 import { UserType } from "@prisma/client";
 import { dbFindUserByZid } from "../models/auth.models";
-import { getProjectReccsContext, getProjectReccsContextByCareer, model } from "../utils/ai";
+import { getProjectReccsContextByCareer, model } from "../utils/ai";
 
 const router = express.Router();
+
+/**
+ * Given the zid of a user, create a string of their skills
+ * @param {String} zid zid of the user
+ * @returns {String} A string of the user's skills
+ */
+const createUserSkillsString = async (zid: string) => {
+    try {
+        const user = await dbGetUserSkills(zid);
+        let joinedSkills = "";
+        if (user && user.Skills) {
+            for (const skill of user.Skills) {
+                joinedSkills += skill.skillName + ", ";
+            }
+            joinedSkills = joinedSkills.slice(0, -2);
+        }
+        return joinedSkills;
+    } catch (error) {
+        console.error("Error creating user skills string:", error);
+        throw error;
+    }
+};
 
 /**
  * @route POST /projects/add
@@ -452,6 +474,16 @@ router.post("/reject", async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * @route PUT /projects/update
+ * @desc Updates a project. User needs to be the owner of the project
+ * @access Private
+ * @returns {String} Success message
+ * @returns {String} Error message
+ * @throws {400} If missing fields
+ * @throws {401} If premissions invalid
+ * @throws {500} If an error occurs while updating project
+ */
 router.put("/update", async (req: Request, res: Response) => {
     const { projectId, title, description, skills } = req.body;
     if (!projectId || !title || !description || !skills) {
@@ -637,6 +669,15 @@ router.post("/get-career-reco", authMiddleWare, async (req, res) => {
       return res.status(500).send("Failed to get recommendations");
   }
 });
+
+/**
+ * @route POST /projects/get-reco
+ * @desc Get recommended projects based on skills
+ * @access Private
+ * @returns {Array} List of recommended projects
+ * @throws {500} If an error occurs while fetching recommended projects
+ *
+ */
 router.get(
     "/user-in-group/:userId/:projectId",
     authMiddleWare,

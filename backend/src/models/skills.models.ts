@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// search skills by name
 export const dbSearchSkillByName = async (skillName: string) => {
     return await prisma.skills.findMany({
         where: {
@@ -17,6 +18,7 @@ export const dbSearchSkillByName = async (skillName: string) => {
     });
 };
 
+// generate gap analysis model
 export const dbGenerateGapAnalysis = async (
     groupId: number,
     projectId: number,
@@ -62,6 +64,7 @@ export const dbGenerateGapAnalysis = async (
     return { projectSkills, matchingSkills, unmatchedSkills };
 };
 
+// get all skills
 export const dbGetSkills = async () => {
     return await prisma.skills.findMany({
         select: {
@@ -71,6 +74,7 @@ export const dbGetSkills = async () => {
     });
 };
 
+// update skills ratings
 export const dbUpdateSkillsRatings = async (
     courseId: string,
     skillNames: string[],

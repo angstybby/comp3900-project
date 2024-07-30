@@ -18,11 +18,25 @@ import {
 } from "../utils/auth.utils";
 import { dbAddProfile } from "../models/profile.models";
 import axios from "axios";
+import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 
 const request = require('request-promise');
 
 const router = express.Router();
 
+/**
+ * Endpoint for user registration.
+ * Registers a new user with the provided email, password, fullname, zid, and userType.
+ * @name POST /register
+ * @function
+ * @memberof module:routes/auth.routes
+ * @param {string} req.body.email - The email of the user.
+ * @param {string} req.body.password - The password of the user.
+ * @param {string} req.body.fullname - The full name of the user.
+ * @param {string} req.body.zid - The zID of the user.
+ * @param {string} req.body.userType - The type of user (e.g., student, staff).
+ * @returns {Response} The response object.
+ */
 router.post("/register", async (req, res) => {
     console.log("Registering user");
     // Gets the email and password from the request body
@@ -34,7 +48,6 @@ router.post("/register", async (req, res) => {
     }
 
     // Check if the zid is valid
-    // TODO check that the zid hasnt been used
     if (!validateZid(zid)) {
         return res.status(400).send("Zid is invalid");
     }
@@ -90,6 +103,16 @@ router.post("/register", async (req, res) => {
     res.status(200).send("User registered");
 });
 
+/**
+ * Endpoint for user login.
+ * Logs in a user with the provided email and password.
+ * @name POST /login
+ * @function
+ * @memberof module:routes/auth.routes
+ * @param {string} req.body.email - The email of the user.
+ * @param {string} req.body.password - The password of the user.
+ * @returns {Response} The response object.
+ */
 router.post("/login", async (req, res) => {
     // Gets the email and password from the request body
     const { email, password } = req.body;
@@ -124,6 +147,16 @@ router.post("/login", async (req, res) => {
     res.status(200).send("Successful login");
 });
 
+
+/**
+ * Endpoint for resetting user password.
+ * Sends a reset link to the user's email.
+ * @name POST /reset-password
+ * @function
+ * @memberof module:routes/auth.routes
+ * @param {string} req.body.email - The email of the user.
+ * @returns {Response} The response object.
+ */
 router.post("/reset-password", async (req, res) => {
     // Gets the email from the request body
     const { email } = req.body;
@@ -155,6 +188,17 @@ router.post("/reset-password", async (req, res) => {
     res.status(200).send("Reset link sent");
 });
 
+
+/**
+ * Endpoint for changing user password.
+ * Changes the user's password using the provided reset token and new password.
+ * @name POST /change-password
+ * @function
+ * @memberof module:routes/auth.routes
+ * @param {string} req.body.resetToken - The reset token for password change.
+ * @param {string} req.body.password - The new password.
+ * @returns {Response} The response object.
+ */
 router.post("/change-password", async (req, res) => {
     const { resetToken, password } = req.body;
 
@@ -175,6 +219,14 @@ router.post("/change-password", async (req, res) => {
     res.status(200).send("Password changed");
 });
 
+/**
+ * Endpoint for LinkedIn integration. Signs the user in using LinkedIn. Sync details
+ * with their respective LinkedIn account. Redirects the user to the LinkedIn authorization page.
+ * @name GET /proxy/linkedin
+ * @function
+ * @memberof module:routes/auth.routes
+ * @returns {Response} The response object.
+ */
 router.get('/proxy/linkedin', async (req, res) => {
     try {
         const clientId = process.env.LINKEDIN_CLIENT_ID;
@@ -199,6 +251,15 @@ router.get('/proxy/linkedin', async (req, res) => {
     }
 });
 
+/**
+ * Callback endpoint for LinkedIn integration.
+ * Handles the callback after the user authorizes LinkedIn integration.
+ * @name GET /proxy/linkedin/callback
+ * @function
+ * @memberof module:routes/auth.routes
+ * @param {string} req.query.code - The authorization code from LinkedIn.
+ * @returns {Response} The response object.
+ */
 router.get('/proxy/linkedin/callback', async (req, res) => {
     const authCode = req.query.code as string;
 
@@ -231,16 +292,27 @@ router.get('/proxy/linkedin/callback', async (req, res) => {
     }
 });
 
+/**
+ * Endpoint for fetching LinkedIn user details. Retrieves the user details from LinkedIn using the access token.
+ * @name GET /proxy/linkedin/details
+ * @function
+ * @memberof module:routes/auth.routes
+ * @returns {Response} The response object.
+ */
 router.get('/proxy/linkedin/details', async (req, res) => {
     const cookie = req.headers.cookie;
-    const accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
-    if (!accessToken) return res.status(400).send('No LinkedId access token found');
+    let accessToken;
+    try {
+        accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
+    } catch (error) {
+        return res.status(400).send('No LinkedIn access token found');
+    }
 
     try {
         const response = await axios.get("https://api.linkedin.com/v2/userinfo", {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          }
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
         })
 
         const pictureResponse = await axios.get(response.data.picture, {responseType: 'arraybuffer'});
@@ -250,27 +322,68 @@ router.get('/proxy/linkedin/details', async (req, res) => {
         const payload = response.data;
         payload.picture = dataURL;
         res.status(200).send(payload);
+
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred while fetching LinkedIn data');
     }
 });
 
-// Temporary route for testing
-router.get('/proxy/linkedin/temp', async (req, res) => {
+/**
+ * Endpoint for sharing content on LinkedIn.
+ * Shares the provided text content on the user's LinkedIn profile.
+ * @name POST /proxy/linkedin/share
+ * @function
+ * @memberof module:routes/auth.routes
+ * @param {string} req.body.shareText - The text content to be shared on LinkedIn.
+ * @returns {Response} The response object.
+ */
+router.post('/proxy/linkedin/share', authMiddleWare, async (req, res) => {
+    const customReq = req as CustomRequest;
+    if (!customReq.token || typeof customReq.token === "string") {
+        throw new Error("Token is not valid");
+    }
+
+    const cookie = req.headers.cookie;
+    let accessToken;
     try {
-        console.log("HELLO")
-        const cookie = req.headers.cookie;
-        const accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
-        const response = await axios.get("https://api.linkedin.com/v2/me", {
+        accessToken = cookie?.split('linkedIn_AccessToken=')[1].split(';')[0];
+    } catch (error) {
+        return res.status(400).send('No LinkedIn access token found');
+    }
+
+    try {
+        const userInfo = await axios.get("https://api.linkedin.com/v2/userinfo", {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             }
         })
-        console.log(response.data);
+        const { shareText } = req.body;
+        const shareResponse = await axios.post("https://api.linkedin.com/v2/ugcPosts", 
+            {
+                "author": `urn:li:person:${userInfo.data.sub}`,
+                "lifecycleState": "PUBLISHED",
+                "specificContent": {
+                    "com.linkedin.ugc.ShareContent": {
+                        "shareCommentary": {
+                            "text": `${shareText}`
+                        },
+                        "shareMediaCategory": "NONE"
+                    }
+                },
+                "visibility": {
+                    "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+                }
+            }, 
+            {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            }
+        })
+        res.status(200).send(`https://www.linkedin.com/feed/update/${shareResponse.data.id}`);
     } catch (error) {
         console.error(error);
-        
+        res.status(500).send('An error occurred while sharing post');
     }
 });
 

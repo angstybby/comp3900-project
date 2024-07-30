@@ -61,6 +61,8 @@ model Profile {
   Skills         Skills[]
   GroupJoined    GroupJoined[]
   GroupInterest  GroupInterest[]
+  feedbackGiven  Feedback[]       @relation("FromProfile")
+  feedbackReceived  Feedback[]    @relation("ToProfile")
   CareerPath     String?         @db.Text
 }
 
@@ -174,4 +176,16 @@ model Notification {
   action   String
   sentWhen DateTime @default(now())
   msgRead  Boolean  @default(false)
+}
+
+model Feedback {
+  id          Int       @id @default(autoincrement())
+  fromZid     String
+  fromProfile Profile   @relation("FromProfile", fields: [fromZid], references: [zid])
+  toZid       String
+  toProfile   Profile   @relation("ToProfile", fields: [toZid], references: [zid])    
+  comment     String    @db.Text
+  rating      Int
+  createdAt   DateTime  @default(now())
+
 }

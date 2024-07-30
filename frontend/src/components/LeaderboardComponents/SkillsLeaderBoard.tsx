@@ -25,7 +25,6 @@ const SkillsLeaderBoard = () => {
       }
     }
     fetchData();
-    console.log(data);
   },[])
 
   const generateColours: () => string[] = (): string[] => {

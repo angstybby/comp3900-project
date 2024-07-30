@@ -2,6 +2,7 @@ import { PrismaClient, Profile } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// add profile to database
 export const dbAddProfile = async (zid: string, fullname: string) => {
     try {
         await prisma.profile.create({
@@ -17,6 +18,7 @@ export const dbAddProfile = async (zid: string, fullname: string) => {
     }
 };
 
+// get a profile from database
 export const dbGetProfile = async (zid: string): Promise<Profile> => {
     try {
         const user = await prisma.profile.findFirst({
@@ -34,6 +36,7 @@ export const dbGetProfile = async (zid: string): Promise<Profile> => {
     }
 };
 
+// update a profile from database
 export const dbUpdateProfile = async (profile: Profile): Promise<Profile> => {
     try {
         const user = await prisma.profile.update({
@@ -55,6 +58,7 @@ export const dbUpdateProfile = async (profile: Profile): Promise<Profile> => {
     }
 };
 
+// get user type of user given their zid from database
 export const getUserType = async (zid: string) => {
     return await prisma.user.findFirst({
         where: {
@@ -66,6 +70,7 @@ export const getUserType = async (zid: string) => {
     })
 }
 
+// get all students from database
 export const dbGetStudentProfiles = async () => {
     return await prisma.profile.findMany({
         where: {
@@ -84,13 +89,7 @@ export const dbGetStudentProfiles = async () => {
     });
 }
 
-/**
- * @function dbGetUserSkills
- * @desc Retrieve a user's skills and career from the database
- * @param {string} zid - The user's ID
- * @returns {Object} The user's skills and career
- * @throws {Error} If an error occurs while retrieving the user's skills
- */
+// get a user's skills from database
 export const dbGetUserSkills = async (zid: string) => {
   try {
       const user = await prisma.profile.findUnique({
@@ -118,3 +117,30 @@ export const dbGetUserSkills = async (zid: string) => {
       throw error;
   }
 };
+
+
+export const dbGetFeedback = async (zid: string) => {
+
+    try {
+        const feedbackReceived = await prisma.profile.findMany({
+            where: {
+                zid
+            },
+            include: {
+                feedbackReceived: {
+                    orderBy: {createdAt: 'desc'},
+                    include: {
+                        fromProfile: true,
+                    },
+                },
+                
+
+            },
+        });
+        console.log(feedbackReceived);
+        return feedbackReceived;
+    } catch (error) {
+        console.log(error);
+        throw new Error("error getting feedback for profile.")
+    }
+}

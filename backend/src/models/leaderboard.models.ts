@@ -2,6 +2,7 @@ import { PrismaClient, UserType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// get all rankings
 export const dbGetAllRankings = async () => {
     return await prisma.profile.findMany({
         where: {
@@ -26,6 +27,7 @@ export const dbGetAllRankings = async () => {
     });
 };
 
+// get ranking by zid
 export const dbGetRankingByZid = async (zid: string) => {
     return await prisma.profile.findUniqueOrThrow({
         where: {
