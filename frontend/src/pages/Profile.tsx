@@ -332,7 +332,7 @@ export default function Profile() {
       {Cookies.get('userType') === 'student' && (
         <div className="m-10 flex flex-col md:flex-row space-y-10 md:space-y-0 md:space-x-10">
           <div className="w-full md:w-1/2">
-            <h2 className="text-2xl font-semibold mb-4">Your Projects</h2>
+            <h2 className="text-2xl font-semibold text-center mb-4">Your Projects</h2>
             <div className="max-h-96 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
                 {projects.map((project) => (
