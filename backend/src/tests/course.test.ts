@@ -140,10 +140,10 @@ describe("/course", async () => {
 
         it("should return 400 and an error message", async () => {
             const response = await request(app)
-                .post("/api/course/delete")
+                .delete("/api/course/delete")
                 .set("Authorization", `Bearer ${jwt_token}`)
                 .send({
-                    id: "COMP6772",
+                    course: "COMP6772",
                 });
             expect(response.status).toBe(400);
         });

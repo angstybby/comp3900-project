@@ -295,5 +295,40 @@ describe("/auth", async () => {
         });
     });
 
-    describe("[ALL] Auth Middleware", () => {});
+    describe("[ALL] Auth Middleware", async () => {
+        it("should return a 401 status code if no token is provided", async () => {
+            const response = await request(app).get("/api/profile/");
+            expect(response.status).toBe(401);
+        });
+
+        it("should return a 401 status code if token is invalid", async () => {
+            const response = await request(app)
+                .get("/api/profile/")
+                .set("Authorization", "Bearer invalidtoken");
+
+            expect(response.status).toBe(401);
+        });
+
+        it("should return a 200 status code if token is valid", async () => {
+            const response = await request(app)
+                .post("/api/auth/register")
+                .send({
+                    zid: studentOneZid,
+                    email: studentOneEmail,
+                    password: studentOnePassword,
+                    fullname: studentOneFullname,
+                    userType: studentUserType,
+                });
+
+            const cookies = response.headers["set-cookie"];
+            console.log(response);
+            const jwt = cookies[0].split(";")[0].split("=")[1];
+
+            const meResponse = await request(app)
+                .get("/api/profile/")
+                .set("Authorization", `Bearer ${jwt}`);
+
+            expect(meResponse.status).toBe(200);
+        });
+    });
 });
