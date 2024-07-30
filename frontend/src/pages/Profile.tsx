@@ -22,7 +22,6 @@ import ChangeProfilePicModal from "@/components/Modals/ChangeProfilePicModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import ParseLinkedInInfoModal from "@/components/Modals/ParseLinkedInInfoModal";
 import Cookies from "js-cookie";
-import { profile } from "console";
 
 interface Feedback {
   fromProfile: any;

@@ -562,24 +562,6 @@ router.get("/user/:zid", async (req: Request, res: Response) => {
 });
 
 
-// Function to fetch user skills and create a string of joined skills
-const createUserSkillsString = async (zid: string) => {
-  try {
-      const user = await dbGetUserSkills(zid);
-      let joinedSkills = "";
-      if (user && user.Skills) {
-          for (const skill of user.Skills) {
-              joinedSkills += skill.skillName + ", ";
-          }
-          joinedSkills = joinedSkills.slice(0, -2);
-      }
-      return joinedSkills;
-  } catch (error) {
-      console.error("Error creating user skills string:", error);
-      throw error;
-  }
-};
-
 /**
  * @route POST /projects/get-career-reco
  * @desc Get recommended projects based on career and skills
