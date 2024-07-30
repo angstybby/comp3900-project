@@ -14,7 +14,8 @@ import {
     dbLeaveGroup,
     dbUpdateGroup,
     dbUserExpressInterest,
-    dbGetGroupMembers
+    dbGetGroupMembers,
+    dbCreateFeedback,
 } from "../models/group.models";
 import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
@@ -656,5 +657,24 @@ router.get("/members/:groupId", async (req, res) => {
             .send("An error occured while fetching members in group");
     }
 });
+
+router.post("/feedback", async (req, res) => {
+    const { fromZid, toZid, comment, rating } = req.body;
+    
+    if (!fromZid || !toZid || !comment || !rating) {
+        return res.status(400).send("Missing required fields");
+    }
+    console.log('Received data:', {fromZid, toZid, comment, rating})
+    try {
+        const newFeedback = await dbCreateFeedback(fromZid, toZid, comment, rating);
+        console.log("feedback created:", newFeedback)
+        return res.status(200).send(newFeedback);
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .send("An error occured creating new feedback.")
+    }
+})
 
 export default router;
