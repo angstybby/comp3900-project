@@ -23,13 +23,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ParseLinkedInInfoModal from "@/components/Modals/ParseLinkedInInfoModal";
 import Cookies from "js-cookie";
 
-interface Feedback {
-  fromProfile: any;
-  id: number;
-  rating: number;
-  comment: string;
-}
-
 export default function Profile() {
   const { profileData, fetchProfileData, updateProfileContext } = useProfile();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -90,7 +83,7 @@ export default function Profile() {
   }
 
   //STUB FEEDBACK DATA
-  const [feedbacks, setFeedbacks] = useState([
+  const [feedbacks] = useState([
     { id: 1, rating: 4, comment: "Great work on the project!" },
     { id: 2, rating: 5, comment: "Excellent contribution and teamwork!" },
     { id: 3, rating: 3, comment: "Good effort, but could improve in communication." },
