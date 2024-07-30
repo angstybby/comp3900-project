@@ -14,49 +14,6 @@ import { useProfile } from "@/contexts/ProfileContext";
 import LoadingCircle from "@/components/LoadingCircle";
 
 // Group Data Placeholders
-const groups = [
-  {
-    id: 1,
-    groupName: "Group Name 1",
-    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
-    members: 1,
-    MaxMembers: 5,
-    groupOwnerId: "1"
-  },
-  {
-    id: 2,
-    groupName: "Group Name 2",
-    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
-    members: 2,
-    MaxMembers: 5,
-    groupOwnerId: "1"
-  },
-  {
-    id: 3,
-    groupName: "Group Name 3",
-    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
-    members: 3,
-    MaxMembers: 5,
-    groupOwnerId: "1"
-  },
-  {
-    id: 4,
-    groupName: "Group Name 4",
-    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
-    members: 4,
-    MaxMembers: 5,
-    groupOwnerId: "1"
-  },
-  {
-    id: 5,
-    groupName: "Group Name 5",
-    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nam deserunt et officiis, explicabo voluptatem ex repellendus consequatur dolore dicta dignissimos, voluptatum ullam saepe, error quibusdam exercitationem commodi molestias qui nesciunt?",
-    members: 5,
-    MaxMembers: 5,
-    groupOwnerId: "1"
-  },
-]
-
 interface Group {
   id: number,
   groupName: string,
@@ -68,6 +25,7 @@ interface Group {
 
 export default function Groups() {
   const [yourGroups, setYourGroups] = useState<Group[]>([]);
+  const [recoGroups, setRecoGroups] = useState<Group[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { profileData } = useProfile();
@@ -91,8 +49,21 @@ export default function Groups() {
     setLoading(false);
   }
 
+  // recco groups
+  const fetchRecoGroups = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstanceWithAuth.post("/group/get-group-reco");
+      setRecoGroups(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     fetchYourGroups();
+    fetchRecoGroups();
   }, [])
 
   return (
@@ -137,7 +108,7 @@ export default function Groups() {
           <div className="h-2/3">
             <h1 className="text-4xl font-medium mt-6">Groups for you</h1>
             <div className="w-[95%] mx-auto grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 grid-rows-2 mt-5 gap-y-14 gap-x-5">
-              {groups.map((group) => (
+              {recoGroups.map((group) => (
                 <GroupCard key={group.id} groupId={group.id} group={group} inCarousel={false} profile={profileData} />
               ))}
             </div>

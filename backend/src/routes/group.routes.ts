@@ -14,12 +14,14 @@ import {
     dbLeaveGroup,
     dbUpdateGroup,
     dbUserExpressInterest,
-    dbGetGroupMembers
+    dbGetGroupMembers,
+    dbGetAllGroups
 } from "../models/group.models";
 import { dbFindUserByZid } from "../models/auth.models";
 import { authMiddleWare, CustomRequest } from "../middleware/auth.middleware";
 import { validateZid } from "../utils/auth.utils";
 import {
+  getGroupsReccsContext,
     getProjectReccsContext,
     getStudentReccsContext,
     model,
@@ -28,6 +30,7 @@ import {
     dbGetAllProjectsWithSkills,
     dbGetProjectByName,
 } from "../models/project.models";
+import { dbGetUserSkills } from "../models/profile.models";
 
 const router = express.Router();
 
@@ -648,5 +651,113 @@ router.get("/members/:groupId", async (req, res) => {
             .send("An error occured while fetching members in group");
     }
 });
+
+// get all groups
+router.get("/allGroups", async (req, res) => {
+  try {
+      const groups = await dbGetAllGroups();
+      res.json(groups);
+  } catch (error) {
+      console.error("Error fetching groups:", error);
+      res.status(500).send("Internal Server Error");
+  }
+});
+
+/**
+ * @route POST /group/get-group-reco
+ * @desc Get recommended groups based on skills and description
+ * @access Private
+ * @returns {Array} List of recommended groups
+ * @throws {500} If an error occurs while fetching recommended groups
+ */
+router.post("/get-group-reco", authMiddleWare, async (req, res) => {
+  const customReq = req as CustomRequest;
+  if (!customReq.token || typeof customReq.token === "string") {
+      return res.status(401).send("Unauthorized");
+  }
+  
+  const userSkills = await createUserSkillsString(customReq.token.zid);
+
+  console.log("User Skills:", userSkills);
+
+  if (!userSkills) {
+      return res.status(200).send([]);
+  }
+
+  try {
+      const allGroups = await dbGetAllGroups();
+      const joinedGroups = await dbGetUserInGroup(customReq.token.zid);
+
+      const detailedGroups = [];
+
+      for (const group of allGroups) {
+          const detailedGroup = await dbGetGroup(group.id);
+          detailedGroups.push(detailedGroup);
+      }
+
+      const stringGroups = detailedGroups
+      .map(
+          (group) => `
+          Details for Group: ${group.id}
+          Name: ${group.groupName}
+          Description: ${group.description}
+          Skills: ${group.CombinedSkills.map(skill => skill.skillName).join(", ")}
+      `,
+      )
+      .join("\n");
+
+      const stringJoinedGroups = joinedGroups
+      .map(
+          (group) => `
+          Details for Joined Group: ${group.id}
+          Name: ${group.groupName}
+          Description: ${group.description}
+      `,
+      )
+      .join("\n");
+
+
+      const promptForAi = getGroupsReccsContext(userSkills, stringGroups, stringJoinedGroups);
+
+      console.log(promptForAi);
+
+      const chat = model.startChat();
+      const result = await chat.sendMessage(promptForAi);
+
+      const groupIds = result.response
+          .text()
+          .trim()
+          .split(",")
+          .map((id) => id.trim());
+
+      console.log("Group ids: \n", groupIds);
+
+      const recommendedGroups = detailedGroups.filter(
+        (group) => groupIds.includes(group.id.toString())
+    );
+
+      return res.status(200).send(recommendedGroups);
+  } catch (error) {
+      console.error("Error getting recommendations:", error);
+      return res.status(500).send("Failed to get recommendations");
+  }
+});
+
+const createUserSkillsString = async (zid: string) => {
+  try {
+      const user = await dbGetUserSkills(zid);
+      let joinedSkills = "";
+      if (user && user.Skills) {
+          for (const skill of user.Skills) {
+              joinedSkills += skill.skillName + ", ";
+          }
+          joinedSkills = joinedSkills.slice(0, -2);
+      }
+      return joinedSkills;
+  } catch (error) {
+      console.error("Error creating user skills string:", error);
+      throw error;
+  }
+};
 
 export default router;

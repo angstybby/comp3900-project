@@ -566,6 +566,18 @@ export const dbFindGroupByString = async (name: string) => {
     });
 };
 
+export const dbGetAllGroups = async () => {
+  try {
+      const groups = await prisma.group.findMany();
+      return groups;
+  } catch (error) {
+      console.error("Error fetching groups:", error);
+      throw error;
+  }
+};
+
+
+
 export const dbGetGroupApplications = async (
     groupId: number,
     groupOwnerId: string,
